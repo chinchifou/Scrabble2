@@ -5,33 +5,43 @@
 from os import path
 import re
 
-#~~~~~~~~ Read file ~~~~~~~~
+#~~~~~~~~ Initialization ~~~~~~~~
 
+#relative path
 path_conf_file = path.abspath('../config/display_settings.ini')
 
-config_file = open(path_conf_file,"r")
-raw_display_settings = config_file.read()
-config_file.close()
+# list of authorized parameters
+params_list = (
+'fullscreen',
+'resizable',
+'resolution_auto',
+'custom_window_heigh',
+'enable_double_buffer',
+'enable_hardware_accelerated')
 
-#~~~~~~~~ Clean data ~~~~~~~~
+# match everything of format : multiple_letters : LeTTers
+match_boolean = re.compile(r'^([a-z_]*)\s*:\s*([A-Za-z]*)\s*$')
+# match everything of format : other_letters : 251
+match_numeric = re.compile(r'^([a-z_]*)\s*:\s*([0-9]*)\s*$')
 
-#remove everything except letters, numbers and symbols '_', ':' , '#' and '\n'
-clean_display_settings = re.sub('[^A-Za-z0-9_:\\n#]', '', raw_display_settings)
-#remove blank lines
-lines_display_settings = [ line for line in clean_display_settings.split('\n') if ( line.strip() != '' ) ]
-
-print(lines_display_settings)
-#~~~~~~~~ Extract data ~~~~~~~~
-
+#store result
 h_params_values = {}
 
-result = ["",""]
-for line in lines_display_settings :
-	result = line.split(':')
-	h_params_values[result[0]] = result[1]
+#~~~~~~~~ Retrieve data ~~~~~~~~
 
-print()
-print(h_params_values)
+for line in open(path_conf_file,"r") :
 
-#~~~~~~~~ How to use ~~~~~~~~
-#text = str(h_params_values["text"])
+	bool_found = match_boolean.search(line)
+	int_found = match_numeric.search(line)
+
+	if bool_found :
+		param = str(bool_found.group(1))
+		if param in params_list :
+			h_params_values[ param ] = bool(bool_found.group(2))
+
+	if int_found :
+		param = str(int_found.group(1))
+		if param in params_list :
+			h_params_values[ param ] = int(int_found.group(2))
+
+#print(h_params_values)
