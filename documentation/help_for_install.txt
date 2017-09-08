@@ -1,0 +1,27 @@
+DOWNLOAD AND INSTALL PYTHON:
+
+On Windows :
+Type 'python download' in the research bar of your web browser and download the latest version.
+You can check the install by typing the command line 'python -v' in a console. If everything is fine you will get the version number of your python installation.
+
+On Linux :
+Do it the Linux' way
+
+On Mac :
+Good luck guys
+
+
+
+DOWNLOAD AND INSTALL PYGAME :
+
+On windows :
+You can wether :
+- Download it from the pygame website (https://www.pygame.org/)
+- Or by command line if you have python 3.4 or later. As an administrator in a console just call 'pip install pygame'.
+You can check the install by typing the command line 'python -v' in a console. Then call 'import pygame'. If nothing shows up it means that everything is fine.
+
+On Linux :
+Do it the Linux' way 
+
+On Mac :
+Good luck guys 
