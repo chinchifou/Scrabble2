@@ -78,7 +78,7 @@ french_letters.append('Z')
 #POINTS
 #ENGLISH
 english_points = {
-'*': 0,
+'*' : 0,
 'A' : 1,
 'B' : 3,
 'C' : 3,
@@ -109,7 +109,7 @@ english_points = {
 
 #FRENCH
 french_points = {
-'*': 0,
+'*' : 0,
 'A' : 1,
 'B' : 3,
 'C' : 3,
@@ -164,7 +164,8 @@ LAYOUT = [
 ]
 
 
-
+'''
+TO DO : PUT ELSEWHERE
 # /// DO NOT REMOVE ///
 #AUTOMATICALY CHOOSE DICTIONNARY AND POINTS BASED ON LANGUAGE SELECTION
 if LANGUAGE == 'french' :
@@ -183,3 +184,4 @@ elif LANGUAGE == 'custom': #create your custom mix inside this one
 else: #default value
 	BAG_OF_LETTERS = english_letters
 	POINTS = english_points
+'''
