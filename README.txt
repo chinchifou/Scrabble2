@@ -1,6 +1,13 @@
+GENERAL INFO
+
+This project is still in development and the game is not working.
+If you just want to play just download my older version of the project named 'Scrabble'
+
+
 REQUIREMENTS
 
-python  
+python
+lxml module for python  
 pygame
 (see : "help_for_install.txt" for further information)
 
@@ -15,8 +22,13 @@ TO change your peferences you can go to : "...\Scrabble2\config\"
 LAUNCH THE GAME
 
 On Windows :
-In "...\Scrabble2\sources\" double-click on "launcher.bat" or "main.py". The effect is the same.
-You can create a windows shortcut to an of these files. You can freely use the icon provided in "...\Scrabble2\assets\icon\" to custom this link.
+The easiest way is to double-click on 'launcher.bat'.
+
+Tip :
+You can create a desktop shortcut for this file. You can freely use the icon provided in "...\Scrabble2\assets\icon\" to custom this link.
+
+On Linux :
+Launch 'main.py' located in the '/sources/' folder
 
 
 HOW TO PLAY
