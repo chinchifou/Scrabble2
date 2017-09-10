@@ -12,13 +12,11 @@ TO change your peferences you can go to : "...\Scrabble2\config\"
 - Edit "display_settings.ini" to change your display settings preference (default is fullscreen)
 
 
-
 LAUNCH THE GAME
 
 On Windows :
 In "...\Scrabble2\sources\" double-click on "launcher.bat" or "main.py". The effect is the same.
 You can create a windows shortcut to an of these files. You can freely use the icon provided in "...\Scrabble2\assets\icon\" to custom this link.
-
 
 
 HOW TO PLAY
