@@ -1,0 +1,47 @@
+<?xml version = "1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:element name="Scrabble_savegame">
+	    <xsd:complexType>
+	        <xsd:sequence>
+
+	        	<xsd:element name="Players">
+	        		<xsd:complexType>
+	        			<xsd:sequence>
+
+	        				<xsd:element name="Player" maxOccurs="8">
+	        					<xsd:complexType>
+	        						<xsd:sequence>
+
+										<xsd:element name="Name" type="xsd:normalizedString"/>
+										<xsd:element name="Hand" type="xsd:normalizedString"/>
+										<xsd:element name="Score" type="xsd:positiveInteger"/>
+
+	        						</xsd:sequence>	        					
+	        					</xsd:complexType>
+	        				</xsd:element>
+
+	        			</xsd:sequence>
+	        		</xsd:complexType>
+	        	</xsd:element>
+
+	        	<xsd:element name="Board_state">	        		
+	        		<xsd:complexType>
+	        			<xsd:sequence>
+
+						<xsd:element name="Row" type="xsd:normalizedString" minOccurs="15" maxOccurs="15"/>
+
+	        			</xsd:sequence>
+	        		</xsd:complexType>		
+	        	</xsd:element>
+
+	        	<xsd:element name="Bag_of_letters" type="xsd:normalizedString"/>
+
+	        </xsd:sequence>
+	        <xsd:attribute name="timestamp" type="xsd:dateTime" use="required"/>
+	    </xsd:complexType>
+
+	</xsd:element>
+
+</xsd:schema>

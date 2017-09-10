@@ -1,16 +1,24 @@
-<Scrabble_savegame timestamp="2017091012300000">
+<?xml version = "1.0" encoding="UTF-8" ?>
+
+<!-- Document to save game -->
+<Scrabble_savegame timestamp="2017-09-10T12:30:00" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="template_save_game.xsd">
+	
 	<Players>
+
 		<Player>
 			<Name>John_Doo</Name>
 			<Hand>AZER*YU</Hand>
 			<Score>123</Score>
 		</Player>
+
 		<Player>
 			<Name>Mike_Hammer</Name>
 			<Hand>AEAEAEF</Hand>
 			<Score>41</Score>
 		</Player>
+
 	</Players>
+
 	<Board_state>
 		<Row>??????????????A</Row>
 		<Row>??????????????W</Row>
@@ -28,7 +36,7 @@
 		<Row>???????????????</Row>
 		<Row>???????????????</Row>
 	</Board_state>
-	<Bag_of_letters>
-		<Content>AZERTYUIOPQDGJLMNVWPIUYTREZA</Content>
-	</Bag_of_letters>
+
+	<Bag_of_letters>AZERTYUIOPQDGJLMNVWPIUYTREZA</Bag_of_letters>
+	
 </Scrabble_savegame>
