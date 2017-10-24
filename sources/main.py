@@ -1,8 +1,11 @@
+#~~~~~~~ MAIN ~~~~~~~~
+
 #~~~~~~ IMPORTS ~~~~~~
 
 #------ Standard library imports ------
 from random import randint
 from math import floor
+from os import path
 
 #------Modules imports -------
 import pygame
@@ -26,6 +29,18 @@ number_of_letters_per_hand = config_reader.h_rules_params['display_next_player_h
 display_next_player_hand = config_reader.h_rules_params['language']
 language = config_reader.h_rules_params['number_of_letters_per_hand']
 players = config_reader.players
+
+
+#------ Launch Pygame ------
+game_engine = pygame.init()
+sound_engine = pygame.mixer.init()
+
+#Add icon
+path_for_icon = path.abspath('../materials/images/icon/')
+icon_image = pygame.image.load(path.join(path_for_icon,'Scrabble_launcher.ico'))
+icon = pygame.transform.scale(icon_image, (32, 32))
+pygame.display.set_icon(icon)
+pygame.display.set_caption('Scrabble')
 
 
 print('All clear Captain !')

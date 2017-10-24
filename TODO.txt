@@ -1,0 +1,14 @@
+PRIMARY
+
+add refreshwindow() function in main.py ( see old version ) 
+
+initialize window
+	set heigh, width depending on CONFIGURATION
+
+
+
+SECONDARY
+
+get game_engine state after init()
+use save game
+
