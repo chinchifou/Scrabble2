@@ -5,6 +5,25 @@
 from os import path
 import re
 
+
+#~~~~~~~~ Returned variables ~~~~~~~~
+
+#store result
+h_display_params = {}
+h_rules_params = {}
+players = []
+
+
+#~~~~~~~~ Returned variables ~~~~~~~~
+def str_to_bool(s):
+	if s == 'True' or s == 'true':
+		return True
+	elif s == 'False' or s == 'false':
+		return False
+	else :
+		raise ValueError("Cannot covert {} to a bool".format(s))
+
+
 #~~~~~~~~ Initialization ~~~~~~~~
 
 #relative path
@@ -20,10 +39,6 @@ match_integer = re.compile(r'^([a-z_]*)\s*=\s*([0-9]*)\s*$')
 #match everything of format >> multiple_letters = LeTTers OTHERletters andSoOn
 match_names = re.compile(r'^([a-z_]*)\s*=([^0-9])*$')
 
-#store result
-h_display_params = {}
-h_rules_params = {}
-players = []
 
 #~~~~~~~~ Retrieve data ~~~~~~~~
 
@@ -35,7 +50,7 @@ for line in open(path_conf_disp_file,"r") :
 
 	if word_found :
 		param = str(word_found.group(1))
-		value = bool(word_found.group(2))
+		value = str_to_bool(word_found.group(2))
 		if param == 'fullscreen' :
 			h_display_params[ param ] = value		
 		if param == 'resizable' :
@@ -62,7 +77,7 @@ for line in open(path_conf_rules_file,"r") :
 	if word_found :
 		param = str(word_found.group(1))
 		if param == 'display_next_player_hand' :
-			h_rules_params[ param ] = bool(word_found.group(2))
+			h_rules_params[ param ] = str_to_bool(word_found.group(2))
 		if param == 'language' :
 			h_rules_params[ param ] = str(word_found.group(2))
 
@@ -81,8 +96,16 @@ for line in open(path_conf_rules_file,"r") :
 		if param == 'number_of_letters_per_hand' :
 			h_rules_params[ param ] = int(int_found.group(2))
 
+
+#DEBUG
 '''
+print("h_display_params = ", h_display_params)
+print("h_rules_params = ", h_rules_params)
+print("players = ", players)
+'''
+
 #should be alright for accents ... PROOF :
+'''
 f = open('result.txt', 'w')
 for name in players :
 	f.write(name)
