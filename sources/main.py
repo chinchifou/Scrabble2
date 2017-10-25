@@ -86,7 +86,7 @@ print("cfg_double_buffer ", cfg_double_buffer)
 print("cfg_custom_window_heigh ", cfg_custom_window_heigh)
 
 #to debug
-'''
+
 game_is_running = True
 
 window = refreshWindow(cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
@@ -99,11 +99,11 @@ while game_is_running:
 
 		#~~~~~~~~~~~ QUIT ~~~~~~~~~~~
 		if ( event_type == pygame.QUIT ) : #close the game window
-		    running = False #exit the game        
+		    game_is_running = False #exit the game        
 
 		#~~~~~~~~~~~ WINDOW RESIZE ~~~~~~~~~~~
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
 			window = refreshWindow(cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
-'''
+
 
 print('All clear Captain !')
