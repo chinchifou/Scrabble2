@@ -48,10 +48,16 @@ def refreshWindow(fullscreen, resizable, resolution_auto, custom_window_heigh, d
 
 #~~~~~~ INITIALIAZATION ~~~~~~
 
+#----- Game state variables -----
+
 #Container for game variables
 GAME_VARS = {}
+#Container for game assets
+GAME_ASSETS = {}
+
 
 #----- Get configuration -----
+
 cfg_fullscreen = config_reader.h_display_params['fullscreen']
 cfg_resizable = config_reader.h_display_params['resizable']
 cfg_resolution_auto = config_reader.h_display_params['resolution_auto']
@@ -64,11 +70,13 @@ display_next_player_hand = config_reader.h_rules_params['display_next_player_han
 language = config_reader.h_rules_params['language']
 players = config_reader.players
 
+#custom window resolution
 GAME_VARS['heigh'] = cfg_custom_window_heigh
 GAME_VARS['width'] = round (cfg_custom_window_heigh * (16/9.0) )
 
 
 #----- Launch Pygame -----
+
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
 
@@ -87,9 +95,10 @@ if cfg_resolution_auto :
 
 
 #----- Init logger -----
+
 path_log_folder = path.abspath('../log/')
 path_log_file = path.join(path_log_folder,'scrabble.log')
-logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S')
+logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
 
 #logging
 logging.info("INITIAL CONFIG")
@@ -97,7 +106,8 @@ logging.info("DISPLAY SETTINGS")
 logging.info("Fullscreen : %s", cfg_fullscreen)
 logging.info("Resizable : %s", cfg_resizable)
 logging.info("Resolution auto : %s", cfg_resolution_auto)
-logging.info("Custom window heigh : %s", cfg_custom_window_heigh)
+logging.info("Custom window width : %s", GAME_VARS['width'])
+logging.info("Custom window heigh : %s", GAME_VARS['heigh'])
 logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.info("Double buffer : %s", cfg_double_buffer)
 logging.info("GAMES RULES")
@@ -108,7 +118,15 @@ logging.info("Display next player hand : %s", display_next_player_hand)
 logging.info("")
 
 
-#Window init
+#----- Load images -----
+
+#Load background
+path_background = path.abspath('../materials/images/background/')
+GAME_ASSETS['board'] = pygame.image.load(path.join(path_background, 'background.png'))
+
+
+#----- Window init -----
+
 window = refreshWindow(cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
 game_is_running = True
 logging.info("Game is running")
@@ -131,9 +149,16 @@ while game_is_running:
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
 			logging.info("Window resize")
 			GAME_VARS['width'] = event.dict['size'][0]
-			GAME_VARS['heigh'] = event.dict['size'][1]
+			GAME_VARS['heigh'] = event.dict['size'][1]			
+			logging.debug("System width is : %s", GAME_VARS['width'])			
+			logging.debug("System height is : %s", GAME_VARS['heigh'])
+			 
 			window = refreshWindow(cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
-		
+
+			GAME_ASSETS['board'] =  pygame.transform.smoothscale( GAME_ASSETS['board'], (GAME_VARS['width'], GAME_VARS['heigh']) )
+			window.blit(GAME_ASSETS['board'], (0, 0))
+			pygame.display.flip()
+
 		#~~~~~~ KEY PRESSED ~~~~~~			
 		elif ( event_type == pygame.KEYDOWN ) :
 			logging.info("Key pressed")

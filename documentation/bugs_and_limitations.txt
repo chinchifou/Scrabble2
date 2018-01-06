@@ -1,0 +1,11 @@
+_________________ Limitations _________________
+
+DICTIONARY
+There is no dictionary to check the spelling. This means that misspellings will not be invalidated by the game.
+
+RULES OF THE GAMES
+If you do not follow the standard rules of Scrabble, the game will crash (for example: write diagonally, write two words at a time ...)
+
+_________________ Known Bugs _________________
+
+It seems impossible to run the game in full-screen mode on a secondary monitor. However, the windowed mode works correctly.

@@ -1,28 +1,28 @@
-_________________On Windows : _________________
+_________________On Windows: _________________
 
 DOWNLOAD AND INSTALL PYTHON:
 
-Type 'python download' in the research bar of your web browser and download the latest version.
-You can check the install by typing the command line 'python -v' in a console. If everything is fine you will get the version number of your python installation.
+Type 'python download' in the search bar of your web browser and download the latest version.
+You can check the installation by typing the 'python -v' command line in a console. If all is well, you will get the version number of your python installation.
 
 
-DOWNLOAD AND INSTALL lxml module for Pyhton:
+DOWNLOAD AND INSTALL the lxml module for Pyhton:
 
-As an administrator in a console just call 'pip3 install lxml'. 
+As an administrator in a console, just call 'pip3 install lxml'.
 
 
-DOWNLOAD AND INSTALL PYGAME :
+DOWNLOAD AND INSTALL PYGAME:
 
-You can wether :
+You can:
 - Download it from the pygame website (https://www.pygame.org/)
-- As an administrator in a console just call 'pip3 install pygame'. (Python v > 3.4 is required)
-You can check the install by typing the command line 'python -v' in a console. Then call 'import pygame'. If nothing shows up it means that everything is fine.
+- As an administrator in a console, simply type 'pip3 install pygame'. (Python v> 3.4 is required)
+You can check the installation by typing the 'python -v' command line in a console. Then call 'import pygame'. If nothing happens, it means everything is fine.
 
 
 
-_________________ On Linux : _________________
+_________________ On Linux: _________________
 
-Do it the Linux' way in command line. it should be something like this :
+Do it linux style, using command line. It should be something like this:
 
 sudo apt-get install python
 pip3 install lxml

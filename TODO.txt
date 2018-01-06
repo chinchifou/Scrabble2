@@ -1,6 +1,6 @@
 PRIMARY
 
-auto resize on secondary scrreen
+auto resize on secondary screen - NOK
 
 
 SECONDARY
