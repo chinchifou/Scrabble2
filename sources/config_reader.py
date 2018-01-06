@@ -1,4 +1,6 @@
-#~~~~~~~ CONFIG FILE READER ~~~~~~~~
+#~~~~~~~~~ CONFIG FILE READER ~~~~~~~~~
+
+#This file read value from display_settings.ini and game_rules.ini and store them respectively into h_display_params and h_rules_params
 
 #~~~~~~~~ Imports ~~~~~~~~
 
@@ -21,7 +23,7 @@ def str_to_bool(s):
 	elif s == 'False' or s == 'false':
 		return False
 	else :
-		raise ValueError("Cannot covert {} to a bool".format(s))
+		raise ValueError("Cannot convert {} to a bool".format(s))
 
 
 #~~~~~~~~ Initialization ~~~~~~~~
@@ -95,14 +97,6 @@ for line in open(path_conf_rules_file,"r") :
 		param = str(int_found.group(1))
 		if param == 'number_of_letters_per_hand' :
 			h_rules_params[ param ] = int(int_found.group(2))
-
-
-#DEBUG
-'''
-print("h_display_params = ", h_display_params)
-print("h_rules_params = ", h_rules_params)
-print("players = ", players)
-'''
 
 #should be alright for accents ... PROOF :
 '''

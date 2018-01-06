@@ -1,4 +1,4 @@
-#~~~~~~~ XML FILE READER ~~~~~~~~
+#~~~~~~~~~ XML FILE READER ~~~~~~~~~
 
 #~~~~~~ IMPORTS ~~~~~~
 
