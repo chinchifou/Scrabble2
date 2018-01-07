@@ -18,6 +18,9 @@ import letters_and_points
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
+#reference tile size for a 1920*1080 resolution
+REFERENCE_TILE_SIZE = 60 
+#actual tile size used to scale all assets. This value changes at runtime if the window is resized.
 TILE_SIZE = 60
 
 #folders' paths
@@ -28,36 +31,44 @@ path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/'
 path_letters_french = path.abspath('../materials/images/assets/letters/french/')
 path_letters_english = path.abspath('../materials/images/assets/letters/english/')
 
-#TODO path letters and tiles
-
 
 #~~~~~~ CLASSES ~~~~~~
 
-#----- Background -----
-class Background(pygame.sprite.Sprite):
+#----- Pygame class override -----
+#specify the pygame class RenderClear to allow easy reasize
+class GroupOfSprites(pygame.sprite.RenderClear):
+
+	#call each resize function of the sprite contained in the group
+    def resize(self, *args):
+        for s in self.sprites():
+            s.resize(*args)
+
+#----- Board -----
+class Board(pygame.sprite.Sprite):
 	def __init__(self):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self)
 
-		self.width_in_tiles = int (1920 / 60 ) #32
-		self.height_in_tiles = int (1080 / 60 ) #18
+		self.width_in_tiles = int (1920 / REFERENCE_TILE_SIZE ) #32
+		self.height_in_tiles = int (1080 / REFERENCE_TILE_SIZE ) #18
 
 		width = TILE_SIZE * self.width_in_tiles
 		height = TILE_SIZE * self.height_in_tiles
 
-		self.image = loadImage(path.join(path_background, 'background.png'))
+		self.image = loadImage(path.join(path_background, 'empty_background.png'))
 		self.image = pygame.transform.smoothscale(self.image, (width, height))
 		self.rect = pygame.Rect((0,0), (width, height))
 
-	def update(self):
+	def resize(self):
 		#calculate new width and height 
 		width = TILE_SIZE * self.width_in_tiles
 		height = TILE_SIZE * self.height_in_tiles
 
 		#update
-		self.image = loadImage(path.join(path_background, 'background.png'))
+		self.image = loadImage(path.join(path_background, 'empty_background.png'))
 		self.image = pygame.transform.smoothscale(self.image, (width, height))
 		self.rect = pygame.Rect((0,0), (width, height))
+
 
 #----- Letter -----
 class Letter(pygame.sprite.Sprite):
@@ -69,19 +80,25 @@ class Letter(pygame.sprite.Sprite):
 
 		size = TILE_SIZE
 
-		self.image = loadImage(path.join(path_letters_french, letter+'.png'))
+		self.image = loadTransparentImage(path.join(path_letters_french, letter+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (size, size))
 
 		pos = pygame.mouse.get_pos()		
 		self.rect = pygame.Rect(pos, (size, size))
 
-	def update(self):
+	def resize(self):
 		#calculate new width and height 
 		size = TILE_SIZE
 
-		self.image = loadImage(path.join(path_letters_french, self.letter+'.png'))
+		self.image = loadTransparentImage(path.join(path_letters_french, self.letter+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (size, size))
 
+		pos = pygame.mouse.get_pos()		
+		self.rect = pygame.Rect(pos, (size, size))
+
+#TODO - to change for normal letters
+	def update(self):
+		size = TILE_SIZE
 		pos = pygame.mouse.get_pos()		
 		self.rect = pygame.Rect(pos, (size, size))
 
@@ -92,6 +109,9 @@ class Letter(pygame.sprite.Sprite):
 def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_window_height, double_buffer, hardware_accelerated) :
 
 	updateTileSize(width,height)
+
+	width = int (1920 / REFERENCE_TILE_SIZE ) * TILE_SIZE
+	height = int (1080 / REFERENCE_TILE_SIZE ) * TILE_SIZE
 
 	logging.info("Window resizing")
 	logging.info("New tile Size is : %s", TILE_SIZE)
@@ -124,12 +144,17 @@ def loadImage(complete_path):
 	image = image.convert()
 	return image
 
+#----- Load transparent image -----
+def loadTransparentImage(complete_path):
+	image = pygame.image.load(complete_path)
+	image = image.convert_alpha()
+	return image
+
 #----- Update Tile Size to match new window size -----
 def updateTileSize(width, height):
-	ORIGINAL_TILE_SIZE = 60
 	zoom_factor = min( float(width / 1920), float(height/1080) )
 	global TILE_SIZE
-	TILE_SIZE = int (floor ( ORIGINAL_TILE_SIZE*zoom_factor ) )
+	TILE_SIZE = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )
 
 
 #~~~~~~ INITIALIAZATION ~~~~~~
@@ -168,15 +193,18 @@ path_log_file = path.join(path_log_folder,'scrabble.log')
 logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
 
 #logging
+logging.info("_________START OF LOG___________")
 logging.info("INITIAL CONFIG")
+logging.info("")
 logging.info("DISPLAY SETTINGS")
 logging.info("Fullscreen : %s", cfg_fullscreen)
 logging.info("Resizable : %s", cfg_resizable)
 logging.info("Resolution auto : %s", cfg_resolution_auto)
-logging.info("Custom window width : %s", cfg_custom_window_height * (16/9.0))
+logging.info("Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
 logging.info("Custom window height : %s", cfg_custom_window_height)
 logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.info("Double buffer : %s", cfg_double_buffer)
+logging.info("")
 logging.info("GAMES RULES")
 logging.info("Language : %s", language)
 logging.info("Players : %s", players)
@@ -205,25 +233,34 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 
 #----- Create sprites -----
 
-#create background
-background = Background()
-letter_k = Letter('K')
+#create sprite groups
+layer_background = GroupOfSprites()
+layer_scores_and_buttons = GroupOfSprites()
+layer_hand_letters = GroupOfSprites()
+layer_side_menu = GroupOfSprites()
+layer_all = GroupOfSprites()
 
-#create groups
-all = pygame.sprite.RenderClear()
-letter_k.add(all)
+#create background
+board = Board()
+board.add(layer_background)
+
+layer_background.draw(window)
+pygame.display.flip()
+
+BACKGROUND = window.copy()
+
+#create letters
+letter_k = Letter('K')
+letter_k.add(layer_hand_letters)
 
 #TODO
 #assign default groups to each sprite class
 
-#display background
-#TODO
-window.blit(background.image, (0,0))
-pygame.display.flip()
-
 #Game is running
 game_is_running = True
-logging.info("Game is running")
+logging.info("-------------------")
+logging.info("GAME STARTED")
+logging.info("-------------------")
 
 
 #~~~~~~ MAIN LOOP ~~~~~~
@@ -237,7 +274,9 @@ while game_is_running:
 		#~~~~~~ QUIT ~~~~~~
 		if ( event_type == pygame.QUIT ) :
 			game_is_running = False #exit the game
+			logging.info("-------------------")
 			logging.info("Exiting game")
+			logging.info("-------------------")
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
@@ -249,11 +288,19 @@ while game_is_running:
 			#update window
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			
+			#TODO
 			#update assets
-			background.update()
-
-			window.blit(background.image, (0,0))
+			#background.resize()
+			#layer_hand_letters.resize()
+			layer_background.resize()
+			layer_background.draw(window)
+			BACKGROUND = window.copy()
+			layer_hand_letters.draw(window)
 			pygame.display.flip()
+
+			#TODO TO REMOVE
+			#window.blit(background, (0,0))
+			#pygame.display.flip()
 
 
 		#~~~~~~ KEY PRESSED ~~~~~~			
@@ -267,15 +314,21 @@ while game_is_running:
 
 		elif(event_type == pygame.MOUSEMOTION ):
 
+			#TODO to remove
 			pos = pygame.mouse.get_pos()
 			x = pos[0]
 			y = pos[1]	
 
-			if ( ( 0 <= x <= background.rect.width ) and ( 0 <= y <= background.rect.height )  ):
-				all.clear(window, background.image)
-				all.update()
-				content = all.draw(window)
+			if ( ( 0 <= x <= board.rect.width ) and ( 0 <= y <= board.rect.height )  ):
+				layer_hand_letters.clear(window, BACKGROUND)
+				layer_hand_letters.update()
+
+				content = layer_hand_letters.draw(window)
+
+				
 				pygame.display.flip()
+				#TODO why disply update is not working ? see aliens.py ...
 				#pygame.display.update(content)
 
 logging.info("Game has ended properly")
+logging.info("_________END OF LOG___________")

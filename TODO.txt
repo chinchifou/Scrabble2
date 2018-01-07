@@ -1,12 +1,10 @@
 PRIMARY
 
-auto resize on secondary screen - NOK
+assign default groups to each sprite class (letter -> layer_letters )
 
-create a proper background (use Scrabble V1)
+check todo in code
 
-create a general function to draw everything once
-
-assign default groups to each sprite class
+add a priority level for layer ?
 
 
 SECONDARY
@@ -16,3 +14,4 @@ get game_engine state after init()
 use save game
 
 allow to change display settings while game is running
+
