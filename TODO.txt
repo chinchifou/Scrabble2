@@ -2,6 +2,10 @@ PRIMARY
 
 auto resize on secondary screen - NOK
 
+create a proper background (use Scrabble V1)
+
+create a general function to draw everything once
+
 
 SECONDARY
 

@@ -16,13 +16,57 @@ import config_reader
 import letters_and_points
 
 
+#~~~~~~ GLOBAL VARIBLES ~~~~~~
+
+TILE_SIZE = 60
+
+#folders' paths
+path_icon = path.abspath('../materials/images/icon/')
+path_background = path.abspath('../materials/images/background/')
+path_buttons = path.abspath('../materials/images/assets/buttons/primary/')
+path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/')
+#TODO path letters and tiles
+
+
+#~~~~~~ CLASSES ~~~~~~
+
+#----- Game window -----
+class Background(pygame.sprite.Sprite):
+	def __init__(self):
+		#call superclass constructor
+		pygame.sprite.Sprite.__init__(self)
+
+		self.width_in_tiles = int (1920 / 60 ) #32
+		self.heigh_in_tiles = int (1080 / 60 ) #18
+
+		width = TILE_SIZE * self.width_in_tiles
+		heigh = TILE_SIZE * self.heigh_in_tiles
+
+		self.image = loadImage(path.join(path_background, 'background.png'))
+		self.image = pygame.transform.smoothscale(self.image, (width, heigh))
+		self.rect = pygame.Rect((0,0), (width, heigh))
+
+	def update(self):
+		#calculate new width and heigh 
+		width = TILE_SIZE * self.width_in_tiles
+		heigh = TILE_SIZE * self.heigh_in_tiles
+
+		#update
+		self.image = loadImage(path.join(path_background, 'background.png'))
+		self.image = pygame.transform.smoothscale(self.image, (width, heigh))
+		self.rect = pygame.Rect((0,0), (width, heigh))
+
+
 #~~~~~~ FUNCTIONS ~~~~~~
 
 #----- Game window creation -----
-def refreshWindow(fullscreen, resizable, resolution_auto, custom_window_heigh, double_buffer, hardware_accelerated) :
+def resizeWindow(width, heigh, fullscreen, resizable, resolution_auto, custom_window_heigh, double_buffer, hardware_accelerated) :
 
-	width = GAME_VARS['width']
-	heigh = GAME_VARS['heigh']
+	updateTileSize(width,heigh)
+
+	logging.info("Window resizing")
+	logging.info("New tile Size is : %s", TILE_SIZE)
+	logging.info("New Window size is : %s * %s", width, heigh)
 
 	if fullscreen :
 		if double_buffer :
@@ -45,16 +89,21 @@ def refreshWindow(fullscreen, resizable, resolution_auto, custom_window_heigh, d
 			window = pygame.display.set_mode( (width, heigh))
 	return window
 
+#----- Load image -----
+def loadImage(complete_path):
+	image = pygame.image.load(complete_path)
+	image = image.convert()
+	return image
+
+#----- Update Tile Size to match new window size -----
+def updateTileSize(width, heigh):
+	ORIGINAL_TILE_SIZE = 60
+	zoom_factor = min( float(width / 1920), float(heigh/1080) )
+	global TILE_SIZE
+	TILE_SIZE = int (floor ( ORIGINAL_TILE_SIZE*zoom_factor ) )
+
 
 #~~~~~~ INITIALIAZATION ~~~~~~
-
-#----- Game state variables -----
-
-#Container for game variables
-GAME_VARS = {}
-#Container for game assets
-GAME_ASSETS = {}
-
 
 #----- Get configuration -----
 
@@ -70,10 +119,6 @@ display_next_player_hand = config_reader.h_rules_params['display_next_player_han
 language = config_reader.h_rules_params['language']
 players = config_reader.players
 
-#custom window resolution
-GAME_VARS['heigh'] = cfg_custom_window_heigh
-GAME_VARS['width'] = round (cfg_custom_window_heigh * (16/9.0) )
-
 
 #----- Launch Pygame -----
 
@@ -81,17 +126,10 @@ game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
 
 #Add icon
-path_for_icon = path.abspath('../materials/images/icon/')
-icon_image = pygame.image.load(path.join(path_for_icon,'Scrabble_launcher.ico'))
+icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
 icon = pygame.transform.scale(icon_image, (32, 32))
 pygame.display.set_icon(icon)
 pygame.display.set_caption('Scrabble')
-
-#Resolution auto
-if cfg_resolution_auto :
-	monitor_resolution = pygame.display.Info()
-	GAME_VARS['width'] = monitor_resolution.current_w
-	GAME_VARS['heigh'] = monitor_resolution.current_h
 
 
 #----- Init logger -----
@@ -106,8 +144,8 @@ logging.info("DISPLAY SETTINGS")
 logging.info("Fullscreen : %s", cfg_fullscreen)
 logging.info("Resizable : %s", cfg_resizable)
 logging.info("Resolution auto : %s", cfg_resolution_auto)
-logging.info("Custom window width : %s", GAME_VARS['width'])
-logging.info("Custom window heigh : %s", GAME_VARS['heigh'])
+logging.info("Custom window width : %s", cfg_custom_window_heigh * (16/9.0))
+logging.info("Custom window heigh : %s", cfg_custom_window_heigh)
 logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.info("Double buffer : %s", cfg_double_buffer)
 logging.info("GAMES RULES")
@@ -118,16 +156,38 @@ logging.info("Display next player hand : %s", display_next_player_hand)
 logging.info("")
 
 
-#----- Load images -----
-
-#Load background
-path_background = path.abspath('../materials/images/background/')
-GAME_ASSETS['board'] = pygame.image.load(path.join(path_background, 'background.png'))
-
-
 #----- Window init -----
 
-window = refreshWindow(cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
+#Calculate window resolution
+width=0
+heigh=0
+if cfg_resolution_auto :
+	monitor_resolution = pygame.display.Info()
+	width = monitor_resolution.current_w
+	heigh = monitor_resolution.current_h
+else :
+	width = round (cfg_custom_window_heigh * (16/9.0) )
+	heigh = cfg_custom_window_heigh
+
+
+#Initialize game window
+window = resizeWindow(width, heigh, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
+
+
+#----- Create sprites -----
+
+#create background
+background = Background()
+
+#create groups
+#TODO
+
+#display background
+#TODO
+window.blit(background.image, (0,0))
+pygame.display.flip()
+
+#Game is running
 game_is_running = True
 logging.info("Game is running")
 
@@ -147,17 +207,20 @@ while game_is_running:
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
-			logging.info("Window resize")
-			GAME_VARS['width'] = event.dict['size'][0]
-			GAME_VARS['heigh'] = event.dict['size'][1]			
-			logging.debug("System width is : %s", GAME_VARS['width'])			
-			logging.debug("System height is : %s", GAME_VARS['heigh'])
-			 
-			window = refreshWindow(cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
+			
+			#new width and heigh
+			width = event.dict['size'][0]
+			heigh = event.dict['size'][1]
 
-			GAME_ASSETS['board'] =  pygame.transform.smoothscale( GAME_ASSETS['board'], (GAME_VARS['width'], GAME_VARS['heigh']) )
-			window.blit(GAME_ASSETS['board'], (0, 0))
+			#update window
+			window = resizeWindow(width, heigh, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
+			
+			#update assets
+			background.update()
+
+			window.blit(background.image, (0,0))
 			pygame.display.flip()
+
 
 		#~~~~~~ KEY PRESSED ~~~~~~			
 		elif ( event_type == pygame.KEYDOWN ) :
