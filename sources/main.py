@@ -25,68 +25,97 @@ path_icon = path.abspath('../materials/images/icon/')
 path_background = path.abspath('../materials/images/background/')
 path_buttons = path.abspath('../materials/images/assets/buttons/primary/')
 path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/')
+path_letters_french = path.abspath('../materials/images/assets/letters/french/')
+path_letters_english = path.abspath('../materials/images/assets/letters/english/')
+
 #TODO path letters and tiles
 
 
 #~~~~~~ CLASSES ~~~~~~
 
-#----- Game window -----
+#----- Background -----
 class Background(pygame.sprite.Sprite):
 	def __init__(self):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self)
 
 		self.width_in_tiles = int (1920 / 60 ) #32
-		self.heigh_in_tiles = int (1080 / 60 ) #18
+		self.height_in_tiles = int (1080 / 60 ) #18
 
 		width = TILE_SIZE * self.width_in_tiles
-		heigh = TILE_SIZE * self.heigh_in_tiles
+		height = TILE_SIZE * self.height_in_tiles
 
 		self.image = loadImage(path.join(path_background, 'background.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, heigh))
-		self.rect = pygame.Rect((0,0), (width, heigh))
+		self.image = pygame.transform.smoothscale(self.image, (width, height))
+		self.rect = pygame.Rect((0,0), (width, height))
 
 	def update(self):
-		#calculate new width and heigh 
+		#calculate new width and height 
 		width = TILE_SIZE * self.width_in_tiles
-		heigh = TILE_SIZE * self.heigh_in_tiles
+		height = TILE_SIZE * self.height_in_tiles
 
 		#update
 		self.image = loadImage(path.join(path_background, 'background.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, heigh))
-		self.rect = pygame.Rect((0,0), (width, heigh))
+		self.image = pygame.transform.smoothscale(self.image, (width, height))
+		self.rect = pygame.Rect((0,0), (width, height))
+
+#----- Letter -----
+class Letter(pygame.sprite.Sprite):
+	def __init__(self, letter):
+		#call superclass constructor
+		pygame.sprite.Sprite.__init__(self)
+
+		self.letter = letter
+
+		size = TILE_SIZE
+
+		self.image = loadImage(path.join(path_letters_french, letter+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (size, size))
+
+		pos = pygame.mouse.get_pos()		
+		self.rect = pygame.Rect(pos, (size, size))
+
+	def update(self):
+		#calculate new width and height 
+		size = TILE_SIZE
+
+		self.image = loadImage(path.join(path_letters_french, self.letter+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (size, size))
+
+		pos = pygame.mouse.get_pos()		
+		self.rect = pygame.Rect(pos, (size, size))
 
 
 #~~~~~~ FUNCTIONS ~~~~~~
 
 #----- Game window creation -----
-def resizeWindow(width, heigh, fullscreen, resizable, resolution_auto, custom_window_heigh, double_buffer, hardware_accelerated) :
+def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_window_height, double_buffer, hardware_accelerated) :
 
-	updateTileSize(width,heigh)
+	updateTileSize(width,height)
 
 	logging.info("Window resizing")
 	logging.info("New tile Size is : %s", TILE_SIZE)
-	logging.info("New Window size is : %s * %s", width, heigh)
+	logging.info("New Window size is : %s * %s", width, height)
 
 	if fullscreen :
 		if double_buffer :
 			if hardware_accelerated :
-				window = pygame.display.set_mode( (width, heigh), pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
+				window = pygame.display.set_mode( (width, height), pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
 			else :
-				window = pygame.display.set_mode( (width, heigh), pygame.FULLSCREEN | pygame.DOUBLEBUF)
+				window = pygame.display.set_mode( (width, height), pygame.FULLSCREEN | pygame.DOUBLEBUF)
 		else:
-			window = pygame.display.set_mode( (width, heigh), pygame.FULLSCREEN)
+			window = pygame.display.set_mode( (width, height), pygame.FULLSCREEN)
 	else :
 		if resizable :
 			if double_buffer :
 				if hardware_accelerated :
-					window = pygame.display.set_mode( (width, heigh), pygame.RESIZABLE | pygame.DOUBLEBUF | pygame.HWSURFACE)
+					window = pygame.display.set_mode( (width, height), pygame.RESIZABLE | pygame.DOUBLEBUF | pygame.HWSURFACE)
 				else :
-					window = pygame.display.set_mode( (width, heigh), pygame.RESIZABLE | pygame.DOUBLEBUF)
+					window = pygame.display.set_mode( (width, height), pygame.RESIZABLE | pygame.DOUBLEBUF)
 			else:
-				window = pygame.display.set_mode( (width, heigh), pygame.RESIZABLE)
+				window = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
 		else:
-			window = pygame.display.set_mode( (width, heigh))
+			window = pygame.display.set_mode( (width, height))
 	return window
 
 #----- Load image -----
@@ -96,9 +125,9 @@ def loadImage(complete_path):
 	return image
 
 #----- Update Tile Size to match new window size -----
-def updateTileSize(width, heigh):
+def updateTileSize(width, height):
 	ORIGINAL_TILE_SIZE = 60
-	zoom_factor = min( float(width / 1920), float(heigh/1080) )
+	zoom_factor = min( float(width / 1920), float(height/1080) )
 	global TILE_SIZE
 	TILE_SIZE = int (floor ( ORIGINAL_TILE_SIZE*zoom_factor ) )
 
@@ -112,7 +141,7 @@ cfg_resizable = config_reader.h_display_params['resizable']
 cfg_resolution_auto = config_reader.h_display_params['resolution_auto']
 cfg_hardware_accelerated = config_reader.h_display_params['enable_hardware_accelerated']
 cfg_double_buffer = config_reader.h_display_params['enable_double_buffer']
-cfg_custom_window_heigh = config_reader.h_display_params['custom_window_heigh']
+cfg_custom_window_height = config_reader.h_display_params['custom_window_height']
 
 number_of_letters_per_hand = config_reader.h_rules_params['number_of_letters_per_hand']
 display_next_player_hand = config_reader.h_rules_params['display_next_player_hand']
@@ -144,8 +173,8 @@ logging.info("DISPLAY SETTINGS")
 logging.info("Fullscreen : %s", cfg_fullscreen)
 logging.info("Resizable : %s", cfg_resizable)
 logging.info("Resolution auto : %s", cfg_resolution_auto)
-logging.info("Custom window width : %s", cfg_custom_window_heigh * (16/9.0))
-logging.info("Custom window heigh : %s", cfg_custom_window_heigh)
+logging.info("Custom window width : %s", cfg_custom_window_height * (16/9.0))
+logging.info("Custom window height : %s", cfg_custom_window_height)
 logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.info("Double buffer : %s", cfg_double_buffer)
 logging.info("GAMES RULES")
@@ -160,27 +189,32 @@ logging.info("")
 
 #Calculate window resolution
 width=0
-heigh=0
+height=0
 if cfg_resolution_auto :
 	monitor_resolution = pygame.display.Info()
 	width = monitor_resolution.current_w
-	heigh = monitor_resolution.current_h
+	height = monitor_resolution.current_h
 else :
-	width = round (cfg_custom_window_heigh * (16/9.0) )
-	heigh = cfg_custom_window_heigh
+	width = round (cfg_custom_window_height * (16/9.0) )
+	height = cfg_custom_window_height
 
 
 #Initialize game window
-window = resizeWindow(width, heigh, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
+window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
 
 #----- Create sprites -----
 
 #create background
 background = Background()
+letter_k = Letter('K')
 
 #create groups
+all = pygame.sprite.RenderClear()
+letter_k.add(all)
+
 #TODO
+#assign default groups to each sprite class
 
 #display background
 #TODO
@@ -208,12 +242,12 @@ while game_is_running:
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
 			
-			#new width and heigh
+			#new width and height
 			width = event.dict['size'][0]
-			heigh = event.dict['size'][1]
+			height = event.dict['size'][1]
 
 			#update window
-			window = resizeWindow(width, heigh, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_heigh, cfg_double_buffer, cfg_hardware_accelerated)
+			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			
 			#update assets
 			background.update()
@@ -230,5 +264,18 @@ while game_is_running:
 			if ( key_pressed == pygame.K_ESCAPE ) :
 				logging.info("ESCAPE key pressed")
 				game_is_running = False #exit the game
+
+		elif(event_type == pygame.MOUSEMOTION ):
+
+			pos = pygame.mouse.get_pos()
+			x = pos[0]
+			y = pos[1]	
+
+			if ( ( 0 <= x <= background.rect.width ) and ( 0 <= y <= background.rect.height )  ):
+				all.clear(window, background.image)
+				all.update()
+				content = all.draw(window)
+				pygame.display.flip()
+				#pygame.display.update(content)
 
 logging.info("Game has ended properly")

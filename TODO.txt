@@ -6,6 +6,8 @@ create a proper background (use Scrabble V1)
 
 create a general function to draw everything once
 
+assign default groups to each sprite class
+
 
 SECONDARY
 

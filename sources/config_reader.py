@@ -66,7 +66,7 @@ for line in open(path_conf_disp_file,"r") :
 
 	if int_found :
 		param = str(int_found.group(1))
-		if param == 'custom_window_heigh' :
+		if param == 'custom_window_height' :
 			h_display_params[ param ] = int(int_found.group(2))
 
 #groupe rules
