@@ -288,19 +288,14 @@ while game_is_running:
 			#update window
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			
-			#TODO
-			#update assets
-			#background.resize()
-			#layer_hand_letters.resize()
+			#TODO use layer_all
 			layer_background.resize()
+			layer_hand_letters.resize()
+
 			layer_background.draw(window)
 			BACKGROUND = window.copy()
 			layer_hand_letters.draw(window)
 			pygame.display.flip()
-
-			#TODO TO REMOVE
-			#window.blit(background, (0,0))
-			#pygame.display.flip()
 
 
 		#~~~~~~ KEY PRESSED ~~~~~~			
