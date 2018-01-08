@@ -4,6 +4,13 @@ check todo in code
 
 add a priority level for layer ?
 
+tile size 2 times smaller ??
+
+create draw all() function ? see for background copy and buttons and scores ...
+def draw all()
+	layer_background.draw()
+	layer_letters.draw()
+	...
 
 SECONDARY
 

@@ -43,6 +43,7 @@ class GroupOfSprites(pygame.sprite.RenderClear):
         for s in self.sprites():
             s.resize(*args)
 
+
 #----- Board -----
 class Board(pygame.sprite.Sprite):
 	def __init__(self):
@@ -68,6 +69,44 @@ class Board(pygame.sprite.Sprite):
 		self.image = loadImage(path.join(path_background, 'empty_background.png'))
 		self.image = pygame.transform.smoothscale(self.image, (width, height))
 		self.rect = pygame.Rect((0,0), (width, height))
+
+
+#----- Buttons -----
+class Button(pygame.sprite.Sprite):
+	def __init__(self, button_name):
+		#call superclass constructor
+		pygame.sprite.Sprite.__init__(self, self.containers)
+
+		self.button_name = button_name
+
+		self.width_in_tiles = 3
+		self.height_in_tiles = 1
+
+		self.pos_x_in_tiles = 27
+		self.pos_y_in_tiles = 3.5
+
+		width = TILE_SIZE * self.width_in_tiles
+		height = TILE_SIZE * self.height_in_tiles
+
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		self.image = loadImage(path.join(path_buttons, self.button_name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (width, height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+
+	def resize(self):
+		#calculate new width and height 
+		width = TILE_SIZE * self.width_in_tiles
+		height = TILE_SIZE * self.height_in_tiles
+
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		#update
+		self.image = loadImage(path.join(path_buttons, self.button_name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (width, height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
 
 
 #----- Letter -----
@@ -240,6 +279,7 @@ layer_all = GroupOfSprites()
 
 #set default groups
 Board.containers = layer_all, layer_background
+Button.containers = layer_all, layer_scores_and_buttons
 Letter.containers = layer_all, layer_hand_letters
 
 #create background
@@ -250,6 +290,9 @@ current_backgroud = window.copy()
 
 #create a test letter
 letter_k = Letter('K')
+
+#create a test button
+button = Button("draw")
 
 #Game is running
 game_is_running = True
@@ -285,7 +328,10 @@ while game_is_running:
 			
 			layer_all.resize()
 			layer_background.draw(window)
+			layer_scores_and_buttons.draw(window)
+			
 			current_backgroud = window.copy()
+
 			layer_hand_letters.draw(window)
 			pygame.display.flip()
 
