@@ -1,15 +1,11 @@
 PRIMARY
 
-assign default groups to each sprite class (letter -> layer_letters )
-
 check todo in code
 
 add a priority level for layer ?
 
 
 SECONDARY
-
-get game_engine state after init()
 
 use save game
 

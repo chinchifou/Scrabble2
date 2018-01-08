@@ -159,8 +159,14 @@ def updateTileSize(width, height):
 
 #~~~~~~ INITIALIAZATION ~~~~~~
 
-#----- Get configuration -----
+#----- Init logger -----
+path_log_folder = path.abspath('../log/')
+path_log_file = path.join(path_log_folder,'scrabble.log')
+logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
+logging.info("_________START OF LOG___________")
 
+#----- Get configuration -----
+#Display settings
 cfg_fullscreen = config_reader.h_display_params['fullscreen']
 cfg_resizable = config_reader.h_display_params['resizable']
 cfg_resolution_auto = config_reader.h_display_params['resolution_auto']
@@ -168,32 +174,13 @@ cfg_hardware_accelerated = config_reader.h_display_params['enable_hardware_accel
 cfg_double_buffer = config_reader.h_display_params['enable_double_buffer']
 cfg_custom_window_height = config_reader.h_display_params['custom_window_height']
 
+#Game rules
 number_of_letters_per_hand = config_reader.h_rules_params['number_of_letters_per_hand']
 display_next_player_hand = config_reader.h_rules_params['display_next_player_hand']
 language = config_reader.h_rules_params['language']
 players = config_reader.players
 
-
-#----- Launch Pygame -----
-
-game_engine = pygame.init() #init() -> (numpass, numfail)
-sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
-
-#Add icon
-icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
-icon = pygame.transform.scale(icon_image, (32, 32))
-pygame.display.set_icon(icon)
-pygame.display.set_caption('Scrabble')
-
-
-#----- Init logger -----
-
-path_log_folder = path.abspath('../log/')
-path_log_file = path.join(path_log_folder,'scrabble.log')
-logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
-
-#logging
-logging.info("_________START OF LOG___________")
+#logging configuration
 logging.info("INITIAL CONFIG")
 logging.info("")
 logging.info("DISPLAY SETTINGS")
@@ -212,6 +199,18 @@ logging.info("Number of letters per_hand : %s", number_of_letters_per_hand)
 logging.info("Display next player hand : %s", display_next_player_hand)
 logging.info("")
 
+#Launch Pygame
+game_engine = pygame.init() #init() -> (numpass, numfail)
+sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
+logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
+logging.info("Pygame started")
+
+#Add icon
+icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
+icon = pygame.transform.scale(icon_image, (32, 32))
+pygame.display.set_icon(icon)
+pygame.display.set_caption('Scrabble')
+
 
 #----- Window init -----
 
@@ -225,7 +224,6 @@ if cfg_resolution_auto :
 else :
 	width = round (cfg_custom_window_height * (16/9.0) )
 	height = cfg_custom_window_height
-
 
 #Initialize game window
 window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
@@ -252,7 +250,6 @@ current_backgroud = window.copy()
 
 #create a test letter
 letter_k = Letter('K')
-
 
 #Game is running
 game_is_running = True
@@ -286,7 +283,6 @@ while game_is_running:
 			#update window
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			
-
 			layer_all.resize()
 			layer_background.draw(window)
 			current_backgroud = window.copy()
@@ -312,26 +308,11 @@ while game_is_running:
 
 			if ( ( 0 <= x <= board.rect.width ) and ( 0 <= y <= board.rect.height )  ):
 				
-				"""
-				#use dirty rects -> pb clipping
-				window.blit(current_backgroud,(0,0))
-				dirty_rects = []
-				dirty_rects.append(letter_k.rect)
-				letter_k.update()
-				window.blit(letter_k.image, letter_k.rect.topleft)
-				dirty_rects.append(letter_k.rect)
-				pygame.display.update(dirty_rects)
-
-				"""
 				layer_hand_letters.clear(window, current_backgroud)
 				layer_hand_letters.update()
-
 				content = layer_hand_letters.draw(window)
-
 				pygame.display.flip()
-				#TODO why disply update is not working ? see aliens.py ...
-				#pygame.display.update(content)
 				
 
-logging.info("Game has ended properly")
+logging.info("Game has ended")
 logging.info("_________END OF LOG___________")
