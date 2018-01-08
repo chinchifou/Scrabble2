@@ -47,7 +47,7 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 class Board(pygame.sprite.Sprite):
 	def __init__(self):
 		#call superclass constructor
-		pygame.sprite.Sprite.__init__(self)
+		pygame.sprite.Sprite.__init__(self, self.containers)
 
 		self.width_in_tiles = int (1920 / REFERENCE_TILE_SIZE ) #32
 		self.height_in_tiles = int (1080 / REFERENCE_TILE_SIZE ) #18
@@ -74,7 +74,7 @@ class Board(pygame.sprite.Sprite):
 class Letter(pygame.sprite.Sprite):
 	def __init__(self, letter):
 		#call superclass constructor
-		pygame.sprite.Sprite.__init__(self)
+		pygame.sprite.Sprite.__init__(self, self.containers)
 
 		self.letter = letter
 
@@ -240,21 +240,19 @@ layer_hand_letters = GroupOfSprites()
 layer_side_menu = GroupOfSprites()
 layer_all = GroupOfSprites()
 
+#set default groups
+Board.containers = layer_all, layer_background
+Letter.containers = layer_all, layer_hand_letters
+
 #create background
 board = Board()
-board.add(layer_background)
-
 layer_background.draw(window)
 pygame.display.flip()
+current_backgroud = window.copy()
 
-BACKGROUND = window.copy()
-
-#create letters
+#create a test letter
 letter_k = Letter('K')
-letter_k.add(layer_hand_letters)
 
-#TODO
-#assign default groups to each sprite class
 
 #Game is running
 game_is_running = True
@@ -288,12 +286,10 @@ while game_is_running:
 			#update window
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			
-			#TODO use layer_all
-			layer_background.resize()
-			layer_hand_letters.resize()
 
+			layer_all.resize()
 			layer_background.draw(window)
-			BACKGROUND = window.copy()
+			current_backgroud = window.copy()
 			layer_hand_letters.draw(window)
 			pygame.display.flip()
 
@@ -315,15 +311,27 @@ while game_is_running:
 			y = pos[1]	
 
 			if ( ( 0 <= x <= board.rect.width ) and ( 0 <= y <= board.rect.height )  ):
-				layer_hand_letters.clear(window, BACKGROUND)
+				
+				"""
+				#use dirty rects -> pb clipping
+				window.blit(current_backgroud,(0,0))
+				dirty_rects = []
+				dirty_rects.append(letter_k.rect)
+				letter_k.update()
+				window.blit(letter_k.image, letter_k.rect.topleft)
+				dirty_rects.append(letter_k.rect)
+				pygame.display.update(dirty_rects)
+
+				"""
+				layer_hand_letters.clear(window, current_backgroud)
 				layer_hand_letters.update()
 
 				content = layer_hand_letters.draw(window)
 
-				
 				pygame.display.flip()
 				#TODO why disply update is not working ? see aliens.py ...
 				#pygame.display.update(content)
+				
 
 logging.info("Game has ended properly")
 logging.info("_________END OF LOG___________")
