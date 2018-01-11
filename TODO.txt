@@ -1,5 +1,7 @@
 PRIMARY
 
+Redraw eaxh time the background for better customability
+
 check todo in code
 
 add a priority level for layer ?
@@ -11,6 +13,10 @@ def draw all()
 	layer_background.draw()
 	layer_letters.draw()
 	...
+
+
+create function for log ?
+
 
 SECONDARY
 

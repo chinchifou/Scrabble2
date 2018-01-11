@@ -18,12 +18,18 @@ import letters_and_points
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
+#----- Constants -----
 #reference tile size for a 1920*1080 resolution
-REFERENCE_TILE_SIZE = 60 
-#actual tile size used to scale all assets. This value changes at runtime if the window is resized.
+REFERENCE_TILE_SIZE = 60
+
+#----- CHANGING AT RUNTIME -----
+#actual tile size used to scale all assets.
 TILE_SIZE = 60
+#all the remaining letters in the stack
+BAG_OF_LETTERS = []
 
 #folders' paths
+path_log_folder = path.abspath('../log/')
 path_icon = path.abspath('../materials/images/icon/')
 path_background = path.abspath('../materials/images/background/')
 path_buttons = path.abspath('../materials/images/assets/buttons/primary/')
@@ -142,6 +148,20 @@ class Letter(pygame.sprite.Sprite):
 		self.rect = pygame.Rect(pos, (size, size))
 
 
+#----- Player -----
+class Player :
+
+    def __init__(self, name, points, hand) :
+        self.name = name
+        self.points = points
+        self.hand = hand
+
+    def info(self) :
+        logging.info('name : %s', self.name)
+        logging.info('points : %s', self.points)
+        logging.info('hand : %s', self.hand)
+
+
 #~~~~~~ FUNCTIONS ~~~~~~
 
 #----- Game window creation -----
@@ -199,7 +219,6 @@ def updateTileSize(width, height):
 #~~~~~~ INITIALIAZATION ~~~~~~
 
 #----- Init logger -----
-path_log_folder = path.abspath('../log/')
 path_log_file = path.join(path_log_folder,'scrabble.log')
 logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
 logging.info("_________START OF LOG___________")
