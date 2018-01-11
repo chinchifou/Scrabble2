@@ -1,84 +1,87 @@
-#~~~~ GAME RULES ~~~~
+#~~~~~~ GAMES RULES ~~~~~~
 
-#DICTIONARIES
-#ENGLISH
-english_letters = [] #total length must be 100
+
+#~~~~~~ DICTIONARIES ~~~~~~
+
+#----- English -----
+letters_english = [] #total length must be 100
 for i in range(12):
-	english_letters.append('E')
+	letters_english.append('E')
 for i in range(9):
-	english_letters.append('I')
+	letters_english.append('I')
 for i in range(8):
-	english_letters.append('O')
+	letters_english.append('O')
 for i in range(6):
-	english_letters.append('N')
-	english_letters.append('R')
-	english_letters.append('T')
+	letters_english.append('N')
+	letters_english.append('R')
+	letters_english.append('T')
 for i in range(4) :
-	english_letters.append('S')
-	english_letters.append('U')
-	english_letters.append('L')
-	english_letters.append('D')
+	letters_english.append('S')
+	letters_english.append('U')
+	letters_english.append('L')
+	letters_english.append('D')
 for i in range(3):
-	english_letters.append('G')
+	letters_english.append('G')
 for i in range(2):	
-	english_letters.append('M')
-	english_letters.append('B')
-	english_letters.append('C')
-	english_letters.append('P')
-	english_letters.append('F')
-	english_letters.append('H')
-	english_letters.append('V')
-	english_letters.append('*')
-	english_letters.append('W')
-	english_letters.append('Y')
-english_letters.append('J')
-english_letters.append('Q')
-english_letters.append('K')
-english_letters.append('X')
-english_letters.append('Z')
+	letters_english.append('M')
+	letters_english.append('B')
+	letters_english.append('C')
+	letters_english.append('P')
+	letters_english.append('F')
+	letters_english.append('H')
+	letters_english.append('V')
+	letters_english.append('*')
+	letters_english.append('W')
+	letters_english.append('Y')
+letters_english.append('J')
+letters_english.append('Q')
+letters_english.append('K')
+letters_english.append('X')
+letters_english.append('Z')
 
-#FRENCH
-french_letters = [] #total length must be 102
+#----- French -----
+letters_french = [] #total length must be 102
 for i in range(15):
-	french_letters.append('E')
+	letters_french.append('E')
 for i in range(9):
-	french_letters.append('A')
+	letters_french.append('A')
 for i in range(8):
-	french_letters.append('I')
+	letters_french.append('I')
 for i in range(6):
-	french_letters.append('N')
-	french_letters.append('O')
-	french_letters.append('R')
-	french_letters.append('S')
-	french_letters.append('T')
-	french_letters.append('U')
+	letters_french.append('N')
+	letters_french.append('O')
+	letters_french.append('R')
+	letters_french.append('S')
+	letters_french.append('T')
+	letters_french.append('U')
 for i in range(5):
-	french_letters.append('L')
+	letters_french.append('L')
 for i in range(3):
-	french_letters.append('D')
-	french_letters.append('M')
+	letters_french.append('D')
+	letters_french.append('M')
 for i in range(2):
-	french_letters.append('G')
-	french_letters.append('B')
-	french_letters.append('C')
-	french_letters.append('P')
-	french_letters.append('F')
-	french_letters.append('H')
-	french_letters.append('V')
-	french_letters.append('*')
-french_letters.append('J')
-french_letters.append('Q')
-french_letters.append('K')
-french_letters.append('W')
-french_letters.append('X')
-french_letters.append('Y')
-french_letters.append('Z')
+	letters_french.append('G')
+	letters_french.append('B')
+	letters_french.append('C')
+	letters_french.append('P')
+	letters_french.append('F')
+	letters_french.append('H')
+	letters_french.append('V')
+	letters_french.append('*')
+letters_french.append('J')
+letters_french.append('Q')
+letters_french.append('K')
+letters_french.append('W')
+letters_french.append('X')
+letters_french.append('Y')
+letters_french.append('Z')
 
 
-#POINTS
-#ENGLISH
-english_points = {
-'*' : 0,
+#~~~~~~ POINTS ~~~~~~
+
+#----- English -----
+points_english = {
+'*': 0,
 'A' : 1,
 'B' : 3,
 'C' : 3,
@@ -107,9 +110,9 @@ english_points = {
 'Z' : 10
 }
 
-#FRENCH
-french_points = {
-'*' : 0,
+#----- French -----
+points_french = {
+'*': 0,
 'A' : 1,
 'B' : 3,
 'C' : 3,
@@ -138,14 +141,17 @@ french_points = {
 'Z' : 10
 }
 
-#LAYOUT OF THE BONUSES ON THE BOARD
+
+#~~~~~~ BOARD LAYOUT ~~~~~~
+
+#LAYOUT FOR THE BONUSES ON THE BOARD
 # 0 : start
 # 1 : normal tile
 # 2 : double letter
 # 3 : triple letter
 # 4 : double word
 # 5 : triple word
-LAYOUT = [
+BOARD_LAYOUT = [
 [5,1,1,2,1,1,1,5,1,1,1,2,1,1,5],
 [1,4,1,1,1,3,1,1,1,3,1,1,1,4,1],
 [1,1,4,1,1,1,2,1,2,1,1,1,4,1,1],
@@ -162,26 +168,3 @@ LAYOUT = [
 [1,4,1,1,1,3,1,1,1,3,1,1,1,4,1],
 [5,1,1,2,1,1,1,5,1,1,1,2,1,1,5]
 ]
-
-
-'''
-TO DO : PUT ELSEWHERE
-# /// DO NOT REMOVE ///
-#AUTOMATICALY CHOOSE DICTIONNARY AND POINTS BASED ON LANGUAGE SELECTION
-if LANGUAGE == 'french' :
-	BAG_OF_LETTERS = french_letters #choose current dictionary
-	POINTS = french_points #choose points attributed per letter
-
-elif LANGUAGE == 'english' :
-	BAG_OF_LETTERS = english_letters
-	POINTS = english_points
-
-elif LANGUAGE == 'custom': #create your custom mix inside this one
-	BAG_OF_LETTERS = french_letters
-	LANGUAGE = 'french' #needed to find the folder where the letters are sotored
-	POINTS = english_points
-
-else: #default value
-	BAG_OF_LETTERS = english_letters
-	POINTS = english_points
-'''

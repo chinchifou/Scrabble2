@@ -13,7 +13,7 @@ import logging
 
 #Other python files imports
 import config_reader
-import letters_and_points
+import letters_and_points as rules
 
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
@@ -232,11 +232,19 @@ cfg_hardware_accelerated = config_reader.h_display_params['enable_hardware_accel
 cfg_double_buffer = config_reader.h_display_params['enable_double_buffer']
 cfg_custom_window_height = config_reader.h_display_params['custom_window_height']
 
-#Game rules
+#Game settings
 number_of_letters_per_hand = config_reader.h_rules_params['number_of_letters_per_hand']
 display_next_player_hand = config_reader.h_rules_params['display_next_player_hand']
 language = config_reader.h_rules_params['language']
 players = config_reader.players
+
+#Letters and points
+if language == 'english' :
+	BAG_OF_LETTERS = rules.letters_english
+	POINTS_FOR = rules.points_english
+elif language == 'french':
+	BAG_OF_LETTERS = rules.letters_french
+	POINTS_FOR = rules.points_french
 
 #logging configuration
 logging.info("INITIAL CONFIG")
