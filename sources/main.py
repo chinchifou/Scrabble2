@@ -21,14 +21,18 @@ import letters_and_points as rules
 #----- Constants -----
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
+#number of tiles on the board for each column and each row
+TILES_PER_BOARD_COLUMN = 15
 
-#----- CHANGING AT RUNTIME -----
+#----- Changing at runtime -----
 #actual tile size used to scale all assets.
 TILE_SIZE = 60
 #all the remaining letters in the stack
 BAG_OF_LETTERS = []
+#current state of the board
+BOARD_STATE = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
 
-#folders' paths
+#----- Folders' paths-----
 path_log_folder = path.abspath('../log/')
 path_icon = path.abspath('../materials/images/icon/')
 path_background = path.abspath('../materials/images/background/')
