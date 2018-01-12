@@ -163,21 +163,21 @@ class Button(pygame.sprite.Sprite):
 
 #----- Letter -----
 class Letter(pygame.sprite.Sprite):
-	def __init__(self, letter):
+	def __init__(self, letter, pos_x, pos_y):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
 		self.letter = letter
 		self.points = POINTS_FOR[letter]
+		self.pos_x = pos_x
+		self.pos_y = pos_y
 		self.is_on_board = False #TODO see if usefull
 
 		size = TILE_SIZE
 
 		self.image = loadTransparentImage(path.join(path_letters, letter+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (size, size))
-
-		pos = pygame.mouse.get_pos()		
-		self.rect = pygame.Rect(pos, (size, size))
+		self.image = pygame.transform.smoothscale(self.image, (size, size))		
+		self.rect = pygame.Rect((self.pos_x, self.pos_y), (size, size))
 
 	def resize(self):
 		#calculate new width and height 
@@ -186,14 +186,10 @@ class Letter(pygame.sprite.Sprite):
 		self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (size, size))
 
-		pos = pygame.mouse.get_pos()		
-		self.rect = pygame.Rect(pos, (size, size))
-
-#TODO - to change for normal letters
 	def update(self):
 		size = TILE_SIZE
-		pos = pygame.mouse.get_pos()		
-		self.rect = pygame.Rect(pos, (size, size))
+
+		self.rect = pygame.Rect((self.pos_x, self.pos_y), (size, size))
 
 
 #----- Player -----
@@ -350,15 +346,16 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 #create sprite groups
 layer_background = GroupOfSprites()
 layer_tiles = GroupOfSprites()
+layer_letters_on_board = GroupOfSprites()
 layer_scores_and_buttons = GroupOfSprites()
-layer_letters_and_hand = GroupOfSprites()
+layer_letters_in_hand = GroupOfSprites()
 layer_side_menu = GroupOfSprites()
 layer_all = GroupOfSprites()
 
 #set default groups
 Board.containers = layer_all, layer_background
 Button.containers = layer_all, layer_scores_and_buttons
-Letter.containers = layer_all, layer_letters_and_hand
+Letter.containers = layer_all, layer_letters_in_hand
 Tile.containers = layer_all, layer_tiles
 
 #create background
@@ -390,7 +387,7 @@ for row in range(0,TILES_PER_BOARD_COLUMN) :
 	y_pos += 1
 
 #create letters
-letter_k = Letter('K')
+letter_k = Letter('K', 4, 4)
 
 #create a test button
 button = Button("draw", 27, 3.5)
@@ -434,7 +431,7 @@ while game_is_running:
 			
 			current_backgroud = window.copy()
 
-			layer_letters_and_hand.draw(window)
+			layer_letters_in_hand.draw(window)
 			pygame.display.flip()
 
 
@@ -456,9 +453,11 @@ while game_is_running:
 
 			if ( ( 0 <= x <= board.rect.width ) and ( 0 <= y <= board.rect.height )  ):
 				
-				layer_letters_and_hand.clear(window, current_backgroud)
-				layer_letters_and_hand.update()
-				content = layer_letters_and_hand.draw(window)
+				layer_letters_in_hand.clear(window, current_backgroud)
+				letter_k.pos_x = x
+				letter_k.pos_y = y
+				layer_letters_in_hand.update()
+				content = layer_letters_in_hand.draw(window)
 				pygame.display.flip()
 				
 
