@@ -2,14 +2,6 @@ PRIMARY
 
 check TODO in code
 
-remove all updates functions 
-
-Redraw each time the background for better customability
-
-add a priority level for layer ?
-
-tile size 2 times smaller ??
-
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
 	layer_background.draw()
@@ -26,3 +18,13 @@ use save game
 
 allow to change display settings while game is running
 
+remove all updates functions 
+
+play music if "SCRABBLE"
+
+
+TO SEE 
+
+add a priority level for layer ?
+
+tile size 2 times smaller ??

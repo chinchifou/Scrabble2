@@ -32,7 +32,7 @@ TILE_SIZE = 60
 #all the remaining letters in the stack
 BAG_OF_LETTERS = []
 #current state of the board
-BOARD_STATE = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
+current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
 
 #----- Folders' paths-----
 path_log_folder = path.abspath('../log/')
@@ -171,11 +171,14 @@ class Letter(pygame.sprite.Sprite):
 		self.points = POINTS_FOR[letter]
 		self.pos_x = pos_x
 		self.pos_y = pos_y
-		self.is_on_board = False #TODO see if usefull
 
 		size = TILE_SIZE
 
-		self.image = loadTransparentImage(path.join(path_letters, letter+'.png'))
+		if self.letter == '*':
+			self.image = loadTransparentImage(path.join(path_letters, 'joker.png'))
+		else :
+			self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
+
 		self.image = pygame.transform.smoothscale(self.image, (size, size))		
 		self.rect = pygame.Rect((self.pos_x, self.pos_y), (size, size))
 
@@ -183,7 +186,11 @@ class Letter(pygame.sprite.Sprite):
 		#calculate new width and height 
 		size = TILE_SIZE
 
-		self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
+		if self.letter == '*':
+			self.image = loadTransparentImage(path.join(path_letters, 'joker.png'))
+		else :
+			self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
+
 		self.image = pygame.transform.smoothscale(self.image, (size, size))
 
 	def update(self):
@@ -195,15 +202,13 @@ class Letter(pygame.sprite.Sprite):
 #----- Player -----
 class Player :
 
-    def __init__(self, name, points, hand) :
+    def __init__(self, name, score, hand) :
         self.name = name
-        self.points = points
+        self.score = score
         self.hand = hand
 
     def info(self) :
-        logging.info('name : %s', self.name)
-        logging.info('points : %s', self.points)
-        logging.info('hand : %s', self.hand)
+    	logging.info("%s has %s points and the following hand : %s", self.name, self.score, self.hand)
 
 
 #~~~~~~ FUNCTIONS ~~~~~~
@@ -259,13 +264,21 @@ def updateTileSize(width, height):
 	global TILE_SIZE
 	TILE_SIZE = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )
 
+#----- Logging functions -----
+def logPlayersInfo():
+	logging.info("")
+	logging.info("PLAYERS INFO")
+	for player in PLAYERS :
+		player.info()
 
-#~~~~~~ INITIALIAZATION ~~~~~~
+
+#~~~~~~ LOAD CONFIGURATION ~~~~~~
 
 #----- Init logger -----
 path_log_file = path.join(path_log_folder,'scrabble.log')
 logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
 logging.info("_________START OF LOG___________")
+logging.info("")
 
 #----- Get configuration -----
 #Display settings
@@ -280,7 +293,7 @@ cfg_custom_window_height = config_reader.h_display_params['custom_window_height'
 number_of_letters_per_hand = config_reader.h_rules_params['number_of_letters_per_hand']
 display_next_player_hand = config_reader.h_rules_params['display_next_player_hand']
 LANGUAGE = config_reader.h_rules_params['language']
-players = config_reader.players
+players_names = config_reader.players
 
 #Letters and points
 if LANGUAGE == 'english' :
@@ -288,13 +301,11 @@ if LANGUAGE == 'english' :
 	POINTS_FOR = rules.points_english
 	path_letters = path_letters_english
 elif LANGUAGE == 'french':
-	BAG_OFLANGUAGE_LETTERS = rules.letters_french
+	BAG_OF_LETTERS = rules.letters_french
 	POINTS_FOR = rules.points_french
 	path_letters = path_letters_french
 
 #logging configuration
-logging.info("INITIAL CONFIG")
-logging.info("")
 logging.info("DISPLAY SETTINGS")
 logging.info("Fullscreen : %s", cfg_fullscreen)
 logging.info("Resizable : %s", cfg_resizable)
@@ -306,18 +317,21 @@ logging.info("Double buffer : %s", cfg_double_buffer)
 logging.info("")
 logging.info("GAMES RULES")
 logging.info("Language : %s", LANGUAGE)
-logging.info("Players : %s", players)
+logging.info("Players : %s", players_names)
 logging.info("Number of letters per_hand : %s", number_of_letters_per_hand)
 logging.info("Display next player hand : %s", display_next_player_hand)
 logging.info("")
 
-#Launch Pygame
+
+#~~~~~~ GAME INITIALIAZATION ~~~~~~
+
+#----- Launch Pygame -----
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
 logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.info("Pygame started")
 
-#Add icon
+#Add icon to the window
 icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
 icon = pygame.transform.scale(icon_image, (32, 32))
 pygame.display.set_icon(icon)
@@ -386,21 +400,42 @@ for row in range(0,TILES_PER_BOARD_COLUMN) :
 	x_pos = 0 + DELTA
 	y_pos += 1
 
-#create letters
-letter_k = Letter('K', 4, 4)
-
 #create a test button
 button = Button("draw", 27, 3.5)
 
+
+#----- Create players -----
+
+PLAYERS = []
+
+for player_name in players_names :
+	start_hand = []
+	for i in range(number_of_letters_per_hand) :
+		random_int = randint(0,len(BAG_OF_LETTERS)-1)
+		start_hand.append(BAG_OF_LETTERS[random_int])
+		del(BAG_OF_LETTERS[random_int])
+
+	PLAYERS.append(Player(player_name,0,start_hand))
+
+logPlayersInfo()
+
+current_player = PLAYERS[0]
+
+#TODO to remove
+test_letter = Letter( current_player.hand[0], 7, 7)
+
+#~~~~~~ MAIN  ~~~~~~
+
+#----- Start -----
+
 #Game is running
 game_is_running = True
+logging.info("")
 logging.info("-------------------")
 logging.info("GAME STARTED")
 logging.info("-------------------")
 
-
-#~~~~~~ MAIN LOOP ~~~~~~
-
+#Main loop
 while game_is_running:
 	
 	for event in pygame.event.get():
@@ -454,12 +489,13 @@ while game_is_running:
 			if ( ( 0 <= x <= board.rect.width ) and ( 0 <= y <= board.rect.height )  ):
 				
 				layer_letters_in_hand.clear(window, current_backgroud)
-				letter_k.pos_x = x
-				letter_k.pos_y = y
+				test_letter.pos_x = x
+				test_letter.pos_y = y
 				layer_letters_in_hand.update()
 				content = layer_letters_in_hand.draw(window)
 				pygame.display.flip()
 				
 
 logging.info("Game has ended")
+logging.info("")
 logging.info("_________END OF LOG___________")
