@@ -23,6 +23,8 @@ import letters_and_points as rules
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
 TILES_PER_BOARD_COLUMN = 15
+#delta expressed in tiles from top left corner of the Window
+DELTA = 1.5
 
 #----- Changing at runtime -----
 #actual tile size used to scale all assets.
@@ -366,9 +368,9 @@ pygame.display.flip()
 current_backgroud = window.copy()
 
 #create tiles
-delta = 1.5
-x_pos = 0 + delta
-y_pos = 0 + delta
+DELTA = 1.5
+x_pos = 0 + DELTA
+y_pos = 0 + DELTA
 for row in range(0,TILES_PER_BOARD_COLUMN) :
 	for column in range(0, TILES_PER_BOARD_COLUMN) :
 		if rules.BOARD_LAYOUT[row][column] == 0 :
@@ -384,9 +386,8 @@ for row in range(0,TILES_PER_BOARD_COLUMN) :
 		elif rules.BOARD_LAYOUT[row][column] == 5 :
 			Tile('triple_word', x_pos, y_pos)
 		x_pos += 1
-	x_pos = 0 + delta
+	x_pos = 0 + DELTA
 	y_pos += 1
-
 
 #create letters
 letter_k = Letter('K')
