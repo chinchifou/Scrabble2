@@ -40,6 +40,8 @@ path_buttons = path.abspath('../materials/images/assets/buttons/primary/')
 path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/')
 path_letters_french = path.abspath('../materials/images/assets/letters/french/')
 path_letters_english = path.abspath('../materials/images/assets/letters/english/')
+path_letters = path.abspath('../materials/images/assets/letters/')
+path_tiles = path.abspath('../materials/images/assets/tiles/')
 
 
 #~~~~~~ CLASSES ~~~~~~
@@ -81,19 +83,19 @@ class Board(pygame.sprite.Sprite):
 		self.rect = pygame.Rect((0,0), (width, height))
 
 
-#----- Buttons -----
-class Button(pygame.sprite.Sprite):
-	def __init__(self, button_name):
+#----- Tiles -----
+class Tile(pygame.sprite.Sprite):
+	def __init__(self, tile_name, pos_x, pos_y):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
-		self.button_name = button_name
+		self.name = tile_name
 
-		self.width_in_tiles = 3
+		self.width_in_tiles = 1
 		self.height_in_tiles = 1
 
-		self.pos_x_in_tiles = 27
-		self.pos_y_in_tiles = 3.5
+		self.pos_x_in_tiles = pos_x
+		self.pos_y_in_tiles = pos_y
 
 		width = TILE_SIZE * self.width_in_tiles
 		height = TILE_SIZE * self.height_in_tiles
@@ -101,7 +103,7 @@ class Button(pygame.sprite.Sprite):
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
-		self.image = loadImage(path.join(path_buttons, self.button_name+'.png'))
+		self.image = loadImage(path.join(path_tiles, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (width, height))
 		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
 
@@ -114,7 +116,45 @@ class Button(pygame.sprite.Sprite):
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
 		#update
-		self.image = loadImage(path.join(path_buttons, self.button_name+'.png'))
+		self.image = loadImage(path.join(path_tiles, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (width, height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+
+
+#----- Buttons -----
+class Button(pygame.sprite.Sprite):
+	def __init__(self, button_name, pos_x, pos_y):
+		#call superclass constructor
+		pygame.sprite.Sprite.__init__(self, self.containers)
+
+		self.name = button_name
+
+		self.width_in_tiles = 3
+		self.height_in_tiles = 1
+
+		self.pos_x_in_tiles = pos_x
+		self.pos_y_in_tiles = pos_y
+
+		width = TILE_SIZE * self.width_in_tiles
+		height = TILE_SIZE * self.height_in_tiles
+
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (width, height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+
+	def resize(self):
+		#calculate new width and height 
+		width = TILE_SIZE * self.width_in_tiles
+		height = TILE_SIZE * self.height_in_tiles
+
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		#update
+		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (width, height))
 		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
 
@@ -126,10 +166,12 @@ class Letter(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
 		self.letter = letter
+		self.points = POINTS_FOR[letter]
+		self.is_on_board = False #TODO see if usefull
 
 		size = TILE_SIZE
 
-		self.image = loadTransparentImage(path.join(path_letters_french, letter+'.png'))
+		self.image = loadTransparentImage(path.join(path_letters, letter+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (size, size))
 
 		pos = pygame.mouse.get_pos()		
@@ -139,7 +181,7 @@ class Letter(pygame.sprite.Sprite):
 		#calculate new width and height 
 		size = TILE_SIZE
 
-		self.image = loadTransparentImage(path.join(path_letters_french, self.letter+'.png'))
+		self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (size, size))
 
 		pos = pygame.mouse.get_pos()		
@@ -239,16 +281,18 @@ cfg_custom_window_height = config_reader.h_display_params['custom_window_height'
 #Game settings
 number_of_letters_per_hand = config_reader.h_rules_params['number_of_letters_per_hand']
 display_next_player_hand = config_reader.h_rules_params['display_next_player_hand']
-language = config_reader.h_rules_params['language']
+LANGUAGE = config_reader.h_rules_params['language']
 players = config_reader.players
 
 #Letters and points
-if language == 'english' :
+if LANGUAGE == 'english' :
 	BAG_OF_LETTERS = rules.letters_english
 	POINTS_FOR = rules.points_english
-elif language == 'french':
-	BAG_OF_LETTERS = rules.letters_french
+	path_letters = path_letters_english
+elif LANGUAGE == 'french':
+	BAG_OFLANGUAGE_LETTERS = rules.letters_french
 	POINTS_FOR = rules.points_french
+	path_letters = path_letters_french
 
 #logging configuration
 logging.info("INITIAL CONFIG")
@@ -263,7 +307,7 @@ logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.info("Double buffer : %s", cfg_double_buffer)
 logging.info("")
 logging.info("GAMES RULES")
-logging.info("Language : %s", language)
+logging.info("Language : %s", LANGUAGE)
 logging.info("Players : %s", players)
 logging.info("Number of letters per_hand : %s", number_of_letters_per_hand)
 logging.info("Display next player hand : %s", display_next_player_hand)
@@ -303,15 +347,17 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 
 #create sprite groups
 layer_background = GroupOfSprites()
+layer_tiles = GroupOfSprites()
 layer_scores_and_buttons = GroupOfSprites()
-layer_hand_letters = GroupOfSprites()
+layer_letters_and_hand = GroupOfSprites()
 layer_side_menu = GroupOfSprites()
 layer_all = GroupOfSprites()
 
 #set default groups
 Board.containers = layer_all, layer_background
 Button.containers = layer_all, layer_scores_and_buttons
-Letter.containers = layer_all, layer_hand_letters
+Letter.containers = layer_all, layer_letters_and_hand
+Tile.containers = layer_all, layer_tiles
 
 #create background
 board = Board()
@@ -319,11 +365,34 @@ layer_background.draw(window)
 pygame.display.flip()
 current_backgroud = window.copy()
 
-#create a test letter
+#create tiles
+delta = 1.5
+x_pos = 0 + delta
+y_pos = 0 + delta
+for row in range(0,TILES_PER_BOARD_COLUMN) :
+	for column in range(0, TILES_PER_BOARD_COLUMN) :
+		if rules.BOARD_LAYOUT[row][column] == 0 :
+			Tile('start', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 1 :
+			Tile('empty', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 2 :
+			Tile('double_letter', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 3 :
+			Tile('triple_letter', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 4 :
+			Tile('double_word', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 5 :
+			Tile('triple_word', x_pos, y_pos)
+		x_pos += 1
+	x_pos = 0 + delta
+	y_pos += 1
+
+
+#create letters
 letter_k = Letter('K')
 
 #create a test button
-button = Button("draw")
+button = Button("draw", 27, 3.5)
 
 #Game is running
 game_is_running = True
@@ -359,11 +428,12 @@ while game_is_running:
 			
 			layer_all.resize()
 			layer_background.draw(window)
+			layer_tiles.draw(window)
 			layer_scores_and_buttons.draw(window)
 			
 			current_backgroud = window.copy()
 
-			layer_hand_letters.draw(window)
+			layer_letters_and_hand.draw(window)
 			pygame.display.flip()
 
 
@@ -385,9 +455,9 @@ while game_is_running:
 
 			if ( ( 0 <= x <= board.rect.width ) and ( 0 <= y <= board.rect.height )  ):
 				
-				layer_hand_letters.clear(window, current_backgroud)
-				layer_hand_letters.update()
-				content = layer_hand_letters.draw(window)
+				layer_letters_and_hand.clear(window, current_backgroud)
+				layer_letters_and_hand.update()
+				content = layer_letters_and_hand.draw(window)
 				pygame.display.flip()
 				
 

@@ -1,8 +1,6 @@
 PRIMARY
 
-Redraw eaxh time the background for better customability
-
-check todo in code
+Redraw each time the background for better customability
 
 add a priority level for layer ?
 
