@@ -220,9 +220,8 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 
 	width = int (1920 / REFERENCE_TILE_SIZE ) * TILE_SIZE
 	height = int (1080 / REFERENCE_TILE_SIZE ) * TILE_SIZE
-	
-	logging.info("")
-	logging.info("Window resizing")
+
+	logging.info("WINDOW RESIZING")
 	logging.info("New tile Size is : %s", TILE_SIZE)
 	logging.info("New Window size is : %s * %s", width, height)
 	logging.info("")
@@ -268,11 +267,10 @@ def updateTileSize(width, height):
 
 #----- Logging functions -----
 def logPlayersInfo():
-	logging.info("")
 	logging.info("PLAYERS INFO")
 	for player in PLAYERS :
 		player.info()
-
+	logging.info("")
 
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
@@ -330,8 +328,14 @@ logging.info("")
 #----- Launch Pygame -----
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
+logging.info("INITIALIZATION")
 logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.info("Pygame started")
+logging.info("")
+logging.info("-------------------")
+logging.info("GAME STARTED")
+logging.info("-------------------")
+logging.info("")
 
 #Add icon to the window
 icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
@@ -355,7 +359,7 @@ else :
 
 #Initialize game window
 window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-to_be_resized = True
+to_be_resized = False
 #TODO
 
 #----- Create sprites -----
@@ -437,10 +441,6 @@ test_letter = Letter( current_player.hand[0], 7, 7)
 
 #Game is running
 game_is_running = True
-logging.info("")
-logging.info("-------------------")
-logging.info("GAME STARTED")
-logging.info("-------------------")
 
 #Main loop
 while game_is_running:
@@ -455,6 +455,7 @@ while game_is_running:
 			logging.info("-------------------")
 			logging.info("Exiting game")
 			logging.info("-------------------")
+			logging.info("")
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
