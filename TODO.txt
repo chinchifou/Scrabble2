@@ -1,5 +1,7 @@
 PRIMARY
 
+prevent window blinking on first render
+
 check TODO in code
 
 create draw all() function ? see for background copy and buttons and scores ...
