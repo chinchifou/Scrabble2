@@ -220,10 +220,12 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 
 	width = int (1920 / REFERENCE_TILE_SIZE ) * TILE_SIZE
 	height = int (1080 / REFERENCE_TILE_SIZE ) * TILE_SIZE
-
+	
+	logging.info("")
 	logging.info("Window resizing")
 	logging.info("New tile Size is : %s", TILE_SIZE)
 	logging.info("New Window size is : %s * %s", width, height)
+	logging.info("")
 
 	if fullscreen :
 		if double_buffer :
@@ -276,7 +278,7 @@ def logPlayersInfo():
 
 #----- Init logger -----
 path_log_file = path.join(path_log_folder,'scrabble.log')
-logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d @ %I:%M:%S %p')
+logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
 
@@ -353,7 +355,8 @@ else :
 
 #Initialize game window
 window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-
+to_be_resized = True
+#TODO
 
 #----- Create sprites -----
 
@@ -372,11 +375,15 @@ Button.containers = layer_all, layer_scores_and_buttons
 Letter.containers = layer_all, layer_letters_in_hand
 Tile.containers = layer_all, layer_tiles
 
+
+#----- Create board game -----
+
 #create background
 board = Board()
-layer_background.draw(window)
-pygame.display.flip()
-current_backgroud = window.copy()
+#layer_background.draw(window)
+#TO DO to remove
+#pygame.display.flip()
+#current_backgroud = window.copy()
 
 #create tiles
 DELTA = 1.5
@@ -457,9 +464,13 @@ while game_is_running:
 			height = event.dict['size'][1]
 
 			#update window
-			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-			
+			if to_be_resized :
+				window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
+			else : to_be_resized = True
+
 			layer_all.resize()
+			#TODO
+			#layer_all.clear(window, black_background)
 			layer_background.draw(window)
 			layer_tiles.draw(window)
 			layer_scores_and_buttons.draw(window)
