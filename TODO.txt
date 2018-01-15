@@ -1,7 +1,35 @@
 PRIMARY
 
-
 check TODO in code
+
+
+
+FOR TILE do :
+Tile()
+
+self.pos_x_on_board /int
+self.pos_y_on_board /int
+has_a_letter_on_it /boolean
+
+so that when colling "collidepoint", you directly get the position on the board without calculation
+
+/!\ warning for BUTTON UP, the letter must not always go where the player release the click. More calculation to do
+
+
+
+FOR BUTTON do :
+
+# Main Loop
+while running:
+    # Mouse position and button clicking.
+    pos = pygame.mouse.get_pos()
+    pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()
+    # Check if the rect collided with the mouse pos
+    # and if the left mouse button was pressed.
+    if Rectplace.collidepoint(pos) and pressed1:
+        print("You have opened a chest!")
+
+
 
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
@@ -10,7 +38,9 @@ def draw all()
 	...
 
 
+
 create function for log ?
+
 
 
 SECONDARY
@@ -22,6 +52,8 @@ allow to change display settings while game is running
 remove all updates functions 
 
 play music if "SCRABBLE"
+
+The event queue offers some simple filtering. This can help performance slightly by blocking certain event types from the queue, use the pygame.event.set_allowed() and pygame.event.set_blocked() to work with this filtering
 
 
 TO SEE 
