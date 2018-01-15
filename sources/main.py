@@ -215,15 +215,14 @@ class Player :
 
 #----- Game window creation -----
 def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_window_height, double_buffer, hardware_accelerated) :
-
+	
+	logging.info("WINDOW Creation")
 	updateTileSize(width,height)
 
 	width = int (1920 / REFERENCE_TILE_SIZE ) * TILE_SIZE
 	height = int (1080 / REFERENCE_TILE_SIZE ) * TILE_SIZE
 
-	logging.info("WINDOW RESIZING")
-	logging.info("New tile Size is : %s", TILE_SIZE)
-	logging.info("New Window size is : %s * %s", width, height)
+	logging.info("Size of game window is : %s * %s", width, height)
 	logging.info("")
 
 	if fullscreen :
@@ -245,6 +244,9 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 				window = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
 		else:
 			window = pygame.display.set_mode( (width, height))
+
+	pygame.event.clear(pygame.VIDEORESIZE) #remove the event pygame.VIDEORESIZE from the queue
+
 	return window
 
 #----- Load image -----
@@ -264,6 +266,7 @@ def updateTileSize(width, height):
 	zoom_factor = min( float(width / 1920), float(height/1080) )
 	global TILE_SIZE
 	TILE_SIZE = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )
+	logging.info("New Tile Size is : %s", TILE_SIZE)
 
 #----- Logging functions -----
 def logPlayersInfo():
@@ -359,8 +362,7 @@ else :
 
 #Initialize game window
 window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-to_be_resized = False
-#TODO
+
 
 #----- Create sprites -----
 
@@ -384,10 +386,6 @@ Tile.containers = layer_all, layer_tiles
 
 #create background
 board = Board()
-#layer_background.draw(window)
-#TO DO to remove
-#pygame.display.flip()
-#current_backgroud = window.copy()
 
 #create tiles
 DELTA = 1.5
@@ -435,6 +433,22 @@ current_player = PLAYERS[0]
 #TODO to remove
 test_letter = Letter( current_player.hand[0], 7, 7)
 
+
+#----- First image -----
+
+BLACK_BACKGROUND = window.copy()
+
+layer_background.draw(window)
+layer_tiles.draw(window)
+layer_scores_and_buttons.draw(window)
+
+current_backgroud = window.copy()	
+
+layer_letters_in_hand.draw(window)
+
+pygame.display.update()
+
+
 #~~~~~~ MAIN  ~~~~~~
 
 #----- Start -----
@@ -464,14 +478,13 @@ while game_is_running:
 			width = event.dict['size'][0]
 			height = event.dict['size'][1]
 
-			#update window
-			if to_be_resized :
-				window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-			else : to_be_resized = True
+			BLACK_BACKGROUND = window.fill((0,0,0))
+			pygame.display.update()
+
+			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
 			layer_all.resize()
-			#TODO
-			#layer_all.clear(window, black_background)
+
 			layer_background.draw(window)
 			layer_tiles.draw(window)
 			layer_scores_and_buttons.draw(window)
@@ -479,9 +492,9 @@ while game_is_running:
 			current_backgroud = window.copy()
 
 			layer_letters_in_hand.draw(window)
-			pygame.display.flip()
-
-
+			
+			pygame.display.update()
+			
 		#~~~~~~ KEY PRESSED ~~~~~~			
 		elif ( event_type == pygame.KEYDOWN ) :
 			logging.info("Key pressed")

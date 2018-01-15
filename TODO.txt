@@ -1,6 +1,5 @@
 PRIMARY
 
-prevent window blinking on first render
 
 check TODO in code
 
