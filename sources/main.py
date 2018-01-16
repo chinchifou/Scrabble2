@@ -33,6 +33,8 @@ TILE_SIZE = 60
 BAG_OF_LETTERS = []
 #current state of the board
 current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
+#postion of the mouse cursor on the tile
+delta_pos_on_tile = [0.5 ,0.5 ]
 
 #----- Folders' paths-----
 path_log_folder = path.abspath('../log/')
@@ -91,36 +93,40 @@ class Tile(pygame.sprite.Sprite):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
+		#name
 		self.name = tile_name
 
+		#width and height
 		self.width_in_tiles = 1
 		self.height_in_tiles = 1
 
-		self.pos_x_in_tiles = pos_x
-		self.pos_y_in_tiles = pos_y
+		self.width = TILE_SIZE * self.width_in_tiles
+		self.height = TILE_SIZE * self.height_in_tiles
 
-		width = TILE_SIZE * self.width_in_tiles
-		height = TILE_SIZE * self.height_in_tiles
+		#position
+		self.pos_x_in_tiles = pos_x
+		self.pos_y_in_tiles = pos_y	
 
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
+		#image
 		self.image = loadImage(path.join(path_tiles, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
 
 	def resize(self):
 		#calculate new width and height 
-		width = TILE_SIZE * self.width_in_tiles
-		height = TILE_SIZE * self.height_in_tiles
+		self.width = TILE_SIZE * self.width_in_tiles
+		self.height = TILE_SIZE * self.height_in_tiles
 
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
 		#update
 		self.image = loadImage(path.join(path_tiles, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
 
 
 #----- Buttons -----
@@ -130,35 +136,37 @@ class Button(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
 		self.name = button_name
-
+		
+		#width and heigth
 		self.width_in_tiles = 3
 		self.height_in_tiles = 1
 
+		self.width = TILE_SIZE * self.width_in_tiles
+		self.height = TILE_SIZE * self.height_in_tiles
+
+		#position
 		self.pos_x_in_tiles = pos_x
 		self.pos_y_in_tiles = pos_y
-
-		width = TILE_SIZE * self.width_in_tiles
-		height = TILE_SIZE * self.height_in_tiles
 
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
 		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
 
 	def resize(self):
 		#calculate new width and height 
-		width = TILE_SIZE * self.width_in_tiles
-		height = TILE_SIZE * self.height_in_tiles
+		self.width = TILE_SIZE * self.width_in_tiles
+		self.height = TILE_SIZE * self.height_in_tiles
 
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
 		#update
 		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (width, height))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
 
 
 #----- Letter -----
@@ -169,34 +177,36 @@ class Letter(pygame.sprite.Sprite):
 
 		self.letter = letter
 		self.points = POINTS_FOR[letter]
-		self.pos_x = pos_x
-		self.pos_y = pos_y
 
-		size = TILE_SIZE
+		self.pos_x_in_tiles = pos_x
+		self.pos_y_in_tiles = pos_y
 
-		if self.letter == '*':
-			self.image = loadTransparentImage(path.join(path_letters, 'joker.png'))
-		else :
-			self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
 
-		self.image = pygame.transform.smoothscale(self.image, (size, size))		
-		self.rect = pygame.Rect((self.pos_x, self.pos_y), (size, size))
-
-	def resize(self):
-		#calculate new width and height 
-		size = TILE_SIZE
+		self.size = TILE_SIZE
 
 		if self.letter == '*':
 			self.image = loadTransparentImage(path.join(path_letters, 'joker.png'))
 		else :
 			self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
 
-		self.image = pygame.transform.smoothscale(self.image, (size, size))
+		self.image = pygame.transform.smoothscale(self.image, (self.size, self.size))		
+		self.rect = pygame.Rect((self.pos_x, self.pos_y), (self.size, self.size))
 
-	def update(self):
-		size = TILE_SIZE
+	def resize(self): 
+		self.size = TILE_SIZE
 
-		self.rect = pygame.Rect((self.pos_x, self.pos_y), (size, size))
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		if self.letter == '*':
+			self.image = loadTransparentImage(path.join(path_letters, 'joker.png'))
+		else :
+			self.image = loadTransparentImage(path.join(path_letters, self.letter+'.png'))
+
+		self.image = pygame.transform.smoothscale(self.image, (self.size, self.size))
+		self.rect = pygame.Rect((self.pos_x, self.pos_y), (self.size, self.size))
 
 
 #----- Player -----
@@ -208,7 +218,12 @@ class Player :
         self.hand = hand
 
     def info(self) :
-    	logging.info("%s has %s points and the following hand : %s", self.name, self.score, self.hand)
+    	str_hand = "["
+    	for letter_sprite in self.hand :
+    		str_hand += '"' + letter_sprite.letter + '"' + ' ,'
+    	str_hand = str_hand[:-2]
+    	str_hand += "]"
+    	logging.info("%s has %s points and the following hand : %s", self.name, self.score, str_hand)
 
 
 #~~~~~~ FUNCTIONS ~~~~~~
@@ -331,6 +346,7 @@ logging.info("")
 #----- Launch Pygame -----
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
+clock = pygame.time.Clock()
 logging.info("INITIALIZATION")
 logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.info("Pygame started")
@@ -370,6 +386,7 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 layer_background = GroupOfSprites()
 layer_tiles = GroupOfSprites()
 layer_letters_on_board = GroupOfSprites()
+layer_letters_just_played = GroupOfSprites()
 layer_scores_and_buttons = GroupOfSprites()
 layer_letters_in_hand = GroupOfSprites()
 layer_side_menu = GroupOfSprites()
@@ -378,7 +395,7 @@ layer_all = GroupOfSprites()
 #set default groups
 Board.containers = layer_all, layer_background
 Button.containers = layer_all, layer_scores_and_buttons
-Letter.containers = layer_all, layer_letters_in_hand
+Letter.containers = layer_all
 Tile.containers = layer_all, layer_tiles
 
 
@@ -418,11 +435,14 @@ button = Button("draw", 27, 3.5)
 PLAYERS = []
 
 for player_name in players_names :
-	start_hand = []
+	start_hand = GroupOfSprites()
+	pos_x = (TILES_PER_BOARD_COLUMN+4)
+	pos_y = 3.5
 	for i in range(number_of_letters_per_hand) :
 		random_int = randint(0,len(BAG_OF_LETTERS)-1)
-		start_hand.append(BAG_OF_LETTERS[random_int])
+		start_hand.add(Letter(BAG_OF_LETTERS[random_int], pos_x, pos_y))
 		del(BAG_OF_LETTERS[random_int])
+		pos_x = pos_x+1
 
 	PLAYERS.append(Player(player_name,0,start_hand))
 
@@ -430,8 +450,17 @@ logPlayersInfo()
 
 current_player = PLAYERS[0]
 
+
+
 #TODO to remove
-test_letter = Letter( current_player.hand[0], 7, 7)
+#test_letter = Letter( current_player.hand[0], 7, 7)
+
+for letter in current_player.hand :
+	layer_letters_in_hand.add(letter)
+
+#///// Test Values /////
+layer_letters_just_played.add(Letter("J",3+DELTA, 5+DELTA))
+#///////////////////////
 
 
 #----- First image -----
@@ -441,12 +470,22 @@ BLACK_BACKGROUND = window.copy()
 layer_background.draw(window)
 layer_tiles.draw(window)
 layer_scores_and_buttons.draw(window)
+layer_letters_just_played.draw(window) #TODO TEMP ?
 
 current_backgroud = window.copy()	
 
 layer_letters_in_hand.draw(window)
 
 pygame.display.update()
+
+#----- Initial game state -----
+
+current_action = 'SELECT_A_LETTER'
+selected_letter = Letter('A',0,0)
+
+
+
+
 
 
 #~~~~~~ MAIN  ~~~~~~
@@ -483,11 +522,14 @@ while game_is_running:
 
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
+			#To IMPROVE ?
+			BLACK_BACKGROUND = window.fill((0,0,0))
 			layer_all.resize()
 
 			layer_background.draw(window)
 			layer_tiles.draw(window)
 			layer_scores_and_buttons.draw(window)
+			layer_letters_just_played.draw(window)
 			
 			current_backgroud = window.copy()
 
@@ -504,8 +546,52 @@ while game_is_running:
 				logging.info("ESCAPE key pressed")
 				game_is_running = False #exit the game
 
-		elif(event_type == pygame.MOUSEMOTION ):
 
+		#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
+		elif ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
+
+			timer = clock.tick()            
+			#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
+			if ( event_type == pygame.MOUSEBUTTONDOWN ) :
+
+				cursor_pos_x, cursor_pos_y = event.pos[0], event.pos[1]
+
+				#------ SELECT A LETTER -------
+				if current_action == 'SELECT_A_LETTER' :
+
+					#click on a letter in hand ?
+					for tile_in_hand in layer_letters_in_hand :
+
+						if tile_in_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+
+							selected_letter = tile_in_hand
+							logging.debug("Selected letter is : %s", selected_letter.letter)
+							delta_pos_on_tile = ( cursor_pos_x - tile_in_hand.pos_x , cursor_pos_y - tile_in_hand.pos_y)
+							current_action = "PLAY_A_LETTER"
+
+					#TODO improve perfo ?
+					#click on a letter just played ?
+					for tile_in_hand in layer_letters_just_played :
+
+						if tile_in_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+
+							selected_letter = tile_in_hand
+							logging.debug("Selected letter is : %s", selected_letter.letter)
+							delta_pos_on_tile = ( cursor_pos_x - tile_in_hand.pos_x , cursor_pos_y - tile_in_hand.pos_y)
+
+							tile_x_on_board = int( tile_in_hand.pos_x_in_tiles - DELTA)
+							tile_y_on_board = int(tile_in_hand.pos_y_in_tiles - DELTA)	
+							current_board_state[tile_x_on_board][tile_y_on_board] = '?'
+
+							layer_letters_just_played.remove(selected_letter)
+							layer_letters_in_hand.add(selected_letter)
+
+							current_action = "PLAY_A_LETTER"
+
+
+		#~~~~~~ MOUSE MOTION ~~~~~~	
+		elif(event_type == pygame.MOUSEMOTION ):
+			"""
 			#TODO to remove
 			pos = pygame.mouse.get_pos()
 			x = pos[0]
@@ -519,8 +605,11 @@ while game_is_running:
 				layer_letters_in_hand.update()
 				content = layer_letters_in_hand.draw(window)
 				pygame.display.flip()
+			"""
 				
 
 logging.info("Game has ended")
 logging.info("")
 logging.info("_________END OF LOG___________")
+
+
