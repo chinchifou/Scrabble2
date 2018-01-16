@@ -9,11 +9,12 @@ Tile()
 
 self.pos_x_on_board /int
 self.pos_y_on_board /int
-has_a_letter_on_it /boolean
+has_a_letter_on_it /boolean ??
+multiplier /int ??
 
 so that when colling "collidepoint", you directly get the position on the board without calculation
 
-/!\ warning for BUTTON UP, the letter must not always go where the player release the click. More calculation to do
+/!\ warning for BUTTON UP, the letter must not always go where the player release the click. More calculation to do use collidelistall()
 
 
 
@@ -37,6 +38,8 @@ def draw all()
 	layer_letters.draw()
 	...
 
+
+crete a class Action()
 
 
 create function for log ?
