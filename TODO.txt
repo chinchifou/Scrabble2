@@ -25,6 +25,8 @@ create function for log ?
 
 SECONDARY
 
+Able to change the language of the UI
+
 FOR BUTTON do :
 
 # Main Loop
