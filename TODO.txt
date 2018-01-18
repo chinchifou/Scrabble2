@@ -25,19 +25,9 @@ create function for log ?
 
 SECONDARY
 
+less highlighted buttons
+
 Able to change the language of the UI
-
-FOR BUTTON do :
-
-# Main Loop
-while running:
-    # Mouse position and button clicking.
-    pos = pygame.mouse.get_pos()
-    pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()
-    # Check if the rect collided with the mouse pos
-    # and if the left mouse button was pressed.
-    if Rectplace.collidepoint(pos) and pressed1:
-        print("You have opened a chest!")
 
 use save game
 

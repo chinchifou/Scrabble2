@@ -146,6 +146,9 @@ class Button(pygame.sprite.Sprite):
 		self.width = TILE_SIZE * self.width_in_tiles
 		self.height = TILE_SIZE * self.height_in_tiles
 
+		self.is_highlighted = False
+		self.is_pushed = False
+
 		#position
 		self.pos_x_in_tiles = pos_x
 		self.pos_y_in_tiles = pos_y
@@ -169,6 +172,26 @@ class Button(pygame.sprite.Sprite):
 		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
 		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
+
+	def turnOnHighlighted(self):
+		self.image = loadImage(path.join(path_buttons, self.name+'_highlighted.png'))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.is_highlighted = True
+
+	def turnOffHighlighted(self):
+		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.is_highlighted = False
+
+	def push(self):
+		self.image = loadImage(path.join(path_buttons, self.name+'_pushed.png'))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.is_pushed = True	
+
+	def release(self):
+		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.is_pushed = False		
 
 
 #----- Letter -----
@@ -444,7 +467,7 @@ for row in range(0,TILES_PER_BOARD_COLUMN) :
 	y_pos += 1
 
 #create a test button
-button = Button("draw", 27, 3.5)
+button_end_turn = Button("end_turn", 27, 3.5)
 
 
 #----- Create players -----
@@ -541,6 +564,7 @@ while game_is_running:
 
 			layer_background.draw(window)
 			layer_tiles.draw(window)
+			layer_letters_on_board.draw(window)
 			layer_scores_and_buttons.draw(window)
 			layer_letters_just_played.draw(window)
 			
@@ -558,37 +582,7 @@ while game_is_running:
 			if ( key_pressed == pygame.K_ESCAPE ) :
 				logging.info("ESCAPE key pressed")
 				game_is_running = False #exit the game
-
-			"""
-			#WORK IN PROGRESS
-						
-			#TODO temp
-			#next player
-			elif( key_pressed == pygame.K_SPACE ) :
-				#TODO calculate score
-
-				for letter in layer_letters_just_played :
-					layer_letters_on_board.add(letter)
-
-				layer_letters_just_played.empty()
-				layer_letters_in_hand.empty()
-
-				current_player = current_player.next()
-				layer_letters_in_hand = current_player.hand
-				logging.info("Current player is : %s", current_player.name)
-
-				layer_letters_on_board.clear(window, current_background)
-				layer_letters_just_played.clear(window, current_background)
-				layer_letters_in_hand.clear(window, current_background)
-
-				layer_letters_on_board.draw(window)
-
-				current_background = window.copy()
-
-				layer_letters_in_hand.draw(window)
-
-				pygame.display.update()
-			"""
+			
 
 		#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
 		elif ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
@@ -636,6 +630,43 @@ while game_is_running:
 							pygame.display.update()
 
 							current_action = "PLAY_A_LETTER"
+
+			
+					#TODO temp
+					#next player
+					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+						#change button state
+						button_end_turn.push()
+						button_end_turn.is_highlighted = False
+						layer_scores_and_buttons.clear(window, current_background)
+						layer_scores_and_buttons.draw(window)
+						pygame.display.update()
+
+						#TODO calculate score
+
+						#WORK IN PROGRESS
+						for letter in layer_letters_just_played :
+							layer_letters_on_board.add(letter)
+
+						layer_letters_just_played.empty()
+						layer_letters_in_hand.empty()
+
+						current_player = current_player.next()
+						layer_letters_in_hand = current_player.hand
+						#logging.info("Current player is : %s", current_player.name)
+						current_player.info()
+
+						layer_letters_on_board.clear(window, current_background)
+						layer_letters_just_played.clear(window, current_background)
+						layer_letters_in_hand.clear(window, current_background)
+
+						layer_letters_on_board.draw(window)
+
+						current_background = window.copy()
+
+						layer_letters_in_hand.draw(window)
+
+						pygame.display.update()
 
 
 				#------ PLAY A LETTER -------
@@ -693,6 +724,14 @@ while game_is_running:
 
 									current_action = "SELECT_A_LETTER"
 
+			elif ( event_type == pygame.MOUSEBUTTONUP ) :
+				for button in layer_scores_and_buttons :
+					if button.is_pushed :
+						button.release()
+						button_end_turn.turnOnHighlighted()
+						layer_scores_and_buttons.clear(window, current_background)
+						layer_scores_and_buttons.draw(window)
+						pygame.display.update()
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
 		elif(event_type == pygame.MOUSEMOTION ):
@@ -700,6 +739,22 @@ while game_is_running:
 			mouse_pos = pygame.mouse.get_pos()
 			cursor_pos_x = mouse_pos[0]
 			cursor_pos_y = mouse_pos[1]
+
+			#change appearance of button
+			buttons_changed = False
+			for button in layer_scores_and_buttons :
+				if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+					button.turnOnHighlighted()
+					buttons_changed = True
+				elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ):
+					button_end_turn.turnOffHighlighted()
+					buttons_changed = True
+
+			if buttons_changed :
+				layer_scores_and_buttons.clear(window, current_background)
+				layer_scores_and_buttons.draw(window)
+				pygame.display.update()
+
 
 			selected_letter.moveAt(cursor_pos_x - delta_pos_on_tile[0], cursor_pos_y - delta_pos_on_tile[1])
 
