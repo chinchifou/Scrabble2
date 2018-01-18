@@ -597,7 +597,7 @@ while game_is_running:
 				if current_action == 'SELECT_A_LETTER' :
 					#TODO rename tile in letter
 					#click on a letter in hand ?
-					for tile_in_hand in layer_letters_in_hand :
+					for tile_in_hand in current_player.hand :
 
 						if tile_in_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
@@ -619,13 +619,13 @@ while game_is_running:
 							current_board_state[tile_y_on_board][tile_x_on_board] = '?'
 
 							layer_letters_just_played.remove(selected_letter)
-							layer_letters_in_hand.add(selected_letter)
+							current_player.hand.add(selected_letter)
 
 							layer_letters_just_played.clear(window, current_background)
 							layer_letters_just_played.draw(window)
 
-							layer_letters_in_hand.clear(window, current_background)	
-							layer_letters_in_hand.draw(window)
+							current_player.hand.clear(window, current_background)	
+							current_player.hand.draw(window)
 
 							pygame.display.update()
 
@@ -649,22 +649,20 @@ while game_is_running:
 							layer_letters_on_board.add(letter)
 
 						layer_letters_just_played.empty()
-						layer_letters_in_hand.empty()
 
+						current_player.hand.clear(window, current_background)
 						current_player = current_player.next()
-						layer_letters_in_hand = current_player.hand
-						#logging.info("Current player is : %s", current_player.name)
+
 						current_player.info()
 
 						layer_letters_on_board.clear(window, current_background)
 						layer_letters_just_played.clear(window, current_background)
-						layer_letters_in_hand.clear(window, current_background)
 
 						layer_letters_on_board.draw(window)
 
 						current_background = window.copy()
 
-						layer_letters_in_hand.draw(window)
+						current_player.hand.draw(window)
 
 						pygame.display.update()
 
@@ -684,19 +682,19 @@ while game_is_running:
 							if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
 								#letter from hand
-								if layer_letters_in_hand.has(selected_letter) : 
+								if current_player.hand.has(selected_letter) : 
 
 									selected_letter.moveAt( (tile_x_on_board + DELTA) * TILE_SIZE , (tile_y_on_board + DELTA) * TILE_SIZE )
 									current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.letter
 
-									layer_letters_in_hand.remove(selected_letter)
+									current_player.hand.remove(selected_letter)
 									current_player.hand.remove(selected_letter)
 									layer_letters_just_played.add(selected_letter)
 
 									selected_letter = NO_LETTER
 
-									layer_letters_in_hand.clear(window, current_background)								
-									layer_letters_in_hand.draw(window)
+									current_player.hand.clear(window, current_background)								
+									current_player.hand.draw(window)
 
 									layer_letters_just_played.clear(window, current_background)	
 									layer_letters_just_played.draw(window)
@@ -758,8 +756,8 @@ while game_is_running:
 
 			selected_letter.moveAt(cursor_pos_x - delta_pos_on_tile[0], cursor_pos_y - delta_pos_on_tile[1])
 
-			layer_letters_in_hand.clear(window, current_background)								
-			layer_letters_in_hand.draw(window)
+			current_player.hand.clear(window, current_background)								
+			current_player.hand.draw(window)
 
 			layer_letters_just_played.clear(window, current_background)	
 			layer_letters_just_played.draw(window)
