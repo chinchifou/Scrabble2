@@ -2,14 +2,10 @@ PRIMARY
 
 check TODO in code
 
-text file for ui text in different
-
 Make the hand holder a sprite (for "PLAY_LETTER")
 
-create toTile() and toPixel() ?
 
 /!\ warning for "PLAY_LETTER", the letter must not always go where the player release the click. More calculation to do use collidelistall()
-
 
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
@@ -25,9 +21,11 @@ create function for log ?
 
 SECONDARY
 
-less highlighted buttons
+create toTile() and toPixel() ?
 
-Able to change the language of the UI
+less highlighted buttons (2-3 pixel less pronounced)
+
+Able to change the language of the UI -> text file for ui text in different languages
 
 use save game
 
