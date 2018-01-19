@@ -1,11 +1,8 @@
 PRIMARY
 
-pb of current_player.hand disapearing une fois sur deux
-
 check TODO in code
 
-Make the hand holder a sprite (for "PLAY_LETTER")
-
+create "update" for buttons to update state base on mourse cursor position
 
 create a children class from Sprite with a method resize and common var ! (replace '*' with 'joker' for letters + widht and heightinstead of 'size')
 see if pos_x is needed or if pos_x_in_tiles is_enought / same with width and height
