@@ -87,9 +87,47 @@ class Board(pygame.sprite.Sprite):
 		self.rect = pygame.Rect((0,0), (width, height))
 
 
+#----- Hand holder -----
+class Hand_holder(pygame.sprite.Sprite):
+	def __init__(self, pos_x_in_tiles, pos_y_in_tiles):
+		#call superclass constructor
+		pygame.sprite.Sprite.__init__(self, self.containers)
+
+		#width and heigth
+		self.width_in_tiles = 7.2
+		self.height_in_tiles = 1.2
+
+		self.width = round (TILE_SIZE * self.width_in_tiles)
+		self.height = round (TILE_SIZE * self.height_in_tiles)
+
+		#position
+		self.pos_x_in_tiles = pos_x_in_tiles
+		self.pos_y_in_tiles = pos_y_in_tiles
+
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		self.image = loadImage(path.join(path_background, 'hand_holder.png'))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
+
+	def resize(self):
+		#calculate new width and height 
+		self.width = round (TILE_SIZE * self.width_in_tiles)
+		self.height = round(TILE_SIZE * self.height_in_tiles)
+
+		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
+		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
+
+		#update
+		self.image = loadImage(path.join(path_background, 'hand_holder.png'))
+		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
+
+
 #----- Tiles -----
 class Tile(pygame.sprite.Sprite):
-	def __init__(self, tile_name, pos_x, pos_y):
+	def __init__(self, tile_name, pos_x_in_tiles, pos_y_in_tiles):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
@@ -104,8 +142,8 @@ class Tile(pygame.sprite.Sprite):
 		self.height = TILE_SIZE * self.height_in_tiles
 
 		#position
-		self.pos_x_in_tiles = pos_x
-		self.pos_y_in_tiles = pos_y	
+		self.pos_x_in_tiles = pos_x_in_tiles
+		self.pos_y_in_tiles = pos_y_in_tiles	
 
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
@@ -133,7 +171,7 @@ class Tile(pygame.sprite.Sprite):
 
 #----- Buttons -----
 class Button(pygame.sprite.Sprite):
-	def __init__(self, button_name, pos_x, pos_y):
+	def __init__(self, button_name, pos_x_in_tiles, pos_y_in_tiles):
 		#call superclass constructor
 		pygame.sprite.Sprite.__init__(self, self.containers)
 
@@ -150,8 +188,8 @@ class Button(pygame.sprite.Sprite):
 		self.is_pushed = False
 
 		#position
-		self.pos_x_in_tiles = pos_x
-		self.pos_y_in_tiles = pos_y
+		self.pos_x_in_tiles = pos_x_in_tiles
+		self.pos_y_in_tiles = pos_y_in_tiles
 
 		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
 		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
@@ -433,6 +471,7 @@ layer_all = GroupOfSprites()
 
 #set default groups
 Board.containers = layer_all, layer_background
+Hand_holder.containers = layer_all, layer_background
 Button.containers = layer_all, layer_buttons
 Letter.containers = layer_all
 Tile.containers = layer_all, layer_tiles
@@ -442,6 +481,7 @@ Tile.containers = layer_all, layer_tiles
 
 #create background
 board = Board()
+hand_holder = Hand_holder(18.9, 3.4)
 
 #create tiles
 DELTA = 1.5
@@ -553,6 +593,7 @@ while game_is_running:
 
 			#To IMPROVE ?
 			BLACK_BACKGROUND = window.fill((0,0,0))
+			pygame.display.update()
 			layer_all.resize()
 
 			layer_background.draw(window)
