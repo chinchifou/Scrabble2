@@ -2,9 +2,13 @@ PRIMARY
 
 check TODO in code
 
+use size of the image to initiliaze rect of sprite 
+
+remove all pos_x from Sprite
+
 create "update" for buttons to update state base on mourse cursor position
 
-create a children class from Sprite with a method resize and common var ! (replace '*' with 'joker' for letters + widht and heightinstead of 'size')
+create a children class from Sprite with a method resize and common var ! (replace '*' with 'joker' for letters + widht and height instead of 'size')
 see if pos_x is needed or if pos_x_in_tiles is_enought / same with width and height
 normalize for board (name and position)
 
@@ -23,6 +27,8 @@ create function for log ?
 
 
 SECONDARY
+
+possibility to save different games rules (board layout, letters in bag)
 
 create toTile() and toPixel() ?
 

@@ -48,6 +48,14 @@ path_letters = path.abspath('../materials/images/assets/letters/')
 path_tiles = path.abspath('../materials/images/assets/tiles/')
 
 
+#~~~~~~ CONVERTION ~~~~~~
+
+def tiles(value_in_pixels) :
+	return int(round(value_in_pixels/float(TILE_SIZE)))
+
+def pixels(value_in_tiles) :
+	return int(value_in_tiles*TILE_SIZE)
+
 #~~~~~~ CLASSES ~~~~~~
 
 #----- Pygame class override -----
@@ -59,6 +67,87 @@ class GroupOfSprites(pygame.sprite.RenderClear):
         for s in self.sprites():
             s.resize(*args)
 
+
+#!!!!!!!!! Work in progress !!!!!!
+"""
+Instances variables :
+	type
+	name
+	pos_x, pos_y #expressed in tiles
+	width, height #espressed in tiles
+	image
+	rect
+"""
+"""
+class ResizableSprite(pygame.sprite.Sprite):
+	#received coordinates are expresed in tiles
+	def __init__(self, type, name, pos_x, pos_y):
+		#super class constructor
+		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
+
+		#name and type
+		self.name = name
+		self.type = type
+		#position
+		self.pos_x = pos_x
+		self.pos_y = pos_y
+
+		#load image
+		if self.type == "letter" or self.type == "button" :
+			if self.type == "letter" :
+				self.image = loadTransparentImage(path.join(path_letters, self.name.replace('*','joker')+'.png'))
+				self.width, self.height = 1, 1
+			elif self.type == "button" :
+				self.image = loadTransparentImage(path.join(path_buttons, self.name+'.png'))
+				self.width, self.height = 3, 1
+		else :
+			if self.type == "background" :
+				self.image = loadImage(path.join(path_background, self.name+'.png'))
+				self.width, self.height = 36, 18
+			elif self.type == "tile" :
+				self.image = loadImage(path.join(path_tiles, self.name+'.png'))
+				self.width, self.height = 1, 1
+			elif self.type == "hand_holder" :
+				self.image = loadImage(path.join(path_background, self.name+'.png'))
+				self.width, self.height = 7.2, 1.2
+
+		#resize image
+		self.image = pygame.transform.smoothscale(self.image, ( pixels(self.width), pixels(self.height) ) )
+
+		#set area to be displayed
+		self.rect = pygame.Rect( (self.pos_x,self.pos_y), (self.image.get_width(), self.image.get_height()) )
+
+	def resize(self):
+
+		#reload image
+		if self.type == "letter" or self.type == "button" :
+			if self.type == "letter" :
+				self.image = loadTransparentImage(path.join(path_letters, self.name.replace('*','joker')+'.png'))
+				logging.debug("resize a letter")
+			elif self.type == "button" :
+				self.image = loadTransparentImage(path.join(path_buttons, self.name+'.png'))
+		else :
+			if self.type == "background" :
+				self.image = loadImage(path.join(path_background, self.name+'.png'))
+			elif self.type == "tile" :
+				self.image = loadImage(path.join(path_tiles, self.name+'.png'))
+			elif self.type == "hand_holder" :
+				self.image = loadImage(path.join(path_background, self.name+'.png'))
+		#resize image
+		self.image = pygame.transform.smoothscale(self.image, ( pixels(self.width), pixels(self.height) ) )
+		#set area to be displayed
+		self.rect = pygame.Rect( (self.pos_x,self.pos_y), (self.image.get_width(), self.image.get_height()) )
+
+
+#test childre class
+class TestClass(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y):
+		self.type = 'letter'
+		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
+
+#!!!!!!!!! Work in progress !!!!!!
+
+"""
 
 #----- Board -----
 class Board(pygame.sprite.Sprite):
@@ -368,6 +457,7 @@ def logPlayersInfo():
 		player.info()
 	logging.info("")
 
+
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
 #----- Init logger -----
@@ -531,7 +621,12 @@ id_current_player = 0
 current_player = PLAYERS[id_current_player]
 
 #///// Test Values /////
-layer_letters_just_played.add(Letter("J",3+DELTA, 5+DELTA))
+#layer_letters_just_played.add(Letter("J",3+DELTA, 5+DELTA))
+"""
+TestClass.containers = layer_all
+test_letter = TestClass('a', 5, 5)
+layer_letters_just_played.add(test_letter)
+"""
 #///////////////////////
 
 

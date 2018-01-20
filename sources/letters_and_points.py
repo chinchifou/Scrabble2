@@ -169,7 +169,7 @@ BOARD_LAYOUT = [
 [5,1,1,2,1,1,1,5,1,1,1,2,1,1,5]
 ]
 
-#Override the boarrd layout to customize it to your will
+#Override the board layout to customize it to your will
 BOARD_LAYOUT = [
 [5,1,1,3,1,1,3,1,3,1,1,3,1,1,5],
 [1,1,3,1,1,4,1,1,1,4,1,1,3,1,1],
