@@ -28,7 +28,7 @@ auto shuffling for letters in hand
 
 SECONDARY
 
-fix a glitch (small black strip) for board when big window
+fix a glitch (small black strip) for board when big window (bug already present in Scrabble V1) need to fix image
 
 fix a glitch whe starting windowed but at max reoution (old sprite appearing the right size after resizing to biggest window size)
 > try to force the window to pop IN the screen in the first time
