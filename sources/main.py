@@ -51,10 +51,10 @@ path_tiles = path.abspath('../materials/images/assets/tiles/')
 #~~~~~~ CONVERTION ~~~~~~
 
 def tiles(value_in_pixels) :
-	return int(round(value_in_pixels/float(TILE_SIZE)))
+	return round( value_in_pixels/float(TILE_SIZE) )
 
-def pixels(value_in_tiles) :
-	return value_in_tiles*TILE_SIZE
+def pixels(value1_in_tiles, value2_in_tiles) :
+	return ( round(value1_in_tiles*TILE_SIZE), round(value2_in_tiles*TILE_SIZE) )
 
 #~~~~~~ CLASSES ~~~~~~
 
@@ -112,10 +112,10 @@ class ResizableSprite(pygame.sprite.Sprite):
 				self.width, self.height = 7.2, 1.2
 
 		#resize image
-		self.image = pygame.transform.smoothscale(self.image, ( pixels(self.width), pixels(self.height) ) )
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height) )
 
 		#set area to be displayed
-		self.rect = pygame.Rect( (self.pos_x,self.pos_y), ( pixels(self.width), pixels(self.height) ) )
+		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
 	def resize(self):
 
@@ -134,9 +134,16 @@ class ResizableSprite(pygame.sprite.Sprite):
 			elif self.type == "hand_holder" :
 				self.image = loadImage(path.join(path_background, self.name+'.png'))
 		#resize image
-		self.image = pygame.transform.smoothscale(self.image, ( pixels(self.width), pixels(self.height) ) )
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height) )
 		#set area to be displayed
-		self.rect = pygame.Rect( (self.pos_x,self.pos_y), ( pixels(self.width), pixels(self.height) ) )
+		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
+
+	def info(self) :
+		logging.debug("Sprite info :")
+		logging.debug("name : %s", self.name)
+		logging.debug("type : %s", self.type)
+		logging.debug("at position : %s, %s", self.pos_x, self.pos_y)
+		logging.debug("pixel position is : %s, %s", self.rect.x, self.rect.y)
 
 """
 #test children class
@@ -157,41 +164,10 @@ class Board(ResizableSprite):
 
 
 #----- Hand holder -----
-class Hand_holder(pygame.sprite.Sprite):
-	def __init__(self, pos_x_in_tiles, pos_y_in_tiles):
-		#call superclass constructor
-		pygame.sprite.Sprite.__init__(self, self.containers)
-
-		#width and heigth
-		self.width_in_tiles = 7.2
-		self.height_in_tiles = 1.2
-
-		self.width = round (TILE_SIZE * self.width_in_tiles)
-		self.height = round (TILE_SIZE * self.height_in_tiles)
-
-		#position
-		self.pos_x_in_tiles = pos_x_in_tiles
-		self.pos_y_in_tiles = pos_y_in_tiles
-
-		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
-		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
-
-		self.image = loadImage(path.join(path_background, 'hand_holder.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
-
-	def resize(self):
-		#calculate new width and height 
-		self.width = round (TILE_SIZE * self.width_in_tiles)
-		self.height = round(TILE_SIZE * self.height_in_tiles)
-
-		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
-		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
-
-		#update
-		self.image = loadImage(path.join(path_background, 'hand_holder.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
+class Hand_holder(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y):
+		self.type = 'hand_holder'
+		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
 
 
 #----- Tiles -----
@@ -246,7 +222,7 @@ class Button(pygame.sprite.Sprite):
 
 		self.name = button_name
 		
-		#width and heigth
+		#width and height
 		self.width_in_tiles = 3
 		self.height_in_tiles = 1
 
@@ -551,7 +527,7 @@ Tile.containers = layer_all, layer_tiles
 
 #create background
 board = Board("empty_background", 0, 0)
-hand_holder = Hand_holder(18.9, 3.4)
+hand_holder = Hand_holder("hand_holder", 18.9, 3.4)
 
 #create tiles
 DELTA = 1.5
@@ -611,6 +587,10 @@ layer_letters_just_played.add(test_letter)
 
 
 #----- First image -----
+
+for sprite in layer_background :
+	sprite.info()
+
 
 BLACK_BACKGROUND = window.copy()
 

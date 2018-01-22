@@ -22,15 +22,18 @@ create a class Action()
 
 create function for log ?
 
+auto shuffling for letters in hand
+
 
 
 SECONDARY
 
-fix a litch (small black strip) for board when big window
+fix a glitch (small black strip) for board when big window
+
+fix a glitch whe starting windowed but at max reoution (old sprite appearing the right size after resizing to biggest window size)
+> try to force the window to pop IN the screen in the first time
 
 possibility to save different games rules (board layout, letters in bag)
-
-create toTile() and toPixel() ?
 
 less highlighted buttons (2-3 pixel less pronounced)
 
@@ -39,8 +42,6 @@ Able to change the language of the UI -> text file for ui text in different lang
 use save game
 
 allow to change display settings while game is running
-
-remove all updates functions 
 
 play music if "SCRABBLE"
 
