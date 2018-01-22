@@ -54,7 +54,7 @@ def tiles(value_in_pixels) :
 	return int(round(value_in_pixels/float(TILE_SIZE)))
 
 def pixels(value_in_tiles) :
-	return int(value_in_tiles*TILE_SIZE)
+	return value_in_tiles*TILE_SIZE
 
 #~~~~~~ CLASSES ~~~~~~
 
@@ -78,7 +78,7 @@ Instances variables :
 	image
 	rect
 """
-"""
+
 class ResizableSprite(pygame.sprite.Sprite):
 	#received coordinates are expresed in tiles
 	def __init__(self, type, name, pos_x, pos_y):
@@ -101,9 +101,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 				self.image = loadTransparentImage(path.join(path_buttons, self.name+'.png'))
 				self.width, self.height = 3, 1
 		else :
-			if self.type == "background" :
+			if self.type == "board" :
 				self.image = loadImage(path.join(path_background, self.name+'.png'))
-				self.width, self.height = 36, 18
+				self.width, self.height = 32, 18
 			elif self.type == "tile" :
 				self.image = loadImage(path.join(path_tiles, self.name+'.png'))
 				self.width, self.height = 1, 1
@@ -115,7 +115,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.image = pygame.transform.smoothscale(self.image, ( pixels(self.width), pixels(self.height) ) )
 
 		#set area to be displayed
-		self.rect = pygame.Rect( (self.pos_x,self.pos_y), (self.image.get_width(), self.image.get_height()) )
+		self.rect = pygame.Rect( (self.pos_x,self.pos_y), ( pixels(self.width), pixels(self.height) ) )
 
 	def resize(self):
 
@@ -127,7 +127,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 			elif self.type == "button" :
 				self.image = loadTransparentImage(path.join(path_buttons, self.name+'.png'))
 		else :
-			if self.type == "background" :
+			if self.type == "board" :
 				self.image = loadImage(path.join(path_background, self.name+'.png'))
 			elif self.type == "tile" :
 				self.image = loadImage(path.join(path_tiles, self.name+'.png'))
@@ -136,44 +136,24 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, ( pixels(self.width), pixels(self.height) ) )
 		#set area to be displayed
-		self.rect = pygame.Rect( (self.pos_x,self.pos_y), (self.image.get_width(), self.image.get_height()) )
+		self.rect = pygame.Rect( (self.pos_x,self.pos_y), ( pixels(self.width), pixels(self.height) ) )
 
-
-#test childre class
+"""
+#test children class
 class TestClass(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'letter'
 		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
-
+"""
 #!!!!!!!!! Work in progress !!!!!!
 
-"""
+
 
 #----- Board -----
-class Board(pygame.sprite.Sprite):
-	def __init__(self):
-		#call superclass constructor
-		pygame.sprite.Sprite.__init__(self, self.containers)
-
-		self.width_in_tiles = int (1920 / REFERENCE_TILE_SIZE ) #32
-		self.height_in_tiles = int (1080 / REFERENCE_TILE_SIZE ) #18
-
-		width = TILE_SIZE * self.width_in_tiles
-		height = TILE_SIZE * self.height_in_tiles
-
-		self.image = loadImage(path.join(path_background, 'empty_background.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, height))
-		self.rect = pygame.Rect((0,0), (width, height))
-
-	def resize(self):
-		#calculate new width and height 
-		width = TILE_SIZE * self.width_in_tiles
-		height = TILE_SIZE * self.height_in_tiles
-
-		#update
-		self.image = loadImage(path.join(path_background, 'empty_background.png'))
-		self.image = pygame.transform.smoothscale(self.image, (width, height))
-		self.rect = pygame.Rect((0,0), (width, height))
+class Board(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y):
+		self.type = 'board'
+		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
 
 
 #----- Hand holder -----
@@ -570,7 +550,7 @@ Tile.containers = layer_all, layer_tiles
 #----- Create board game -----
 
 #create background
-board = Board()
+board = Board("empty_background", 0, 0)
 hand_holder = Hand_holder(18.9, 3.4)
 
 #create tiles

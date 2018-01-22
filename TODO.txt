@@ -2,8 +2,6 @@ PRIMARY
 
 check TODO in code
 
-use size of the image to initiliaze rect of sprite 
-
 remove all pos_x from Sprite
 
 create "update" for buttons to update state base on mourse cursor position
@@ -27,6 +25,8 @@ create function for log ?
 
 
 SECONDARY
+
+fix a litch (small black strip) for board when big window
 
 possibility to save different games rules (board layout, letters in bag)
 
