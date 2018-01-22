@@ -84,13 +84,12 @@ Instances variables :
 
 class ResizableSprite(pygame.sprite.Sprite):
 	#received coordinates are expresed in tiles
-	def __init__(self, type, name, pos_x, pos_y):
+	def __init__(self, name, pos_x, pos_y):
 		#super class constructor
 		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
 
 		#name and type
 		self.name = name
-		self.type = type
 		#position
 		self.pos_x = pos_x
 		self.pos_y = pos_y
@@ -167,7 +166,7 @@ class Board(ResizableSprite):
 		self.type = 'board'
 		self.width, self.height = 32, 18
 		self.path = path_background
-		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
 #----- Hand holder -----
@@ -176,7 +175,7 @@ class Hand_holder(ResizableSprite):
 		self.type = 'hand_holder'
 		self.width, self.height = 7.2, 1.2
 		self.path = path_background
-		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
 #----- Tiles -----
@@ -185,69 +184,37 @@ class Tile(ResizableSprite):
 		self.type = 'tile'
 		self.width, self.height = 1, 1
 		self.path = path_tiles
-		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
 #----- Buttons -----
-class Button(pygame.sprite.Sprite):
-	def __init__(self, button_name, pos_x_in_tiles, pos_y_in_tiles):
-		#call superclass constructor
-		pygame.sprite.Sprite.__init__(self, self.containers)
-
-		self.name = button_name
-		
-		#width and height
-		self.width_in_tiles = 3
-		self.height_in_tiles = 1
-
-		self.width = TILE_SIZE * self.width_in_tiles
-		self.height = TILE_SIZE * self.height_in_tiles
-
+class Button(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y):
+		self.type = 'button'
+		self.width, self.height = 3, 1
+		self.path = path_buttons
 		self.is_highlighted = False
 		self.is_pushed = False
-
-		#position
-		self.pos_x_in_tiles = pos_x_in_tiles
-		self.pos_y_in_tiles = pos_y_in_tiles
-
-		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
-		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
-
-		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
-
-	def resize(self):
-		#calculate new width and height 
-		self.width = TILE_SIZE * self.width_in_tiles
-		self.height = TILE_SIZE * self.height_in_tiles
-
-		self.pos_x = TILE_SIZE * self.pos_x_in_tiles
-		self.pos_y = TILE_SIZE * self.pos_y_in_tiles
-
-		#update
-		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
-		self.rect = pygame.Rect((self.pos_x,self.pos_y), (self.width, self.height))
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 	def turnOnHighlighted(self):
-		self.image = loadImage(path.join(path_buttons, self.name+'_highlighted.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.image = loadImage(path.join(self.path, self.name+'_highlighted.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))	
 		self.is_highlighted = True
 
 	def turnOffHighlighted(self):
-		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.image = loadImage(path.join(self.path, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
 		self.is_highlighted = False
 
 	def push(self):
-		self.image = loadImage(path.join(path_buttons, self.name+'_pushed.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.image = loadImage(path.join(self.path, self.name+'_pushed.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
 		self.is_pushed = True	
 
 	def release(self):
-		self.image = loadImage(path.join(path_buttons, self.name+'.png'))
-		self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+		self.image = loadImage(path.join(self.path, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
 		self.is_pushed = False		
 
 
@@ -317,7 +284,10 @@ class Player :
     		str_hand += '"' + letter_sprite.letter + '"' + ' ,'
     	str_hand = str_hand[:-2]
     	str_hand += "]"
-    	logging.info("%s has %s points and the following hand : %s", self.name, self.score, str_hand)
+    	logging.info("%s  :", self.name)
+    	logging.info("%s points", self.score)
+    	logging.info("hand : %s", str_hand)
+    	logging.info("")
 
     def next(self) :
     	return PLAYERS[(self.id + 1) % len(PLAYERS)]
@@ -558,9 +528,11 @@ test_letter = TestClass('a', 5, 5)
 layer_letters_just_played.add(test_letter)
 """
 
-
+"""
 for sprite in layer_background :
 	sprite.info()
+"""
+
 #///////////////////////
 
 
@@ -674,8 +646,8 @@ while game_is_running:
 							selected_letter = tile_in_hand
 							delta_pos_on_tile = ( cursor_pos_x - tile_in_hand.pos_x , cursor_pos_y - tile_in_hand.pos_y)
 
-							tile_x_on_board = int( tile_in_hand.pos_x_in_tiles - DELTA)
-							tile_y_on_board = int(tile_in_hand.pos_y_in_tiles - DELTA)
+							tile_x_on_board = int( tile_in_hand.pos_x - DELTA)
+							tile_y_on_board = int(tile_in_hand.pos_y - DELTA)
 
 							current_board_state[tile_y_on_board][tile_x_on_board] = '?'
 
@@ -701,8 +673,8 @@ while game_is_running:
 
 						if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
-							tile_x_on_board = int( tile.pos_x_in_tiles - DELTA )
-							tile_y_on_board = int( tile.pos_y_in_tiles - DELTA )
+							tile_x_on_board = int( tile.pos_x - DELTA )
+							tile_y_on_board = int( tile.pos_y - DELTA )
 
 							#Tile is empty
 							if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
@@ -741,10 +713,6 @@ while game_is_running:
 									layer_letters_just_played.draw(window)
 
 									pygame.display.update()
-
-
-									logging.debug("board state")
-									logging.debug("%s", current_board_state)
 
 									current_action = "SELECT_A_LETTER"
 
@@ -825,7 +793,6 @@ while game_is_running:
 					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ):
 						button_end_turn.turnOffHighlighted()
 						buttons_changed = True
-
 				if buttons_changed :
 					layer_buttons.clear(window, current_background)
 					layer_buttons.draw(window)
