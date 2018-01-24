@@ -4,11 +4,7 @@ check TODO in code
 
 remove all pos_x from Sprite
 
-create "update" for buttons to update state base on mourse cursor position
-
-create a children class from Sprite with a method resize and common var ! (replace '*' with 'joker' for letters + widht and height instead of 'size')
-see if pos_x is needed or if pos_x_in_tiles is_enought / same with width and height
-normalize for board (name and position)
+create "update" for buttons to update state base on mouse cursor position
 
 /!\ warning for "PLAY_LETTER", the letter must not always go where the player release the click. More calculation to do use collidelistall()
 
@@ -26,12 +22,20 @@ auto shuffling for letters in hand
 
 
 
-SECONDARY
+BUG
 
-fix a glitch (small black strip) for board when big window (bug already present in Scrabble V1) need to fix image
+fix a glitch on LAPTOP (small black strip) for board when big window (bug already present in Scrabble V1) need to fix image
 
-fix a glitch whe starting windowed but at max reoution (old sprite appearing the right size after resizing to biggest window size)
+fix a glitch on LAPTOP when starting windowed but at max reoution (old sprite appearing the right size after resizing to biggest window size)
 > try to force the window to pop IN the screen in the first time
+
+bug when moving a letter above the board where letters are already present
+
+bug : able to to click on end turn even if letter in hand
+
+
+
+SECONDARY
 
 possibility to save different games rules (board layout, letters in bag)
 
