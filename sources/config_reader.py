@@ -68,6 +68,8 @@ for line in open(path_conf_disp_file,"r") :
 		param = str(int_found.group(1))
 		if param == 'custom_window_height' :
 			h_display_params[ param ] = int(int_found.group(2))
+		if param == 'max_fps' :
+			h_display_params[ param ] = int(int_found.group(2))
 
 #groupe rules
 for line in open(path_conf_rules_file,"r") :
