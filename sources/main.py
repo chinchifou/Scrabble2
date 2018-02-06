@@ -341,13 +341,13 @@ def calculatePoints(layer_letters_played) :
 			all_x.append(tuple_pos[0])
 			all_y.append(tuple_pos[1])
 
-			min_x = min(all_x)
-			max_x = max(all_x)
-			min_y = min(all_y)
-			max_y = max(all_y)
+		min_x = min(all_x)
+		max_x = max(all_x)
+		min_y = min(all_y)
+		max_y = max(all_y)
 
-			delta_x = max_x - min_x
-			delta_y = max_y - min_y
+		delta_x = max_x - min_x
+		delta_y = max_y - min_y
 
 
 		words_and_scores = []
@@ -370,7 +370,7 @@ def calculatePoints(layer_letters_played) :
 			#words_and_scores = []
 
 			if ( end_y > start_y ) : #prevent one letter word
-				logging.debug('VERTICAL WORD')
+				logging.debug('HORIZONTAL WORD')
 				#FIRST PASSAGE
 				#store word just created
 				new_word = ''
@@ -414,7 +414,7 @@ def calculatePoints(layer_letters_played) :
 					condition_2 = ( (it_x + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( current_board_state[it_x+1][it_y] != '?' ) 
 
 					if ( condition_1  or condition_2 ) :       
-						logging.debug('HORIZONTAL WORD')
+						logging.debug('VERTICAL WORD')
 				
 						while( ( (it_x - 1) >= 0) and (current_board_state[it_x-1][it_y] != '?') ) : #go to the begining of the word
 							it_x = it_x - 1
@@ -477,7 +477,7 @@ def calculatePoints(layer_letters_played) :
 				end_x = end_x + 1
 
 			if ( end_x > start_x ) : #prevent one letter word
-				logging.debug('HORIZONTAL WORD')
+				logging.debug('VERTICAL WORD')
 				#FIRST PASSAGE
 				#store word just created  
 				new_word = ''
@@ -521,7 +521,7 @@ def calculatePoints(layer_letters_played) :
 					condition_2 = ( (it_y + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( current_board_state[it_x][it_y+1] != '?' ) 
 
 					if ( condition_1  or condition_2 ) :
-						logging.debug('VERTICAL WORD')
+						logging.debug('HORIZONTAL WORD')
 
 						while( ( (it_y - 1) >= 0) and (current_board_state[it_x][it_y-1] != '?') ) : #go to the begining of the word
 							it_y = it_y - 1
@@ -567,6 +567,7 @@ def calculatePoints(layer_letters_played) :
 				total_score += association[1]
 			
 			logging.info('total_score : %i', total_score)
+			logging.info('')
 
 			return words_and_scores
 
