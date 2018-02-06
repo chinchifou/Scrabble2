@@ -56,9 +56,11 @@ path_tiles = path.abspath('../materials/images/assets/tiles/')
 
 
 #~~~~~~ CONVERTION ~~~~~~
-
 def tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(TILE_SIZE) ), round( value_in_pixels2/float(TILE_SIZE) ) )
+
+def tiles_floor(value_in_pixels1, value_in_pixels2) :
+	return ( floor( value_in_pixels1/float(TILE_SIZE) ), round( value_in_pixels2/float(TILE_SIZE) ) )
 
 def pixels(value1_in_tiles, value2_in_tiles) :
 	return ( (value1_in_tiles*TILE_SIZE), (value2_in_tiles*TILE_SIZE) )
@@ -66,10 +68,22 @@ def pixels(value1_in_tiles, value2_in_tiles) :
 def int_pixels(value1_in_tiles, value2_in_tiles) :
 	return ( round(value1_in_tiles*TILE_SIZE), round(value2_in_tiles*TILE_SIZE) )
 
+def indexInHandHolder(cursor_pos_x):
+	delta_x_hand_holder = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1
+	index_in_hand = int( floor( cursor_pos_x/float(TILE_SIZE) ) - delta_x_hand_holder )
+	#fix value on the edge
+	if index_in_hand == -1:
+		index_in_hand = 0
+	elif index_in_hand == 7 :
+		index_in_hand = 6
+	return index_in_hand
+
+
 #~~~~~~ CLASSES ~~~~~~
 
 #----- Pygame class override -----
-#specify the pygame class RenderClear to allow easy reasize
+
+#complete the pygame class RenderClear to allow easy reasize
 class GroupOfSprites(pygame.sprite.RenderClear):
 
 	#call each resize function of the sprite contained in the group
@@ -77,18 +91,9 @@ class GroupOfSprites(pygame.sprite.RenderClear):
         for s in self.sprites():
             s.resize(*args)
 
-
-#!!!!!!!!! Work in progress !!!!!!
-"""
-Instances variables :
-	type
-	name
-	pos_x, pos_y #expressed in tiles
-	width, height #espressed in tiles
-	image
-	rect
-"""
+#create a specific sprite class
 class ResizableSprite(pygame.sprite.Sprite):
+	nb_letters_instances = 0
 	#received coordinates are expresed in tiles
 	def __init__(self, name, pos_x, pos_y):
 		#super class constructor
@@ -133,16 +138,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 		logging.debug("width : %s / height : %s", self.width, self.height)
 		logging.debug("pixel width : %s /  pixel height : %s", self.rect.width, self.rect.height)
 		logging.debug("")
-
-"""
-#test children class
-class TestClass(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y):
-		self.type = 'letter'
-		ResizableSprite.__init__(self, self.type, name, pos_x, pos_y)
-"""
-#!!!!!!!!! Work in progress !!!!!!
-
 
 
 #----- Board -----
@@ -208,9 +203,14 @@ class Letter(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'letter'
 		self.width, self.height = 1, 1
-		self.path = path_letters		
+		self.path = path_letters
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y)		
+
+		#add a instance in the class counter
+		ResizableSprite.nb_letters_instances += 1
+		#and use it to define the id
+		self.id = ResizableSprite.nb_letters_instances	
 
 		self.points = POINTS_FOR[name]
 
@@ -228,25 +228,31 @@ class Letter(ResizableSprite):
 #----- Player -----
 class Player :
 
-    def __init__(self, name, score, hand) :
-        self.name = name
-        self.score = score
-        self.hand = hand
-        self.id = len(PLAYERS)
+	def __init__(self, name, score, hand) :
+		self.name = name
+		self.score = score
+		self.hand = hand
+		self.id = len(PLAYERS)
 
-    def info(self) :
-    	str_hand = "["
-    	for letter_sprite in self.hand :
-    		str_hand += '"' + letter_sprite.name + '"' + ' ,'
-    	str_hand = str_hand[:-2]
-    	str_hand += "]"
-    	logging.info("%s  :", self.name)
-    	logging.info("%s points", self.score)
-    	logging.info("hand : %s", str_hand)
-    	logging.info("")
+		self.hand_state = [0,0,0,0,0,0,0]
+		index = 0
+		for letter in hand :
+			self.hand_state[index] = letter.id
+			index += 1
 
-    def next(self) :
-    	return PLAYERS[(self.id + 1) % len(PLAYERS)]
+	def info(self) :
+		str_hand = "["
+		for letter_sprite in self.hand :
+			str_hand += '"' + letter_sprite.name + '"' + ' ,'
+		str_hand = str_hand[:-2]
+		str_hand += "]"
+		logging.info("%s  :", self.name)
+		logging.info("%s points", self.score)
+		logging.info("hand : %s", str_hand)
+		#logging.debug("hand_state : %s", self.hand_state) #TODO to remove
+
+	def next(self) :
+		return PLAYERS[(self.id + 1) % len(PLAYERS)]
 
 
 #~~~~~~ FUNCTIONS ~~~~~~
@@ -616,6 +622,7 @@ while game_is_running:
 							layer_letters_just_played.clear(window, BACKGROUND_NO_LETTER)
 
 							current_background = window.copy()
+							layer_letters_just_played.draw(window)
 							layer_selected_letter.draw(window)
 
 							pygame.display.update()
@@ -638,9 +645,38 @@ while game_is_running:
 				elif current_action == 'PLAY_A_LETTER' :
 
 					#------ A LETTER IS SELECTED -------
-					if len(layer_selected_letter) == 1 :
+					if len(layer_selected_letter) == 1 : 
 
-						#click on a tile ?
+						#------ CLIC ON THE HAND HOLDER ? ------- #TODO IN PROGRESS
+						for hand_holder in layer_hand_holder :
+
+							if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+
+								index_in_hand = indexInHandHolder(cursor_pos_x)
+
+								"""
+								#Tile is empty
+								if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+
+									selected_letter = layer_selected_letter.sprites()[0]
+
+									selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
+									current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+
+									layer_letters_just_played.add(selected_letter)								
+									layer_selected_letter.remove(selected_letter)
+
+									layer_selected_letter.clear(window, current_background)	
+									layer_letters_just_played.draw(window)
+
+									current_background = window.copy()	
+									pygame.display.update()
+
+									current_action = "SELECT_A_LETTER"
+								"""
+
+
+						#------ CLIC ON A TILE ON THE BOARD ? -------
 						for tile in layer_tiles :
 
 							if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -649,7 +685,7 @@ while game_is_running:
 								tile_y_on_board = int( tile.pos_y - DELTA )
 
 								#Tile is empty
-								if current_board_state[tile_y_on_board][tile_x_on_board] == '?': #TODO for hand holder
+								if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
 									selected_letter = layer_selected_letter.sprites()[0]
 

@@ -18,19 +18,16 @@ Able to change the language of the UI -> text file for ui text in different lang
 
 
 
-
 BUG
 
 fix a glitch on LAPTOP or low resolutions (small black strip) for board when big window (bug already present in Scrabble V1) maybe due to to bad "round"
-
-
+> use smaller tile size ?
 
 
 TO KEEP IN MIND
 
 /!\ warning for "PLAY_LETTER", the letter must not always go where the player release the click. More calculation to do use collidelistall()
 /!\ warning for "PLAY_LETTER", when clicking on a butioon and relaesing the clic above a letter
-
 
 
 
