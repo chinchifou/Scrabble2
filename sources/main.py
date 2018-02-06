@@ -965,7 +965,6 @@ while game_is_running:
 						layer_buttons.clear(window, current_background)
 						layer_buttons.draw(window)
 
-						#TODO calculate score
 						last_words_and_scores = calculatePoints(layer_letters_just_played)
 
 						for association in last_words_and_scores :
@@ -975,8 +974,20 @@ while game_is_running:
 							layer_letters_on_board.add(letter)
 
 						layer_letters_just_played.empty()
-
 						current_player.hand.clear(window, BACKGROUND_NO_LETTER)
+
+						#redraw letters
+						index_hand = 0
+						while len(BAG_OF_LETTERS) > 0 and index_hand < number_of_letters_per_hand :
+							if current_player.hand_state[index_hand] == 0 :
+								random_int = randint(0,len(BAG_OF_LETTERS)-1)
+								drawn_letter = Letter(BAG_OF_LETTERS[random_int], 0, 0)
+								current_player.hand_state[index_hand] = drawn_letter.id
+								delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
+								drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
+								current_player.hand.add(drawn_letter)								
+							index_hand += 1
+
 						current_player = current_player.next()
 						current_player.info()
 
