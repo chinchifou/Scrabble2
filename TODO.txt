@@ -2,10 +2,6 @@ PRIMARY
 
 check TODO in code
 
-possibility to put a letter back to hand
-
-create "update" for buttons to update state base on mouse cursor position
-
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
 	layer_background.draw()
@@ -16,6 +12,7 @@ auto shuffling for letters in hand
 
 Able to change the language of the UI -> text file for ui text in different languages
 
+use save game
 
 
 BUG
@@ -39,8 +36,7 @@ create function for log ?
 
 possibility to save different games rules (board layout, letters in bag)
 
-
-use save game
+create "update" for buttons to update state base on mouse cursor position
 
 allow to change display settings while game is running
 

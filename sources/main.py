@@ -59,9 +59,6 @@ path_tiles = path.abspath('../materials/images/assets/tiles/')
 def tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(TILE_SIZE) ), round( value_in_pixels2/float(TILE_SIZE) ) )
 
-def tiles_floor(value_in_pixels1, value_in_pixels2) :
-	return ( floor( value_in_pixels1/float(TILE_SIZE) ), round( value_in_pixels2/float(TILE_SIZE) ) )
-
 def pixels(value1_in_tiles, value2_in_tiles) :
 	return ( (value1_in_tiles*TILE_SIZE), (value2_in_tiles*TILE_SIZE) )
 
@@ -249,7 +246,6 @@ class Player :
 		logging.info("%s  :", self.name)
 		logging.info("%s points", self.score)
 		logging.info("hand : %s", str_hand)
-		#logging.debug("hand_state : %s", self.hand_state) #TODO to remove
 
 	def next(self) :
 		return PLAYERS[(self.id + 1) % len(PLAYERS)]
@@ -584,7 +580,7 @@ while game_is_running:
 				#------ SELECT A LETTER -------
 				if current_action == 'SELECT_A_LETTER' :
 
-					#click on a letter in hand ?
+					#------ CLIC ON A LETTER IN HAND ? -------
 					for letter_from_hand in current_player.hand :
 
 						if letter_from_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -593,6 +589,8 @@ while game_is_running:
 							layer_selected_letter.add(letter_from_hand)
 							
 							current_player.hand.remove(letter_from_hand)
+							hand_state_index = current_player.hand_state.index(letter_from_hand.id)
+							current_player.hand_state[hand_state_index] = 0
 							current_player.hand.clear(window, BACKGROUND_NO_LETTER)
 							current_player.hand.draw(window)
 
@@ -604,7 +602,7 @@ while game_is_running:
 							current_action = "PLAY_A_LETTER"
 
 
-					#click on a letter just played ?
+					#------ CLIC ON A LETTER JUST PLAYED ? -------
 					for letter_from_board in layer_letters_just_played :
 
 						if letter_from_board.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -629,7 +627,7 @@ while game_is_running:
 
 							current_action = "PLAY_A_LETTER"
 
-					#next player
+					#------ CLIC ON END TURN -------
 					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 						#change button state
 						button_end_turn.is_highlighted = False
@@ -647,33 +645,32 @@ while game_is_running:
 					#------ A LETTER IS SELECTED -------
 					if len(layer_selected_letter) == 1 : 
 
-						#------ CLIC ON THE HAND HOLDER ? ------- #TODO IN PROGRESS
+						#------ CLIC ON THE HAND HOLDER ? -------
 						for hand_holder in layer_hand_holder :
 
 							if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
 								index_in_hand = indexInHandHolder(cursor_pos_x)
 
-								"""
-								#Tile is empty
-								if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+								#------ EMPTY SPOT ? -------
+								if current_player.hand_state[index_in_hand] == 0 :
 
 									selected_letter = layer_selected_letter.sprites()[0]
+									
+									delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
+									selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
+									current_player.hand_state[index_in_hand] = selected_letter.id
 
-									selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
-									current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
-
-									layer_letters_just_played.add(selected_letter)								
+									current_player.hand.add(selected_letter)
 									layer_selected_letter.remove(selected_letter)
 
-									layer_selected_letter.clear(window, current_background)	
-									layer_letters_just_played.draw(window)
+									layer_selected_letter.clear(window, current_background)
+									current_player.hand.draw(window)
 
 									current_background = window.copy()	
 									pygame.display.update()
 
 									current_action = "SELECT_A_LETTER"
-								"""
 
 
 						#------ CLIC ON A TILE ON THE BOARD ? -------
@@ -684,7 +681,7 @@ while game_is_running:
 								tile_x_on_board = int( tile.pos_x - DELTA )
 								tile_y_on_board = int( tile.pos_y - DELTA )
 
-								#Tile is empty
+								#------ EMPTY TILE ? -------
 								if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
 									selected_letter = layer_selected_letter.sprites()[0]
@@ -709,7 +706,8 @@ while game_is_running:
 
 				#------ SELECT A LETTER -------
 				if current_action == 'SELECT_A_LETTER' :
-					#next player
+
+					#------ RELEASE CLIC ON BUTTON -------
 					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 						button_end_turn.turnOnHighlighted()
 						layer_buttons.clear(window, current_background)
@@ -726,7 +724,6 @@ while game_is_running:
 						current_player = current_player.next()
 						current_player.info()
 
-						#layer_letters_on_board.clear(window, current_background)
 						layer_letters_just_played.clear(window, current_background)
 
 						layer_letters_on_board.draw(window)
@@ -735,11 +732,10 @@ while game_is_running:
 						current_background = window.copy()
 						pygame.display.update()
 
-				#------ SELECT OR PLAY A LETTER -------
-				#relase pushed buttons
+				#------ RELEASE CLIC AWAY FROM BUTTON -------
 				for button in layer_buttons :
 					if button.is_pushed :
-						button.release()
+						button.release() #release all pushed buttons
 						if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
 							button.turnOnHighlighted()
 						else :
