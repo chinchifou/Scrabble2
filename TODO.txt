@@ -2,6 +2,8 @@ PRIMARY
 
 check TODO in code
 
+calculate score
+
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
 	layer_background.draw()

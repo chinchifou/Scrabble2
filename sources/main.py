@@ -19,6 +19,7 @@ import letters_and_points as rules
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
 #----- Constants -----
+global REFERENCE_TILE_SIZE, TILES_PER_BOARD_COLUMN, DELTA
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
@@ -27,20 +28,9 @@ TILES_PER_BOARD_COLUMN = 15
 DELTA = 1.5
 
 #----- Changing at runtime -----
-#resolution of current monitor
-global monitor_resolution
-#actual tile size used to scale all assets.
-global TILE_SIZE
-#all the remaining letters in the stack
-global BAG_OF_LETTERS
+global monitor_resolution, TILE_SIZE, BAG_OF_LETTERS, current_board_state, delta_pos_on_tile, current_action
 BAG_OF_LETTERS = []
-#current state of the board
-global current_board_state
 current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
-#postion of the mouse cursor on the tile
-global delta_pos_on_tile
-#current action of the current player, either select a letter or play a letter
-global current_action
 current_action = 'SELECT_A_LETTER'
 
 #----- Folders' paths-----
@@ -78,17 +68,19 @@ def indexInHandHolder(cursor_pos_x):
 
 #~~~~~~ CLASSES ~~~~~~
 
-#----- Pygame class override -----
+#----- PYGAME CLASSES OVERRIDE -----
 
-#complete the pygame class RenderClear to allow easy reasize
+#----- GroupOfSprites -----
+#complete the pygame class RenderClear to allow easy resize
 class GroupOfSprites(pygame.sprite.RenderClear):
 
 	#call each resize function of the sprite contained in the group
-    def resize(self, *args):
-        for s in self.sprites():
-            s.resize(*args)
+	def resize(self, *args):
+		for s in self.sprites():
+			s.resize(*args)
 
-#create a specific sprite class
+#----- ResizableSprite -----
+#add native capacity to be resized
 class ResizableSprite(pygame.sprite.Sprite):
 	nb_letters_instances = 0
 	#received coordinates are expresed in tiles
@@ -136,6 +128,8 @@ class ResizableSprite(pygame.sprite.Sprite):
 		logging.debug("pixel width : %s /  pixel height : %s", self.rect.width, self.rect.height)
 		logging.debug("")
 
+
+#----- Other classes -----
 
 #----- Board -----
 class Board(ResizableSprite):
@@ -318,6 +312,263 @@ def logPlayersInfo():
 		player.info()
 	logging.info("")
 
+#----- Calculate points -----
+def calculatePoints(layer_letters_played) :
+
+	global current_board_state, TILES_PER_BOARD_COLUMN
+
+	#format letters_played {'a' : (x, y)}
+	letters_played = {}
+	for letter in layer_letters_played :
+		letters_played[(int(letter.pos_y - DELTA), int(letter.pos_x - DELTA))] = letter.name
+
+	if len(letters_played) > 1 :
+		logging.debug('%i letters played', len(letters_played)) #TODO to test
+	else :
+		logging.debug('%i letter played', len(letters_played)) #TODO to test  
+
+	if len(letters_played) == 0 :
+		logging.info('nothing played')
+		logging.info('')
+		return []
+
+	else :
+		#init 
+		all_x = []
+		all_y = []
+
+		for tuple_pos in letters_played.keys() :
+			all_x.append(tuple_pos[0])
+			all_y.append(tuple_pos[1])
+
+			min_x = min(all_x)
+			max_x = max(all_x)
+			min_y = min(all_y)
+			max_y = max(all_y)
+
+			delta_x = max_x - min_x
+			delta_y = max_y - min_y
+
+
+		words_and_scores = []
+
+		if len(letters_played) == 7 : #is a SCRABBLE ?
+			words_and_scores.append(['!! SCRABBLE !!', 50])
+
+		if delta_x == 0 :
+
+			#find first letter
+			start_y = min_y
+			while( ( (start_y - 1) >= 0) and (current_board_state[min_x][start_y - 1] != '?') ) :
+				start_y = start_y - 1
+
+			#find last letter
+			end_y = max_y
+			while( ( (end_y + 1) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[min_x][end_y + 1] != '?') ) :
+				end_y = end_y + 1
+
+			#words_and_scores = []
+
+			if ( end_y > start_y ) : #prevent one letter word
+				logging.debug('VERTICAL WORD')
+				#FIRST PASSAGE
+				#store word just created
+				new_word = ''
+				new_word_multiplier = 1
+				new_word_score = 0
+
+				for it_y in range( start_y, end_y+1 ) :
+					letter = current_board_state[min_x][it_y]
+					new_word += letter
+					if ((min_x, it_y) in letters_played ): #letters just played
+						#calculate points for each letter
+						bonus = rules.BOARD_LAYOUT[min_x][it_y]
+						if bonus == 0 : #start_tile
+							new_word_multiplier *= 2
+							bonus = 1
+						elif bonus == 4:
+							new_word_multiplier *= 2
+							bonus = 1
+						elif bonus == 5:
+							new_word_multiplier *= 3
+							bonus = 1
+
+						new_letter_points = POINTS_FOR[letter]
+						new_word_score = new_word_score + (bonus * new_letter_points)
+
+					else : #old letters
+						old_letter_points = POINTS_FOR[letter]
+						new_word_score = new_word_score + old_letter_points
+						
+				new_word_score = new_word_score * new_word_multiplier
+				words_and_scores.append([new_word, new_word_score])
+
+
+			#SECOND PASSAGE
+			for it_y in range( start_y, end_y+1 ) :
+				#check for horizontal words
+				it_x = min_x
+				if (it_x, it_y) in (letters_played) : #prevent to count already existing words
+
+					condition_1 = ( (it_x - 1) >= 0 ) and ( current_board_state[it_x-1][it_y] != '?' )
+					condition_2 = ( (it_x + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( current_board_state[it_x+1][it_y] != '?' ) 
+
+					if ( condition_1  or condition_2 ) :       
+						logging.debug('HORIZONTAL WORD')
+				
+						while( ( (it_x - 1) >= 0) and (current_board_state[it_x-1][it_y] != '?') ) : #go to the begining of the word
+							it_x = it_x - 1
+
+
+						old_word = ''
+						old_word_score = 0
+						old_word_multiplier = 1  
+
+						while( ( (it_x) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[it_x][it_y] != '?') ) : #go to the end of the word
+
+							old_letter = current_board_state[it_x][it_y]
+							old_word += old_letter
+
+							if (it_x, it_y) in (letters_played) :
+
+								bonus = rules.BOARD_LAYOUT[it_x][it_y]
+
+								if bonus == 0 : #start_tile
+									old_word_multiplier *= 2
+									bonus = 1
+								elif bonus == 4:
+									old_word_multiplier *= 2
+									bonus = 1
+								elif bonus == 5:
+									old_word_multiplier *= 3
+									bonus = 1
+
+								old_word_score += POINTS_FOR[old_letter] * bonus
+
+							else :
+								old_word_score += POINTS_FOR[old_letter]
+
+							it_x = it_x + 1
+
+						old_word_score = old_word_score * old_word_multiplier
+						words_and_scores.append([old_word, old_word_score])
+
+
+			total_score = 0 
+
+			for association in words_and_scores :
+				logging.info('Word %s gives %i points', association[0], association[1])
+				total_score += association[1]
+			
+			logging.info('total_score : %i', total_score)
+			logging.info('')
+			return words_and_scores 
+
+
+		else : 
+			#find first letter
+			start_x = min_x
+			while( ( (start_x - 1) >= 0) and (current_board_state[start_x - 1][min_y] != '?') ) :
+				start_x = start_x - 1
+
+			#find last letter
+			end_x = max_x
+			while( ( (end_x + 1) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[end_x + 1][min_y] != '?') ) :
+				end_x = end_x + 1
+
+			if ( end_x > start_x ) : #prevent one letter word
+				logging.debug('HORIZONTAL WORD')
+				#FIRST PASSAGE
+				#store word just created  
+				new_word = ''
+				new_word_multiplier = 1
+				new_word_score = 0
+
+				for it_x in range( start_x, end_x+1 ) :
+					letter = current_board_state[it_x][min_y]
+					new_word += letter
+					if ((it_x, min_y) in letters_played ): #letters just played
+						#calculate points for each letter
+						bonus = rules.BOARD_LAYOUT[it_x][min_y]
+						if bonus == 0 : #start_tile
+							new_word_multiplier *= 2
+							bonus = 1
+						elif bonus == 4:
+							new_word_multiplier *= 2
+							bonus = 1
+						elif bonus == 5:
+							new_word_multiplier *= 3
+							bonus = 1
+
+						new_letter_points = POINTS_FOR[letter]
+						new_word_score = new_word_score + (bonus * new_letter_points)
+
+					else : #old letters
+						old_letter_points = POINTS_FOR[letter]
+						new_word_score = new_word_score + old_letter_points
+						
+				new_word_score = new_word_score * new_word_multiplier
+				words_and_scores.append([new_word, new_word_score])
+
+
+			#SECOND PASSAGE
+			for it_x in range( start_x, end_x+1 ) :
+				#check for vertical words
+				it_y = min_y
+				if (it_x, it_y) in (letters_played) : #prevent to count already existing words
+
+					condition_1 = ( (it_y - 1) >= 0 ) and ( current_board_state[it_x][it_y-1] != '?' )
+					condition_2 = ( (it_y + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( current_board_state[it_x][it_y+1] != '?' ) 
+
+					if ( condition_1  or condition_2 ) :
+						logging.debug('VERTICAL WORD')
+
+						while( ( (it_y - 1) >= 0) and (current_board_state[it_x][it_y-1] != '?') ) : #go to the begining of the word
+							it_y = it_y - 1
+
+
+						old_word = ''
+						old_word_score = 0
+						old_word_multiplier = 1
+
+						while( ( (it_y) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[it_x][it_y] != '?') ) : #go to the end of the word
+
+							old_letter = current_board_state[it_x][it_y]
+							old_word += old_letter
+
+							if (it_x, it_y) in (letters_played) :
+
+								bonus = rules.BOARD_LAYOUT[it_x][it_y]
+
+								if bonus == 0 : #start_tile
+									old_word_multiplier *= 2
+									bonus = 1
+								elif bonus == 4:
+									old_word_multiplier *= 2
+									bonus = 1
+								elif bonus == 5:
+									old_word_multiplier *= 3
+									bonus = 1
+
+								old_word_score += POINTS_FOR[old_letter] * bonus
+
+							else :
+								old_word_score += POINTS_FOR[old_letter]
+							
+							it_y = it_y + 1
+
+						old_word_score = old_word_score * old_word_multiplier
+						words_and_scores.append([old_word, old_word_score])
+
+			total_score = 0 #TEMP
+
+			for association in words_and_scores :
+				logging.info('Word %s gives %i points', association[0], association[1])
+				total_score += association[1]
+			
+			logging.info('total_score : %i', total_score)
+
+			return words_and_scores
 
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
@@ -714,6 +965,10 @@ while game_is_running:
 						layer_buttons.draw(window)
 
 						#TODO calculate score
+						last_words_and_scores = calculatePoints(layer_letters_just_played)
+
+						for association in last_words_and_scores :
+							current_player.score +=  association[1]
 
 						for letter in layer_letters_just_played :
 							layer_letters_on_board.add(letter)
