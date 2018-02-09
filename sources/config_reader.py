@@ -13,6 +13,7 @@ import re
 #store result
 h_display_params = {}
 h_rules_params = {}
+h_ui_params = {}
 players = []
 
 
@@ -31,6 +32,7 @@ def str_to_bool(s):
 #relative path
 path_conf_disp_file = path.abspath('../config/display_settings.ini')
 path_conf_rules_file = path.abspath('../config/game_settings.ini')
+path_conf_language_file = path.abspath('../config/ui_content.ini')
 
 #match everything of format >> multiple_letters = LeTTers
 match_word = re.compile(r'^([a-z_]*)\s*=\s*([A-Za-z]*)\s*$')
@@ -40,6 +42,9 @@ match_integer = re.compile(r'^([a-z_]*)\s*=\s*([0-9]*)\s*$')
 
 #match everything of format >> multiple_letters = LeTTers OTHERletters andSoOn
 match_names = re.compile(r'^([a-z_]*)\s*=([^0-9])*$')
+
+#match everything of format >> multiple_letters = UI text <VALUE1> / other UI text <VALUE1> AND <VALUE2>
+match_ui_word = re.compile(r'^([a-z_]*)\s*=\s*([A-Za-z12<>\'/\s]*)\s*$')
 
 
 #~~~~~~~~ Retrieve data ~~~~~~~~
@@ -82,7 +87,9 @@ for line in open(path_conf_rules_file,"r") :
 		param = str(word_found.group(1))
 		if param == 'display_next_player_hand' :
 			h_rules_params[ param ] = str_to_bool(word_found.group(2))
-		if param == 'language' :
+		if param == 'letters_language' :
+			h_rules_params[ param ] = str(word_found.group(2))
+		if param == 'ui_language' :
 			h_rules_params[ param ] = str(word_found.group(2))
 
 	if names_found :
@@ -99,6 +106,23 @@ for line in open(path_conf_rules_file,"r") :
 		param = str(int_found.group(1))
 		if param == 'number_of_letters_per_hand' :
 			h_rules_params[ param ] = int(int_found.group(2))
+
+
+for line in open(path_conf_language_file,"r") :
+
+	text_found = match_ui_word.search(line)
+
+	if text_found :
+		param = str(text_found.group(1))
+		text = []
+		if param == 'current_player_turn' :
+			start = line.index('=')+1
+			all_values = line[start:]
+			all_values = all_values.strip().split('/')
+			for value in all_values :
+				if value != '' :
+					text.append(value)	
+			h_ui_params [ param ] = text 
 
 #should be alright for accents ... PROOF :
 '''

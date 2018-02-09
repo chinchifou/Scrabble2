@@ -10,7 +10,7 @@ def draw all()
 
 auto shuffling for letters in hand
 
-Able to change the language of the UI -> text file for ui text in different languages
+Able to change the language of the UI -> One text file for ui text in different languages
 
 use save game
 
@@ -29,6 +29,10 @@ TO KEEP IN MIND
 
 
 SECONDARY
+
+create a variable for "points for a scrabble" + possibilility to change value
+
+restrict length of player name
 
 create a class Action()
 

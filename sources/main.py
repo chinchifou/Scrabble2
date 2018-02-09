@@ -581,26 +581,52 @@ logging.info("")
 
 #----- Get configuration -----
 #Display settings
-cfg_fullscreen = config_reader.h_display_params['fullscreen']
-cfg_resizable = config_reader.h_display_params['resizable']
-cfg_resolution_auto = config_reader.h_display_params['resolution_auto']
-cfg_hardware_accelerated = config_reader.h_display_params['enable_hardware_accelerated']
-cfg_double_buffer = config_reader.h_display_params['enable_double_buffer']
-cfg_custom_window_height = config_reader.h_display_params['custom_window_height']
-cfg_max_fps = config_reader.h_display_params['max_fps']
+display_settings = config_reader.h_display_params
+cfg_fullscreen = display_settings['fullscreen']
+cfg_resizable = display_settings['resizable']
+cfg_resolution_auto = display_settings['resolution_auto']
+cfg_hardware_accelerated = display_settings['enable_hardware_accelerated']
+cfg_double_buffer = display_settings['enable_double_buffer']
+cfg_custom_window_height = display_settings['custom_window_height']
+cfg_max_fps = display_settings['max_fps']
 
 #Game settings
-number_of_letters_per_hand = config_reader.h_rules_params['number_of_letters_per_hand']
-display_next_player_hand = config_reader.h_rules_params['display_next_player_hand']
-LANGUAGE = config_reader.h_rules_params['language']
+game_settings = config_reader.h_rules_params
+number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
+display_next_player_hand = game_settings['display_next_player_hand']
+LETTERS_LANGUAGE = game_settings['letters_language']
+UI_LANGUAGE = game_settings['ui_language']
 players_names = config_reader.players
 
+#User interface language
+if UI_LANGUAGE == 'english' :
+	language_id = 0
+elif UI_LANGUAGE == 'french' :
+	language_id = 1
+else :
+	language_id = 0
+
+#User interface content
+ui_content = config_reader.h_ui_params
+ui_current_player_turn = ui_content['current_player_turn'][language_id]
+#TODO
+next_player_hand = 
+scores = 
+player_score = 
+previous_turn_summary = 
+word_and_score = 
+scrabble_obtained = 
+nothing_played_during_previous_turn = 
+remaining_letters_in_bag = 
+remaining_letter_in_bag = 
+no_remaining_letter_in_bag = 
+
 #Letters and points
-if LANGUAGE == 'english' :
+if LETTERS_LANGUAGE == 'english' :
 	BAG_OF_LETTERS = rules.letters_english
 	POINTS_FOR = rules.points_english
 	path_letters = path_letters_english
-elif LANGUAGE == 'french':
+elif LETTERS_LANGUAGE == 'french':
 	BAG_OF_LETTERS = rules.letters_french
 	POINTS_FOR = rules.points_french
 	path_letters = path_letters_french
@@ -616,7 +642,7 @@ logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.info("Double buffer : %s", cfg_double_buffer)
 logging.info("")
 logging.info("GAMES RULES")
-logging.info("Language : %s", LANGUAGE)
+logging.info("Language : %s", LETTERS_LANGUAGE)
 logging.info("Players : %s", players_names)
 logging.info("Number of letters per_hand : %s", number_of_letters_per_hand)
 logging.info("Display next player hand : %s", display_next_player_hand)
@@ -629,7 +655,7 @@ logging.info("")
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
 fps_clock = pygame.time.Clock()
-button_clock = pygame.time.Clock()
+button_clock = pygame.time.Clock() #TODO to use
 logging.info("INITIALIZATION")
 logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.info("Pygame started")
@@ -822,7 +848,7 @@ while game_is_running:
 		#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
 		elif ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
 
-			timer = button_clock.tick() 
+			timer = button_clock.tick() #TODO to use ?
 
 			#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
 			if ( event_type == pygame.MOUSEBUTTONDOWN ) :
