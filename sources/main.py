@@ -28,10 +28,27 @@ TILES_PER_BOARD_COLUMN = 15
 DELTA = 1.5
 
 #----- Changing at runtime -----
+#class to store game variable
+class GameVariable():
+	def __init__(self):
+
+		self.tile_size = 0.0
+		self.delta_pos_on_tile = 0.0
+
+		self.bag_of_letters = []
+
+		self.current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ] 
+		
+		self.current_action = 'SELECT_A_LETTER'
+
+var = GameVariable()
+
+"""
 global monitor_resolution, TILE_SIZE, BAG_OF_LETTERS, current_board_state, delta_pos_on_tile, current_action
 BAG_OF_LETTERS = []
 current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
 current_action = 'SELECT_A_LETTER'
+"""
 
 #----- Folders' paths-----
 path_log_folder = path.abspath('../log/')
@@ -47,17 +64,17 @@ path_tiles = path.abspath('../materials/images/assets/tiles/')
 
 #~~~~~~ CONVERTION ~~~~~~
 def tiles(value_in_pixels1, value_in_pixels2) :
-	return ( round( value_in_pixels1/float(TILE_SIZE) ), round( value_in_pixels2/float(TILE_SIZE) ) )
+	return ( round( value_in_pixels1/float(var.tile_size) ), round( value_in_pixels2/float(var.tile_size) ) )
 
 def pixels(value1_in_tiles, value2_in_tiles) :
-	return ( (value1_in_tiles*TILE_SIZE), (value2_in_tiles*TILE_SIZE) )
+	return ( (value1_in_tiles*var.tile_size), (value2_in_tiles*var.tile_size) )
 
 def int_pixels(value1_in_tiles, value2_in_tiles) :
-	return ( round(value1_in_tiles*TILE_SIZE), round(value2_in_tiles*TILE_SIZE) )
+	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
 def indexInHandHolder(cursor_pos_x):
 	delta_x_hand_holder = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1
-	index_in_hand = int( floor( cursor_pos_x/float(TILE_SIZE) ) - delta_x_hand_holder )
+	index_in_hand = int( floor( cursor_pos_x/float(var.tile_size) ) - delta_x_hand_holder )
 	#fix value on the edge
 	if index_in_hand == -1:
 		index_in_hand = 0
@@ -253,8 +270,6 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	logging.info("WINDOW Creation")
 	updateTileSize(width,height)
 
-	width = int (1920 / REFERENCE_TILE_SIZE ) * TILE_SIZE
-	height = int (1080 / REFERENCE_TILE_SIZE ) * TILE_SIZE
 
 	logging.info("Size of game window is : %s * %s", width, height)
 	logging.info("")
@@ -298,12 +313,11 @@ def loadTransparentImage(complete_path):
 #----- Update Tile Size to match new window size -----
 def updateTileSize(width, height):
 	zoom_factor = min( float(width / 1920), float(height/1080) )
-	global TILE_SIZE
-	TILE_SIZE = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )	
-	logging.info("New Tile Size is : %s", TILE_SIZE)
-	if current_action == "PLAY_A_LETTER" :
-		global delta_pos_on_tile
-		delta_pos_on_tile = (delta_pos_on_tile[0]*zoom_factor, delta_pos_on_tile[1]*zoom_factor)
+	var.tile_size
+	logging.info("New Tile Size is : %s", var.tile_size)
+	if var.current_action == "PLAY_A_LETTER" :
+		var.delta_pos_on_tile
+		var.delta_pos_on_tile = (var.delta_pos_on_tile[0]*zoom_factor, var.delta_pos_on_tile[1]*zoom_factor)
 
 #----- Logging functions -----
 def logPlayersInfo():
@@ -315,7 +329,7 @@ def logPlayersInfo():
 #----- Calculate points -----
 def calculatePoints(layer_letters_played) :
 
-	global current_board_state, TILES_PER_BOARD_COLUMN
+	var.current_board_state, TILES_PER_BOARD_COLUMN
 
 	#format letters_played {'a' : (x, y)}
 	letters_played = {}
@@ -359,12 +373,12 @@ def calculatePoints(layer_letters_played) :
 
 			#find first letter
 			start_y = min_y
-			while( ( (start_y - 1) >= 0) and (current_board_state[min_x][start_y - 1] != '?') ) :
+			while( ( (start_y - 1) >= 0) and (var.current_board_state[min_x][start_y - 1] != '?') ) :
 				start_y = start_y - 1
 
 			#find last letter
 			end_y = max_y
-			while( ( (end_y + 1) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[min_x][end_y + 1] != '?') ) :
+			while( ( (end_y + 1) <= TILES_PER_BOARD_COLUMN-1) and (var.current_board_state[min_x][end_y + 1] != '?') ) :
 				end_y = end_y + 1
 
 			#words_and_scores = []
@@ -378,7 +392,7 @@ def calculatePoints(layer_letters_played) :
 				new_word_score = 0
 
 				for it_y in range( start_y, end_y+1 ) :
-					letter = current_board_state[min_x][it_y]
+					letter = var.current_board_state[min_x][it_y]
 					new_word += letter
 					if ((min_x, it_y) in letters_played ): #letters just played
 						#calculate points for each letter
@@ -410,13 +424,13 @@ def calculatePoints(layer_letters_played) :
 				it_x = min_x
 				if (it_x, it_y) in (letters_played) : #prevent to count already existing words
 
-					condition_1 = ( (it_x - 1) >= 0 ) and ( current_board_state[it_x-1][it_y] != '?' )
-					condition_2 = ( (it_x + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( current_board_state[it_x+1][it_y] != '?' ) 
+					condition_1 = ( (it_x - 1) >= 0 ) and ( var.current_board_state[it_x-1][it_y] != '?' )
+					condition_2 = ( (it_x + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( var.current_board_state[it_x+1][it_y] != '?' ) 
 
 					if ( condition_1  or condition_2 ) :       
 						logging.debug('VERTICAL WORD')
 				
-						while( ( (it_x - 1) >= 0) and (current_board_state[it_x-1][it_y] != '?') ) : #go to the begining of the word
+						while( ( (it_x - 1) >= 0) and (var.current_board_state[it_x-1][it_y] != '?') ) : #go to the begining of the word
 							it_x = it_x - 1
 
 
@@ -424,9 +438,9 @@ def calculatePoints(layer_letters_played) :
 						old_word_score = 0
 						old_word_multiplier = 1  
 
-						while( ( (it_x) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[it_x][it_y] != '?') ) : #go to the end of the word
+						while( ( (it_x) <= TILES_PER_BOARD_COLUMN-1) and (var.current_board_state[it_x][it_y] != '?') ) : #go to the end of the word
 
-							old_letter = current_board_state[it_x][it_y]
+							old_letter = var.current_board_state[it_x][it_y]
 							old_word += old_letter
 
 							if (it_x, it_y) in (letters_played) :
@@ -468,12 +482,12 @@ def calculatePoints(layer_letters_played) :
 		else : 
 			#find first letter
 			start_x = min_x
-			while( ( (start_x - 1) >= 0) and (current_board_state[start_x - 1][min_y] != '?') ) :
+			while( ( (start_x - 1) >= 0) and (var.current_board_state[start_x - 1][min_y] != '?') ) :
 				start_x = start_x - 1
 
 			#find last letter
 			end_x = max_x
-			while( ( (end_x + 1) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[end_x + 1][min_y] != '?') ) :
+			while( ( (end_x + 1) <= TILES_PER_BOARD_COLUMN-1) and (var.current_board_state[end_x + 1][min_y] != '?') ) :
 				end_x = end_x + 1
 
 			if ( end_x > start_x ) : #prevent one letter word
@@ -485,7 +499,7 @@ def calculatePoints(layer_letters_played) :
 				new_word_score = 0
 
 				for it_x in range( start_x, end_x+1 ) :
-					letter = current_board_state[it_x][min_y]
+					letter = var.current_board_state[it_x][min_y]
 					new_word += letter
 					if ((it_x, min_y) in letters_played ): #letters just played
 						#calculate points for each letter
@@ -517,13 +531,13 @@ def calculatePoints(layer_letters_played) :
 				it_y = min_y
 				if (it_x, it_y) in (letters_played) : #prevent to count already existing words
 
-					condition_1 = ( (it_y - 1) >= 0 ) and ( current_board_state[it_x][it_y-1] != '?' )
-					condition_2 = ( (it_y + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( current_board_state[it_x][it_y+1] != '?' ) 
+					condition_1 = ( (it_y - 1) >= 0 ) and ( var.current_board_state[it_x][it_y-1] != '?' )
+					condition_2 = ( (it_y + 1) <= TILES_PER_BOARD_COLUMN-1 ) and ( var.current_board_state[it_x][it_y+1] != '?' ) 
 
 					if ( condition_1  or condition_2 ) :
 						logging.debug('HORIZONTAL WORD')
 
-						while( ( (it_y - 1) >= 0) and (current_board_state[it_x][it_y-1] != '?') ) : #go to the begining of the word
+						while( ( (it_y - 1) >= 0) and (var.current_board_state[it_x][it_y-1] != '?') ) : #go to the begining of the word
 							it_y = it_y - 1
 
 
@@ -531,9 +545,9 @@ def calculatePoints(layer_letters_played) :
 						old_word_score = 0
 						old_word_multiplier = 1
 
-						while( ( (it_y) <= TILES_PER_BOARD_COLUMN-1) and (current_board_state[it_x][it_y] != '?') ) : #go to the end of the word
+						while( ( (it_y) <= TILES_PER_BOARD_COLUMN-1) and (var.current_board_state[it_x][it_y] != '?') ) : #go to the end of the word
 
-							old_letter = current_board_state[it_x][it_y]
+							old_letter = var.current_board_state[it_x][it_y]
 							old_word += old_letter
 
 							if (it_x, it_y) in (letters_played) :
@@ -622,11 +636,11 @@ no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
-	BAG_OF_LETTERS = rules.letters_english
+	var.bag_of_letters = rules.letters_english
 	POINTS_FOR = rules.points_english
 	path_letters = path_letters_english
 elif LETTERS_LANGUAGE == 'french':
-	BAG_OF_LETTERS = rules.letters_french
+	var.bag_of_letters = rules.letters_french
 	POINTS_FOR = rules.points_french
 	path_letters = path_letters_french
 
@@ -677,9 +691,9 @@ pygame.display.set_caption('Scrabble')
 width=0
 height=0
 if cfg_resolution_auto :
-	monitor_resolution = pygame.display.Info()
-	width = monitor_resolution.current_w
-	height = monitor_resolution.current_h
+	var.monitor_resolution = pygame.display.Info()
+	width = var.monitor_resolution.current_w
+	height = var.monitor_resolution.current_h
 else :
 	width = round (cfg_custom_window_height * (16/9.0) )
 	height = cfg_custom_window_height
@@ -750,9 +764,9 @@ for player_name in players_names :
 	pos_x = (TILES_PER_BOARD_COLUMN+4)
 	pos_y = 3.5
 	for i in range(number_of_letters_per_hand) :
-		random_int = randint(0,len(BAG_OF_LETTERS)-1)
-		start_hand.add(Letter(BAG_OF_LETTERS[random_int], pos_x, pos_y))
-		del(BAG_OF_LETTERS[random_int])
+		random_int = randint(0,len(var.bag_of_letters)-1)
+		start_hand.add(Letter(var.bag_of_letters[random_int], pos_x, pos_y))
+		del(var.bag_of_letters[random_int])
 		pos_x = pos_x+1
 
 	PLAYERS.append(Player(player_name,0,start_hand))
@@ -815,8 +829,8 @@ while game_is_running:
 			height = event.dict['size'][1]
 
 			#create a fullscreen fully black to prevent later artefacts
-			window = resizeWindow(monitor_resolution.current_w, monitor_resolution.current_h, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-			pygame.draw.rect(window, (0,0,0), ( (0,0), (monitor_resolution.current_w, monitor_resolution.current_h) ) )
+			window = resizeWindow(var.monitor_resolution.current_w, var.monitor_resolution.current_h, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
+			pygame.draw.rect(window, (0,0,0), ( (0,0), (var.monitor_resolution.current_w, var.monitor_resolution.current_h) ) )
 			pygame.display.update()
 
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
@@ -856,14 +870,14 @@ while game_is_running:
 				cursor_pos_x, cursor_pos_y = event.pos[0], event.pos[1]
 
 				#------ SELECT A LETTER -------
-				if current_action == 'SELECT_A_LETTER' :
+				if var.current_action == 'SELECT_A_LETTER' :
 
 					#------ CLIC ON A LETTER IN HAND ? -------
 					for letter_from_hand in current_player.hand :
 
 						if letter_from_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
-							delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
+							var.delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
 							layer_selected_letter.add(letter_from_hand)
 							
 							current_player.hand.remove(letter_from_hand)
@@ -877,7 +891,7 @@ while game_is_running:
 
 							pygame.display.update()
 
-							current_action = "PLAY_A_LETTER"
+							var.current_action = "PLAY_A_LETTER"
 
 
 					#------ CLIC ON A LETTER JUST PLAYED ? -------
@@ -885,12 +899,12 @@ while game_is_running:
 
 						if letter_from_board.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
-							delta_pos_on_tile = ( cursor_pos_x - letter_from_board.rect.x , cursor_pos_y - letter_from_board.rect.y)
+							var.delta_pos_on_tile = ( cursor_pos_x - letter_from_board.rect.x , cursor_pos_y - letter_from_board.rect.y)
 
 							tile_x_on_board = int(letter_from_board.pos_x - DELTA)
 							tile_y_on_board = int(letter_from_board.pos_y - DELTA)
 
-							current_board_state[tile_y_on_board][tile_x_on_board] = '?'
+							var.current_board_state[tile_y_on_board][tile_x_on_board] = '?'
 
 							layer_letters_just_played.remove(letter_from_board)
 							layer_selected_letter.add(letter_from_board)
@@ -903,7 +917,7 @@ while game_is_running:
 
 							pygame.display.update()
 
-							current_action = "PLAY_A_LETTER"
+							var.current_action = "PLAY_A_LETTER"
 
 					#------ CLIC ON END TURN -------
 					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -918,7 +932,7 @@ while game_is_running:
 
 
 				#------ PLAY A LETTER -------
-				elif current_action == 'PLAY_A_LETTER' :
+				elif var.current_action == 'PLAY_A_LETTER' :
 
 					#------ A LETTER IS SELECTED -------
 					if len(layer_selected_letter) == 1 : 
@@ -948,7 +962,7 @@ while game_is_running:
 									current_background = window.copy()	
 									pygame.display.update()
 
-									current_action = "SELECT_A_LETTER"
+									var.current_action = "SELECT_A_LETTER"
 
 
 						#------ CLIC ON A TILE ON THE BOARD ? -------
@@ -960,12 +974,12 @@ while game_is_running:
 								tile_y_on_board = int( tile.pos_y - DELTA )
 
 								#------ EMPTY TILE ? -------
-								if current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+								if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
 									selected_letter = layer_selected_letter.sprites()[0]
 
 									selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
-									current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+									var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
 
 									layer_letters_just_played.add(selected_letter)								
 									layer_selected_letter.remove(selected_letter)
@@ -976,14 +990,14 @@ while game_is_running:
 									current_background = window.copy()	
 									pygame.display.update()
 
-									current_action = "SELECT_A_LETTER"
+									var.current_action = "SELECT_A_LETTER"
 
 
 			#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 			elif ( event_type == pygame.MOUSEBUTTONUP ) :
 
 				#------ SELECT A LETTER -------
-				if current_action == 'SELECT_A_LETTER' :
+				if var.current_action == 'SELECT_A_LETTER' :
 
 					#------ RELEASE CLIC ON BUTTON -------
 					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -1004,10 +1018,10 @@ while game_is_running:
 
 						#redraw letters
 						index_hand = 0
-						while len(BAG_OF_LETTERS) > 0 and index_hand < number_of_letters_per_hand :
+						while len(var.bag_of_letters) > 0 and index_hand < number_of_letters_per_hand :
 							if current_player.hand_state[index_hand] == 0 :
-								random_int = randint(0,len(BAG_OF_LETTERS)-1)
-								drawn_letter = Letter(BAG_OF_LETTERS[random_int], 0, 0)
+								random_int = randint(0,len(var.bag_of_letters)-1)
+								drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
 								current_player.hand_state[index_hand] = drawn_letter.id
 								delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
 								drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
@@ -1053,7 +1067,7 @@ while game_is_running:
 			cursor_pos_y = mouse_pos[1]
 
 			#change appearance of button
-			if current_action == 'SELECT_A_LETTER' :
+			if var.current_action == 'SELECT_A_LETTER' :
 				buttons_changed = False
 				for button in layer_buttons :
 					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
@@ -1069,7 +1083,7 @@ while game_is_running:
 					pygame.display.update()
 
 			if len(layer_selected_letter) == 1 :
-				layer_selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - delta_pos_on_tile[0], cursor_pos_y - delta_pos_on_tile[1])
+				layer_selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 
 				layer_selected_letter.clear(window, current_background)
 				current_background = window.copy()
