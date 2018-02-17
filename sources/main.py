@@ -609,17 +609,16 @@ else :
 #User interface content
 ui_content = config_reader.h_ui_params
 ui_current_player_turn = ui_content['current_player_turn'][language_id]
-#TODO
-next_player_hand = 
-scores = 
-player_score = 
-previous_turn_summary = 
-word_and_score = 
-scrabble_obtained = 
-nothing_played_during_previous_turn = 
-remaining_letters_in_bag = 
-remaining_letter_in_bag = 
-no_remaining_letter_in_bag = 
+next_player_hand = ui_content['next_player_hand'][language_id]
+scores = ui_content['scores'][language_id]
+player_score = ui_content['player_score'][language_id]
+previous_turn_summary = ui_content['previous_turn_summary'][language_id]
+word_and_score = ui_content['word_and_score'][language_id]
+scrabble_obtained = ui_content['scrabble_obtained'][language_id]
+nothing_played = ui_content['nothing_played'][language_id]
+remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
+remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
+no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
@@ -762,6 +761,7 @@ logPlayersInfo()
 
 id_current_player = 0
 current_player = PLAYERS[id_current_player]
+current_player.info()
 
 #///// Test Values /////
 #layer_letters_just_played.add(Letter("J",3+DELTA, 5+DELTA))

@@ -44,7 +44,8 @@ match_integer = re.compile(r'^([a-z_]*)\s*=\s*([0-9]*)\s*$')
 match_names = re.compile(r'^([a-z_]*)\s*=([^0-9])*$')
 
 #match everything of format >> multiple_letters = UI text <VALUE1> / other UI text <VALUE1> AND <VALUE2>
-match_ui_word = re.compile(r'^([a-z_]*)\s*=\s*([A-Za-z12<>\'/\s]*)\s*$')
+match_ui_word = re.compile(r'([a-z_]*)\s*=\s*([éA-Za-z12<>\'/\s:._]*)\s*')
+
 
 
 #~~~~~~~~ Retrieve data ~~~~~~~~
@@ -107,6 +108,18 @@ for line in open(path_conf_rules_file,"r") :
 		if param == 'number_of_letters_per_hand' :
 			h_rules_params[ param ] = int(int_found.group(2))
 
+ui_possible_values = (
+'current_player_turn',
+'next_player_hand',
+'scores',
+'player_score',
+'previous_turn_summary',
+'word_and_score',
+'scrabble_obtained',
+'nothing_played',
+'remaining_letters',
+'remaining_letter',
+'no_remaining_letter')
 
 for line in open(path_conf_language_file,"r") :
 
@@ -115,14 +128,17 @@ for line in open(path_conf_language_file,"r") :
 	if text_found :
 		param = str(text_found.group(1))
 		text = []
-		if param == 'current_player_turn' :
+
+		if param in ui_possible_values:
 			start = line.index('=')+1
 			all_values = line[start:]
 			all_values = all_values.strip().split('/')
 			for value in all_values :
 				if value != '' :
-					text.append(value)	
+					text.append(value)
 			h_ui_params [ param ] = text 
+ 
+
 
 #should be alright for accents ... PROOF :
 '''
