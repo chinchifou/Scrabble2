@@ -51,7 +51,7 @@ match_ui_word = re.compile(r'([a-z_]*)\s*=\s*([éA-Za-z12<>\'/\s:._]*)\s*')
 #~~~~~~~~ Retrieve data ~~~~~~~~
 
 #display settings
-for line in open(path_conf_disp_file,"r") :
+for line in open(path_conf_disp_file, "r", encoding="utf8") :
 
 	word_found = match_word.search(line)
 	int_found = match_integer.search(line)
@@ -78,7 +78,7 @@ for line in open(path_conf_disp_file,"r") :
 			h_display_params[ param ] = int(int_found.group(2))
 
 #groupe rules
-for line in open(path_conf_rules_file,"r") :
+for line in open(path_conf_rules_file, "r", encoding="utf8") :
 
 	word_found = match_word.search(line)
 	int_found = match_integer.search(line)
@@ -121,7 +121,7 @@ ui_possible_values = (
 'remaining_letter',
 'no_remaining_letter')
 
-for line in open(path_conf_language_file,"r") :
+for line in open(path_conf_language_file, "r", encoding="utf8") :
 
 	text_found = match_ui_word.search(line)
 
@@ -138,7 +138,6 @@ for line in open(path_conf_language_file,"r") :
 					text.append(value)
 			h_ui_params [ param ] = text 
  
-
 
 #should be alright for accents ... PROOF :
 '''

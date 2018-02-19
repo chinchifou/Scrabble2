@@ -19,18 +19,25 @@ import letters_and_points as rules
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
 #----- Constants -----
-global REFERENCE_TILE_SIZE, TILES_PER_BOARD_COLUMN, DELTA
+global REFERENCE_TILE_SIZE, TILES_PER_BOARD_COLUMN, DELTA, TITLE_LINE_HEIGHT, LINE_HEIGHT, COLOR_LIGHT_GREY
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
 TILES_PER_BOARD_COLUMN = 15
 #delta expressed in tiles from top left corner of the Window
 DELTA = 1.5
+#size of the ui text used for titke expressed in tile
+TITLE_LINE_HEIGHT = 0.9
+#size of the common ui text expressed in tile
+LINE_HEIGHT = 0.6
+#color use for text rendering
+COLOR_LIGHT_GREY = (143,144,138)
 
 #----- Changing at runtime -----
 #class to store game variable
 class GameVariable():
 	def __init__(self):
+		self.monitor_resolution = 0.0
 
 		self.tile_size = 0.0
 		self.delta_pos_on_tile = 0.0
@@ -43,12 +50,19 @@ class GameVariable():
 
 var = GameVariable()
 
-"""
-global monitor_resolution, TILE_SIZE, BAG_OF_LETTERS, current_board_state, delta_pos_on_tile, current_action
-BAG_OF_LETTERS = []
-current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ]
-current_action = 'SELECT_A_LETTER'
-"""
+#class storing varaibles relative to font
+class Font():
+	def __init__(self):
+		self.calibri = ""
+		self.calibri_title = ""
+
+	def resize(self):
+		self.calibri_title = pygame.font.SysFont("Calibri", floor(TITLE_LINE_HEIGHT*var.tile_size))
+		self.calibri_title.set_bold(1)
+		self.calibri = pygame.font.SysFont("Calibri", floor(LINE_HEIGHT*var.tile_size))
+
+fonts = Font()
+
 
 #----- Folders' paths-----
 path_log_folder = path.abspath('../log/')
@@ -270,6 +284,8 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	logging.info("WINDOW Creation")
 	updateTileSize(width,height)
 
+	width = int (1920 / REFERENCE_TILE_SIZE ) * var.tile_size
+	height = int (1080 / REFERENCE_TILE_SIZE ) * var.tile_size
 
 	logging.info("Size of game window is : %s * %s", width, height)
 	logging.info("")
@@ -313,7 +329,7 @@ def loadTransparentImage(complete_path):
 #----- Update Tile Size to match new window size -----
 def updateTileSize(width, height):
 	zoom_factor = min( float(width / 1920), float(height/1080) )
-	var.tile_size
+	var.tile_size = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )	
 	logging.info("New Tile Size is : %s", var.tile_size)
 	if var.current_action == "PLAY_A_LETTER" :
 		var.delta_pos_on_tile
@@ -623,16 +639,16 @@ else :
 #User interface content
 ui_content = config_reader.h_ui_params
 ui_current_player_turn = ui_content['current_player_turn'][language_id]
-next_player_hand = ui_content['next_player_hand'][language_id]
-scores = ui_content['scores'][language_id]
-player_score = ui_content['player_score'][language_id]
-previous_turn_summary = ui_content['previous_turn_summary'][language_id]
-word_and_score = ui_content['word_and_score'][language_id]
-scrabble_obtained = ui_content['scrabble_obtained'][language_id]
-nothing_played = ui_content['nothing_played'][language_id]
-remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
-remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
-no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
+ui_next_player_hand = ui_content['next_player_hand'][language_id]
+ui_scores = ui_content['scores'][language_id]
+ui_player_score = ui_content['player_score'][language_id]
+ui_previous_turn_summary = ui_content['previous_turn_summary'][language_id]
+ui_word_and_score = ui_content['word_and_score'][language_id]
+ui_scrabble_obtained = ui_content['scrabble_obtained'][language_id]
+ui_nothing_played = ui_content['nothing_played'][language_id]
+ui_remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
+ui_remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
+ui_no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
@@ -677,6 +693,11 @@ logging.info("-------------------")
 logging.info("GAME STARTED")
 logging.info("-------------------")
 logging.info("")
+
+#create specific fonts
+fonts.calibri_title = pygame.font.SysFont("Calibri", floor(TITLE_LINE_HEIGHT*var.tile_size))
+fonts.calibri_title.set_bold(1)
+fonts.calibri = pygame.font.SysFont("Calibri", floor(LINE_HEIGHT*var.tile_size))
 
 #Add icon to the window
 icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
@@ -795,6 +816,13 @@ BACKGROUND_NO_LETTER = window.copy()
 current_player.hand.draw(window)
 current_background = window.copy()
 
+#TODO to test
+common_text = fonts.calibri_title.render(ui_current_player_turn,1,COLOR_LIGHT_GREY)
+#TODO to test and store elsewhere
+turn_info_pos = [ (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 1.3*DELTA*var.tile_size ]
+window.blit(common_text, turn_info_pos)
+#TODO debug not displayed
+
 pygame.display.update()
 
 #~~~~~~ MAIN  ~~~~~~
@@ -822,6 +850,7 @@ while game_is_running:
 			logging.info("")
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
+		#TODO create a specific function ?
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
 			
 			#new width and height
@@ -835,6 +864,7 @@ while game_is_running:
 
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			layer_all.resize()
+			fonts.resize()
 
 			layer_background.draw(window)
 			layer_tiles.draw(window)
@@ -846,6 +876,12 @@ while game_is_running:
 			current_player.hand.draw(window)
 			current_background = window.copy()
 			layer_selected_letter.draw(window)
+
+			#TODO to test
+			common_text = fonts.calibri_title.render(ui_current_player_turn.replace("<VALUE1>",current_player.name),1,COLOR_LIGHT_GREY)
+			#TODO to test and store elsewhere
+			turn_info_pos = [ (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 1.3*DELTA*var.tile_size ]
+			window.blit(common_text, turn_info_pos)
 			
 			pygame.display.update()
 			
