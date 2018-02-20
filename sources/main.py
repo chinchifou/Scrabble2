@@ -86,9 +86,12 @@ class GameVariable():
 		self.current_background = []
 		self.current_background_no_text = []
 
+		self.ui_text_container = []
 
 var = GameVariable()
 
+#TODO to remove
+"""
 #class storing varaibles relative to font
 class Font():
 	def __init__(self):
@@ -101,6 +104,7 @@ class Font():
 		self.calibri = pygame.font.SysFont("Calibri", floor(LINE_HEIGHT*var.tile_size))
 
 fonts = Font()
+"""
 
 #class to create rendering layers used for display
 class Layer():
@@ -117,6 +121,8 @@ class Layer():
 
 layers = Layer()
 
+#TODO to remove
+"""
 #class storing user interface data
 class UserInterface():
 	def __init__(self):
@@ -133,6 +139,26 @@ class UserInterface():
 		no_remaining_letter_in_bag = ''
 
 ui = UserInterface()
+"""
+
+#class storing user interface data
+class UserInterfaceText():
+	def __init__(self, text, ligne_heigh, bold, pos_in_tiles):
+		self.text = text
+		self.ligne_heigh = ligne_heigh
+		self.bold = int(bold)	
+
+		self.font = pygame.font.SysFont("Calibri", floor(self.ligne_heigh*var.tile_size))
+		self.font.set_bold(self.bold)
+
+		self.pos_x_tiles, self.pos_y_tiles = pos_in_tiles[0], pos_in_tiles[1]
+		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
+
+	def resize(self):
+		self.font = pygame.font.SysFont("Calibri", floor(self.ligne_heigh*var.tile_size))
+		self.font.set_bold(self.bold)
+
+		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
 
 
 #~~~~~~ CONVERTION ~~~~~~
@@ -159,6 +185,7 @@ def indexInHandHolder(cursor_pos_x):
 
 
 #~~~~~~ GAME CLASSES ~~~~~~
+
 
 #----- ResizableSprite -----
 #add native capacity to be resized
@@ -222,16 +249,25 @@ class Board(ResizableSprite):
 		self.width, self.height = 32, 18
 		self.path = path_background
 
-		#TODO use Hash for other text
+		
+		#TODO to remove
 		self.text_current_player = ""
-		self.pos_text_current_player = [ 0, 0 ]
+		self.pos_text_current_player = ( 0, 0 )
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 	def drawText(self):
+		"""
 		self.text_current_player = fonts.calibri_title.render(ui.current_player_turn.replace('<VALUE1>',var.current_player.name),1,COLOR_LIGHT_GREY)
-		self.pos_text_current_player = [ (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 2.0*var.tile_size ]
+		self.pos_text_current_player = ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 2.0*var.tile_size )
 		window.blit(self.text_current_player, self.pos_text_current_player)
+		"""
+		#TODO to improve
+		text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<VALUE1>',var.current_player.name), 1, COLOR_LIGHT_GREY )
+		window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
+
+		text = ui_next_player_hand.font.render( ui_next_player_hand.text.replace('<VALUE1>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+		window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
 
 
 #----- Hand holder -----
@@ -359,7 +395,11 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	
 	logging.info("WINDOW Creation")
 	updateTileSize(width,height)
-	fonts.resize()
+	#fonts.resize()
+	#TODO
+	for ui_text in var.ui_text_container :
+		ui_text.resize()
+
 	layers.all.resize()
 
 	width = int (1920 / REFERENCE_TILE_SIZE ) * var.tile_size
@@ -708,29 +748,6 @@ LETTERS_LANGUAGE = game_settings['letters_language']
 UI_LANGUAGE = game_settings['ui_language']
 players_names = config_reader.players
 
-#User interface language
-if UI_LANGUAGE == 'english' :
-	language_id = 0
-elif UI_LANGUAGE == 'french' :
-	language_id = 1
-else :
-	language_id = 0
-
-#User interface content
-ui_content = config_reader.h_ui_params
-
-ui.current_player_turn = ui_content['current_player_turn'][language_id]
-ui.next_player_hand = ui_content['next_player_hand'][language_id]
-ui.scores = ui_content['scores'][language_id]
-ui.player_score = ui_content['player_score'][language_id]
-ui.previous_turn_summary = ui_content['previous_turn_summary'][language_id]
-ui.word_and_score = ui_content['word_and_score'][language_id]
-ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
-ui.nothing_played = ui_content['nothing_played'][language_id]
-ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
-ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
-ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
-
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
 	var.bag_of_letters = rules.letters_english
@@ -776,17 +793,51 @@ logging.info("GAME STARTED")
 logging.info("-------------------")
 logging.info("")
 
-#create specific fonts
-fonts.calibri_title = pygame.font.SysFont("Calibri", floor(TITLE_LINE_HEIGHT*var.tile_size))
-fonts.calibri_title.set_bold(1)
-fonts.calibri = pygame.font.SysFont("Calibri", floor(LINE_HEIGHT*var.tile_size))
-
 #Add icon to the window
 icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
 icon = pygame.transform.scale(icon_image, (32, 32))
 pygame.display.set_icon(icon)
 pygame.display.set_caption('Scrabble')
 
+#----- Initializing User Interface texts -----
+#TODO to remove
+"""
+#create specific fonts
+fonts.calibri_title = pygame.font.SysFont("Calibri", floor(TITLE_LINE_HEIGHT*var.tile_size))
+fonts.calibri_title.set_bold(1)
+fonts.calibri = pygame.font.SysFont("Calibri", floor(LINE_HEIGHT*var.tile_size))
+"""
+#User interface language
+if UI_LANGUAGE == 'english' :
+	language_id = 0
+elif UI_LANGUAGE == 'french' :
+	language_id = 1
+else :
+	language_id = 0
+
+#User interface content
+ui_content = config_reader.h_ui_params
+
+#TODO to refactor
+"""
+#ui.current_player_turn = ui_content['current_player_turn'][language_id]
+#ui.next_player_hand = ui_content['next_player_hand'][language_id]
+ui.scores = ui_content['scores'][language_id]
+ui.player_score = ui_content['player_score'][language_id]
+ui.previous_turn_summary = ui_content['previous_turn_summary'][language_id]
+ui.word_and_score = ui_content['word_and_score'][language_id]
+ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
+ui.nothing_played = ui_content['nothing_played'][language_id]
+ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
+ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
+ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
+"""
+
+ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 2.0) )
+var.ui_text_container.append(ui_current_player_turn)
+#TODO find a better way to store instance
+ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 6.0) )
+var.ui_text_container.append(ui_next_player_hand )
 
 #----- Window init -----
 
@@ -854,7 +905,6 @@ for row in range(0,TILES_PER_BOARD_COLUMN) :
 
 #create button END TURN
 button_end_turn = Button("end_turn", 27, 3.5)
-
 
 #first image
 layers.background.draw(window)
