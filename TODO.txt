@@ -2,7 +2,8 @@ PRIMARY
 
 check TODO in code
 
-draw ui text on a surface wich is then updated
+draw ui text on a surface (background for instnce) wich is then updated
+update text when "next player"
 
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
