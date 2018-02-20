@@ -23,17 +23,22 @@ import letters_and_points as rules
 #complete the pygame class RenderClear to allow easy resize
 class GroupOfSprites(pygame.sprite.RenderClear):
 
-	#call each resize function of the sprite contained in the group
+	#for each sprite in this GroupOfSprites, call the resize() function
 	def resize(self, *args):
 		for s in self.sprites():
 			s.resize(*args)
+
+	#for each sprite in this GroupOfSprites, call the drawText() function
+	def drawText(self, *args):
+		for s in self.sprites():
+			s.drawText(*args)
 
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
 #----- Constants -----
 #define global scope for variables
-global REFERENCE_TILE_SIZE, TILES_PER_BOARD_COLUMN, DELTA, TITLE_LINE_HEIGHT, LINE_HEIGHT, COLOR_LIGHT_GREY
+global REFERENCE_TILE_SIZE, TILES_PER_BOARD_COLUMN, DELTA, TITLE_LINE_HEIGHT, LINE_HEIGHT, COLOR_LIGHT_GREY, PLAYERS
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
@@ -46,6 +51,8 @@ TITLE_LINE_HEIGHT = 0.9
 LINE_HEIGHT = 0.6
 #color use for text rendering
 COLOR_LIGHT_GREY = (143,144,138)
+#all players
+PLAYERS = []
 
 #Folders' paths
 path_log_folder = path.abspath('../log/')
@@ -69,10 +76,16 @@ class GameVariable():
 		self.delta_pos_on_tile = 0.0
 
 		self.bag_of_letters = []
-
 		self.current_board_state = [ ['?' for i in range(TILES_PER_BOARD_COLUMN)] for j in range(TILES_PER_BOARD_COLUMN) ] 
 		
+		self.current_player = []
 		self.current_action = 'SELECT_A_LETTER'
+
+		self.background_no_letter = []
+
+		self.current_background = []
+		self.current_background_no_text = []
+
 
 var = GameVariable()
 
@@ -103,6 +116,23 @@ class Layer():
 		self.all = GroupOfSprites()
 
 layers = Layer()
+
+#class storing user interface data
+class UserInterface():
+	def __init__(self):
+		current_player_turn = ''
+		next_player_hand = ''
+		scores = ''
+		player_score = ''
+		previous_turn_summary = ''
+		word_and_score = ''
+		scrabble_obtained = ''
+		nothing_played = ''
+		remaining_letters_in_bag = ''
+		remaining_letter_in_bag = ''
+		no_remaining_letter_in_bag = ''
+
+ui = UserInterface()
 
 
 #~~~~~~ CONVERTION ~~~~~~
@@ -169,6 +199,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
+		if self.type == "board":
+			self.drawText()
+
 	def info(self) :
 		logging.debug("Sprite info :")
 		logging.debug("name : %s", self.name)
@@ -188,7 +221,17 @@ class Board(ResizableSprite):
 		self.type = 'board'
 		self.width, self.height = 32, 18
 		self.path = path_background
+
+		#TODO use Hash for other text
+		self.text_current_player = ""
+		self.pos_text_current_player = [ 0, 0 ]
+		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
+	def drawText(self):
+		self.text_current_player = fonts.calibri_title.render(ui.current_player_turn.replace('<VALUE1>',var.current_player.name),1,COLOR_LIGHT_GREY)
+		self.pos_text_current_player = [ (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 2.0*var.tile_size ]
+		window.blit(self.text_current_player, self.pos_text_current_player)
 
 
 #----- Hand holder -----
@@ -286,7 +329,10 @@ class Player :
 		self.hand = hand
 		self.id = len(PLAYERS)
 
-		self.hand_state = [0,0,0,0,0,0,0]
+		self.hand_state = []
+		for i in range(number_of_letters_per_hand) :
+			self.hand_state.append(0)
+
 		index = 0
 		for letter in hand :
 			self.hand_state[index] = letter.id
@@ -299,8 +345,8 @@ class Player :
 		str_hand = str_hand[:-2]
 		str_hand += "]"
 		logging.info("%s  :", self.name)
-		logging.info("%s points", self.score)
-		logging.info("hand : %s", str_hand)
+		logging.info("  points : %s", self.score)
+		logging.info("  hand : %s", str_hand)
 
 	def next(self) :
 		return PLAYERS[(self.id + 1) % len(PLAYERS)]
@@ -385,9 +431,9 @@ def calculatePoints(layer_letters_played) :
 		letters_played[(int(letter.pos_y - DELTA), int(letter.pos_x - DELTA))] = letter.name
 
 	if len(letters_played) > 1 :
-		logging.debug('%i letters played', len(letters_played)) #TODO to test
+		logging.debug('%i letters played', len(letters_played))
 	else :
-		logging.debug('%i letter played', len(letters_played)) #TODO to test  
+		logging.debug('%i letter played', len(letters_played))  
 
 	if len(letters_played) == 0 :
 		logging.info('nothing played')
@@ -672,17 +718,18 @@ else :
 
 #User interface content
 ui_content = config_reader.h_ui_params
-ui_current_player_turn = ui_content['current_player_turn'][language_id]
-ui_next_player_hand = ui_content['next_player_hand'][language_id]
-ui_scores = ui_content['scores'][language_id]
-ui_player_score = ui_content['player_score'][language_id]
-ui_previous_turn_summary = ui_content['previous_turn_summary'][language_id]
-ui_word_and_score = ui_content['word_and_score'][language_id]
-ui_scrabble_obtained = ui_content['scrabble_obtained'][language_id]
-ui_nothing_played = ui_content['nothing_played'][language_id]
-ui_remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
-ui_remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
-ui_no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
+
+ui.current_player_turn = ui_content['current_player_turn'][language_id]
+ui.next_player_hand = ui_content['next_player_hand'][language_id]
+ui.scores = ui_content['scores'][language_id]
+ui.player_score = ui_content['player_score'][language_id]
+ui.previous_turn_summary = ui_content['previous_turn_summary'][language_id]
+ui.word_and_score = ui_content['word_and_score'][language_id]
+ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
+ui.nothing_played = ui_content['nothing_played'][language_id]
+ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
+ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
+ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
@@ -719,7 +766,7 @@ logging.info("")
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
 fps_clock = pygame.time.Clock()
-button_clock = pygame.time.Clock() #TODO to use
+clic_clock = pygame.time.Clock() #TODO to use
 logging.info("INITIALIZATION")
 logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.info("Pygame started")
@@ -757,12 +804,31 @@ else :
 #Initialize game window
 window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
+#----- Create players -----
+
+for player_name in players_names :
+	start_hand = GroupOfSprites()
+	pos_x = (TILES_PER_BOARD_COLUMN+4)
+	pos_y = 3.5
+	for i in range(number_of_letters_per_hand) :
+		random_int = randint(0,len(var.bag_of_letters)-1)
+		start_hand.add(Letter(var.bag_of_letters[random_int], pos_x, pos_y))
+		del(var.bag_of_letters[random_int])
+		pos_x = pos_x+1
+
+	PLAYERS.append(Player(player_name,0,start_hand))
+
+logPlayersInfo()
+
+var.current_player = PLAYERS[0]
+var.current_player.info()
 
 #----- Create board game -----
 
 #create background
-board = Board("empty_background", 0, 0)
-hand_holder = Hand_holder("hand_holder", 18.9, 3.4)
+board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
+#create hand_holder
+hand_holder = Hand_holder("hand_holder", 18.9, 3.4)#automatically stored in the corresponding layer
 
 #create tiles
 DELTA = 1.5
@@ -786,53 +852,23 @@ for row in range(0,TILES_PER_BOARD_COLUMN) :
 	x_pos = 0 + DELTA
 	y_pos += 1
 
-#create a test button
+#create button END TURN
 button_end_turn = Button("end_turn", 27, 3.5)
 
 
-#----- Create players -----
-
-PLAYERS = []
-
-for player_name in players_names :
-	start_hand = GroupOfSprites()
-	pos_x = (TILES_PER_BOARD_COLUMN+4)
-	pos_y = 3.5
-	for i in range(number_of_letters_per_hand) :
-		random_int = randint(0,len(var.bag_of_letters)-1)
-		start_hand.add(Letter(var.bag_of_letters[random_int], pos_x, pos_y))
-		del(var.bag_of_letters[random_int])
-		pos_x = pos_x+1
-
-	PLAYERS.append(Player(player_name,0,start_hand))
-
-logPlayersInfo()
-
-id_current_player = 0
-current_player = PLAYERS[id_current_player]
-current_player.info()
-
-#///// Test Values /////
-#layer_letters_just_played.add(Letter("J",3+DELTA, 5+DELTA))
-
-
-#///////////////////////
-
-
-#----- First image -----
-#Display text on the background
-common_text = fonts.calibri_title.render(ui_current_player_turn.replace('<VALUE1>',current_player.name),1,COLOR_LIGHT_GREY)
-turn_info_pos = [ (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 2.0*var.tile_size ]
-layers.background.sprites()[0].image.blit(common_text, turn_info_pos)
-
+#first image
 layers.background.draw(window)
 layers.tiles.draw(window)
 layers.hand_holder.draw(window)
 layers.buttons.draw(window)
-BACKGROUND_NO_LETTER = window.copy()
 
-current_player.hand.draw(window)
-current_background = window.copy()
+var.background_no_letter = window.copy()
+
+var.current_player.hand.draw(window)
+var.current_background_no_text = window.copy()
+
+layers.background.drawText()
+var.current_background = window.copy()
 
 pygame.display.update()
 
@@ -875,21 +911,18 @@ while game_is_running:
 			pygame.display.update()
 
 			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-			
-			#Display text on the background
-			common_text = fonts.calibri_title.render(ui_current_player_turn.replace('<VALUE1>',current_player.name),1,COLOR_LIGHT_GREY)
-			turn_info_pos = [ (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1)*var.tile_size, 2.0*var.tile_size ]
-			layers.background.sprites()[0].image.blit(common_text, turn_info_pos)
 
 			layers.background.draw(window)
 			layers.tiles.draw(window)
 			layers.hand_holder.draw(window)
 			layers.buttons.draw(window)
-			BACKGROUND_NO_LETTER = window.copy()
+			var.background_no_letter = window.copy()
 			layers.letters_on_board.draw(window)
 			layers.letters_just_played.draw(window)
-			current_player.hand.draw(window)
-			current_background = window.copy()
+			var.current_player.hand.draw(window)
+			var.current_background_no_text = window.copy()
+			layers.background.drawText()
+			var.current_background = window.copy()
 			layers.selected_letter.draw(window)
 			
 			pygame.display.update()
@@ -907,7 +940,7 @@ while game_is_running:
 		#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
 		elif ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
 
-			timer = button_clock.tick() #TODO to use ?
+			timer = clic_clock.tick() #TODO to use ?
 
 			#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
 			if ( event_type == pygame.MOUSEBUTTONDOWN ) :
@@ -918,20 +951,20 @@ while game_is_running:
 				if var.current_action == 'SELECT_A_LETTER' :
 
 					#------ CLIC ON A LETTER IN HAND ? -------
-					for letter_from_hand in current_player.hand :
+					for letter_from_hand in var.current_player.hand :
 
 						if letter_from_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
 							var.delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
 							layers.selected_letter.add(letter_from_hand)
 							
-							current_player.hand.remove(letter_from_hand)
-							hand_state_index = current_player.hand_state.index(letter_from_hand.id)
-							current_player.hand_state[hand_state_index] = 0
-							current_player.hand.clear(window, BACKGROUND_NO_LETTER)
-							current_player.hand.draw(window)
+							var.current_player.hand.remove(letter_from_hand)
+							hand_state_index = var.current_player.hand_state.index(letter_from_hand.id)
+							var.current_player.hand_state[hand_state_index] = 0
+							var.current_player.hand.clear(window, var.background_no_letter)
+							var.current_player.hand.draw(window)
 
-							current_background = window.copy()
+							var.current_background = window.copy()
 							layers.selected_letter.draw(window)
 
 							pygame.display.update()
@@ -954,9 +987,9 @@ while game_is_running:
 							layers.letters_just_played.remove(letter_from_board)
 							layers.selected_letter.add(letter_from_board)
 
-							layers.letters_just_played.clear(window, BACKGROUND_NO_LETTER)
+							layers.letters_just_played.clear(window, var.background_no_letter)
 
-							current_background = window.copy()
+							var.current_background = window.copy()
 							layers.letters_just_played.draw(window)
 							layers.selected_letter.draw(window)
 
@@ -969,10 +1002,10 @@ while game_is_running:
 						#change button state
 						button_end_turn.is_highlighted = False
 						button_end_turn.push()
-						layers.buttons.clear(window, current_background)
+						layers.buttons.clear(window, var.current_background)
 						layers.buttons.draw(window)
 
-						current_background = window.copy()
+						var.current_background = window.copy()
 						pygame.display.update()
 
 
@@ -990,21 +1023,21 @@ while game_is_running:
 								index_in_hand = indexInHandHolder(cursor_pos_x)
 
 								#------ EMPTY SPOT ? -------
-								if current_player.hand_state[index_in_hand] == 0 :
+								if var.current_player.hand_state[index_in_hand] == 0 :
 
 									selected_letter = layers.selected_letter.sprites()[0]
 									
 									delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
 									selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
-									current_player.hand_state[index_in_hand] = selected_letter.id
+									var.current_player.hand_state[index_in_hand] = selected_letter.id
 
-									current_player.hand.add(selected_letter)
+									var.current_player.hand.add(selected_letter)
 									layers.selected_letter.remove(selected_letter)
 
-									layers.selected_letter.clear(window, current_background)
-									current_player.hand.draw(window)
+									layers.selected_letter.clear(window, var.current_background)
+									var.current_player.hand.draw(window)
 
-									current_background = window.copy()	
+									var.current_background = window.copy()	
 									pygame.display.update()
 
 									var.current_action = "SELECT_A_LETTER"
@@ -1029,10 +1062,10 @@ while game_is_running:
 									layers.letters_just_played.add(selected_letter)								
 									layers.selected_letter.remove(selected_letter)
 
-									layers.selected_letter.clear(window, current_background)	
+									layers.selected_letter.clear(window, var.current_background)	
 									layers.letters_just_played.draw(window)
 
-									current_background = window.copy()	
+									var.current_background = window.copy()	
 									pygame.display.update()
 
 									var.current_action = "SELECT_A_LETTER"
@@ -1044,44 +1077,47 @@ while game_is_running:
 				#------ SELECT A LETTER -------
 				if var.current_action == 'SELECT_A_LETTER' :
 
-					#------ RELEASE CLIC ON BUTTON -------
+					#------ RELEASE CLIC ON END TURN BUTTON -------
 					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 						button_end_turn.turnOnHighlighted()
-						layers.buttons.clear(window, current_background)
+						layers.buttons.clear(window, var.current_background)
 						layers.buttons.draw(window)
 
 						last_words_and_scores = calculatePoints(layers.letters_just_played)
 
 						for association in last_words_and_scores :
-							current_player.score +=  association[1]
+							var.current_player.score +=  association[1]
 
 						for letter in layers.letters_just_played :
 							layers.letters_on_board.add(letter)
 
 						layers.letters_just_played.empty()
-						current_player.hand.clear(window, BACKGROUND_NO_LETTER)
+						window.blit(var.current_background_no_text, (0,0))
+						var.current_player.hand.clear(window, var.background_no_letter)
 
 						#redraw letters
 						index_hand = 0
 						while len(var.bag_of_letters) > 0 and index_hand < number_of_letters_per_hand :
-							if current_player.hand_state[index_hand] == 0 :
+							if var.current_player.hand_state[index_hand] == 0 :
 								random_int = randint(0,len(var.bag_of_letters)-1)
 								drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
-								current_player.hand_state[index_hand] = drawn_letter.id
+								var.current_player.hand_state[index_hand] = drawn_letter.id
 								delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
 								drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
-								current_player.hand.add(drawn_letter)								
+								var.current_player.hand.add(drawn_letter)								
 							index_hand += 1
 
-						current_player = current_player.next()
-						current_player.info()
+						var.current_player = var.current_player.next()
+						var.current_player.info()
 
-						layers.letters_just_played.clear(window, current_background)
-
+						layers.letters_just_played.clear(window, var.current_background_no_text)
 						layers.letters_on_board.draw(window)
-						current_player.hand.draw(window)
 
-						current_background = window.copy()
+						var.current_player.hand.draw(window)
+						var.current_background_no_text = window.copy()
+						layers.background.drawText()
+						var.current_background = window.copy()
+
 						pygame.display.update()
 
 				#------ RELEASE CLIC AWAY FROM BUTTON -------
@@ -1092,13 +1128,13 @@ while game_is_running:
 							button.turnOnHighlighted()
 						else :
 							button.turnOffHighlighted()
-						layers.buttons.clear(window, current_background)
+						layers.buttons.clear(window, var.current_background)
 						layers.buttons.draw(window)
 
 						#TO DO - prevent artefact
 
-						layers.selected_letter.clear(window, current_background)
-						current_background = window.copy()
+						layers.selected_letter.clear(window, var.current_background)
+						var.current_background = window.copy()
 						layers.selected_letter.draw(window)
 
 						pygame.display.update()
@@ -1122,7 +1158,7 @@ while game_is_running:
 						button_end_turn.turnOffHighlighted()
 						buttons_changed = True
 				if buttons_changed :
-					layers.buttons.clear(window, current_background)
+					layers.buttons.clear(window, var.current_background)
 					layers.buttons.draw(window)
 
 					pygame.display.update()
@@ -1130,8 +1166,8 @@ while game_is_running:
 			if len(layers.selected_letter) == 1 :
 				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 
-				layers.selected_letter.clear(window, current_background)
-				current_background = window.copy()
+				layers.selected_letter.clear(window, var.current_background)
+				var.current_background = window.copy()
 				layers.selected_letter.draw(window)
 
 				pygame.display.update()

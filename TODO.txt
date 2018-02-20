@@ -2,9 +2,6 @@ PRIMARY
 
 check TODO in code
 
-draw ui text on a surface (background for instnce) wich is then updated
-update text when "next player"
-
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
 	layer_background.draw()
@@ -12,8 +9,6 @@ def draw all()
 	...
 
 auto shuffling for letters in hand
-
-Able to change the language of the UI -> One text file for ui text in different languages
 
 use save game
 
@@ -30,8 +25,13 @@ TO KEEP IN MIND
 /!\ warning for "PLAY_LETTER", when clicking on a butioon and relaesing the clic above a letter
 
 
-
 SECONDARY
+
+use relative positionning for hand holder en end button to allow hands of more than 7 letters
+
+find a better way to initialize game variables by using their real type
+
+display error message on UI when invalid move
 
 create a variable for "points for a scrabble" + possibilility to change value
 
