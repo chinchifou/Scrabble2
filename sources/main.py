@@ -86,8 +86,6 @@ class GameVariable():
 		self.current_background = []
 		self.current_background_no_text = []
 
-		self.ui_text_container = []
-
 var = GameVariable()
 
 #TODO to remove
@@ -143,6 +141,7 @@ ui = UserInterface()
 
 #class storing user interface data
 class UserInterfaceText():
+	all = []
 	def __init__(self, text, ligne_heigh, bold, pos_in_tiles):
 		self.text = text
 		self.ligne_heigh = ligne_heigh
@@ -153,6 +152,8 @@ class UserInterfaceText():
 
 		self.pos_x_tiles, self.pos_y_tiles = pos_in_tiles[0], pos_in_tiles[1]
 		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
+
+		UserInterfaceText.all.append(self)
 
 	def resize(self):
 		self.font = pygame.font.SysFont("Calibri", floor(self.ligne_heigh*var.tile_size))
@@ -396,8 +397,12 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	logging.info("WINDOW Creation")
 	updateTileSize(width,height)
 	#fonts.resize()
-	#TODO
+	#TODO to remove
+	"""
 	for ui_text in var.ui_text_container :
+		ui_text.resize()
+	"""
+	for ui_text in UserInterfaceText.all :
 		ui_text.resize()
 
 	layers.all.resize()
@@ -834,10 +839,11 @@ ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 """
 
 ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 2.0) )
-var.ui_text_container.append(ui_current_player_turn)
-#TODO find a better way to store instance
+#var.ui_text_container.append(ui_current_player_turn)
+#TODO find a better way to store instance -> use class variable 
 ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 6.0) )
-var.ui_text_container.append(ui_next_player_hand )
+#TODO to remove
+#var.ui_text_container.append(ui_next_player_hand )
 
 #----- Window init -----
 
