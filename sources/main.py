@@ -231,9 +231,15 @@ class Board(ResizableSprite):
 
 		pos_y_delta = 0
 		for player in PLAYERS :
-			text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
-			window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-			pos_y_delta += 1
+			if ( player == var.current_player ) :
+				ui_player_score.font.set_bold(1)
+				text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+				ui_player_score.font.set_bold(0)
+				window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+			else :
+				text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+				window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+			pos_y_delta += 0.8
 
 
 #----- Hand holder -----
@@ -806,7 +812,7 @@ ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_
 
 ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 9.0) )
 
-ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 10.0) )
+ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 9.7) )
 
 
 #----- Window init -----
