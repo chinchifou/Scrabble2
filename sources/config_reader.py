@@ -114,7 +114,7 @@ ui_possible_values = (
 'scores',
 'player_score',
 'previous_turn_summary',
-'word_and_score',
+'word_and_points',
 'scrabble_obtained',
 'nothing_played',
 'remaining_letters',

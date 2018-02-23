@@ -82,9 +82,10 @@ class GameVariable():
 		self.current_action = 'SELECT_A_LETTER'
 
 		self.background_no_letter = []
-
 		self.current_background = []
 		self.current_background_no_text = []
+
+		self.points_for_scrabble = 50
 
 var = GameVariable()
 
@@ -219,11 +220,20 @@ class Board(ResizableSprite):
 	def drawText(self):
 
 		#TODO to improve
-		text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<VALUE1>',var.current_player.name), 1, COLOR_LIGHT_GREY )
+		text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
 		window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
 
-		text = ui_next_player_hand.font.render( ui_next_player_hand.text.replace('<VALUE1>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+		text = ui_next_player_hand.font.render( ui_next_player_hand.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
 		window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
+
+		text = ui_scores.font.render( ui_scores.text, 1, COLOR_LIGHT_GREY )
+		window.blit(text, (ui_scores.pos_x, ui_scores.pos_y))
+
+		pos_y_delta = 0
+		for player in PLAYERS :
+			text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+			window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+			pos_y_delta += 1
 
 
 #----- Hand holder -----
@@ -343,6 +353,12 @@ class Player :
 	def next(self) :
 		return PLAYERS[(self.id + 1) % len(PLAYERS)]
 
+	#TODO to test
+	def previous(self) :
+		if ( self.id - 1 >= 0 ) :
+			return PLAYERS[(self.id - 1) % len(PLAYERS)]
+		else :
+			return None
 
 #~~~~~~ FUNCTIONS ~~~~~~
 
@@ -456,7 +472,7 @@ def calculatePoints(layer_letters_played) :
 		words_and_scores = []
 
 		if len(letters_played) == 7 : #is a SCRABBLE ?
-			words_and_scores.append(['!! SCRABBLE !!', 50])
+			words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
 
 		if delta_x == 0 :
 
@@ -774,7 +790,7 @@ ui_content = config_reader.h_ui_params
 ui.scores = ui_content['scores'][language_id]
 ui.player_score = ui_content['player_score'][language_id]
 ui.previous_turn_summary = ui_content['previous_turn_summary'][language_id]
-ui.word_and_score = ui_content['word_and_score'][language_id]
+ui.word_and_points = ui_content['word_and_points'][language_id]
 ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
 ui.nothing_played = ui_content['nothing_played'][language_id]
 ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
@@ -784,7 +800,13 @@ ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 
 ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 2.0) )
 
-ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 6.0) )
+ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 6.0) )
+
+#TODO draw hand info
+
+ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 9.0) )
+
+ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 10.0) )
 
 
 #----- Window init -----
