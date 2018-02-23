@@ -140,13 +140,15 @@ def int_pixels(value1_in_tiles, value2_in_tiles) :
 	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
 def indexInHandHolder(cursor_pos_x):
-	delta_x_hand_holder = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1
+	delta_x_hand_holder = round( layers.hand_holder.sprites()[0].rect.x/float(var.tile_size))
 	index_in_hand = int( floor( cursor_pos_x/float(var.tile_size) ) - delta_x_hand_holder )
-	#fix value on the edge
+
+	#fix value on the edges
 	if index_in_hand == -1:
 		index_in_hand = 0
 	elif index_in_hand == 7 :
 		index_in_hand = 6
+
 	return index_in_hand
 
 
@@ -331,20 +333,12 @@ Letter.containers = layers.all
 #----- Player -----
 class Player :
 
-	def __init__(self, name, score, hand) :
+	def __init__(self, name, score, hand, hand_state) :
 		self.name = name
 		self.score = score
 		self.hand = hand
 		self.id = len(PLAYERS)
-
-		self.hand_state = []
-		for i in range(number_of_letters_per_hand) :
-			self.hand_state.append(0)
-
-		index = 0
-		for letter in hand :
-			self.hand_state[index] = letter.id
-			index += 1
+		self.hand_state = hand_state
 
 	def info(self) :
 		str_hand = "["
@@ -804,13 +798,13 @@ ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
 ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 """
 
-ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 2.0) )
+ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 2) )
 
-ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 6.0) )
+ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), ui_current_player_turn.pos_y_tiles+1+2) )
 
 #TODO draw hand info
 
-ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 9.0) )
+ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), ui_next_player_hand.pos_y_tiles+3) )
 
 ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_BOARD_COLUMN+DELTA+1), 9.7) )
 
@@ -835,15 +829,18 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 
 for player_name in players_names :
 	start_hand = GroupOfSprites()
+	hand_state = []
 	pos_x = (TILES_PER_BOARD_COLUMN+4)
-	pos_y = 3.5
+	pos_y = ui_current_player_turn.pos_y_tiles+1
 	for i in range(number_of_letters_per_hand) :
 		random_int = randint(0,len(var.bag_of_letters)-1)
-		start_hand.add(Letter(var.bag_of_letters[random_int], pos_x, pos_y))
+		letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
+		start_hand.add(letter)
+		hand_state.append(letter.id)
 		del(var.bag_of_letters[random_int])
 		pos_x = pos_x+1
 
-	PLAYERS.append(Player(player_name,0,start_hand))
+	PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
 
 logPlayersInfo()
 
@@ -855,7 +852,8 @@ var.current_player.info()
 #create background
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 #create hand_holder
-hand_holder = Hand_holder("hand_holder", 18.9, 3.4)#automatically stored in the corresponding layer
+#hand_holder = Hand_holder("hand_holder", 18.9, 3.4)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", (DELTA+TILES_PER_BOARD_COLUMN+DELTA+0.9), ui_current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
 
 #create tiles
 DELTA = 1.5
@@ -981,14 +979,23 @@ while game_is_running:
 
 						if letter_from_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
+							logging.debug("hand state : %s", var.current_player.hand_state)
+
 							var.delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
 							layers.selected_letter.add(letter_from_hand)
 							
 							var.current_player.hand.remove(letter_from_hand)
 							hand_state_index = var.current_player.hand_state.index(letter_from_hand.id)
+
+							logging.debug("letter from hand id : %s", str(letter_from_hand.id))
+							logging.debug("hand state index : %s", hand_state_index)
+
 							var.current_player.hand_state[hand_state_index] = 0
 							var.current_player.hand.clear(window, var.background_no_letter)
 							var.current_player.hand.draw(window)
+
+							logging.debug("hand_state_index : %s", hand_state_index)
+							logging.debug("hand state : %s", var.current_player.hand_state)
 
 							var.current_background = window.copy()
 							layers.selected_letter.draw(window)
@@ -1053,7 +1060,10 @@ while game_is_running:
 
 									selected_letter = layers.selected_letter.sprites()[0]
 									
-									delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
+									#TODO to remove
+									#delta_x, delta_y = DELTA + TILES_PER_BOARD_COLUMN + DELTA + 1, DELTA + 2
+									delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
+
 									selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 									var.current_player.hand_state[index_in_hand] = selected_letter.id
 
