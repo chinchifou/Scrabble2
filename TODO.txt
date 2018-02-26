@@ -2,10 +2,6 @@ PRIMARY
 
 check TODO in code
 
-Move buton end
-
-Fix "go back to hand holder"
-
 Display UI element relatively to each other
 
 create draw all() function ? see for background copy and buttons and scores ...
