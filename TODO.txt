@@ -2,8 +2,6 @@ PRIMARY
 
 check TODO in code
 
-Display UI element relatively to each other
-
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
 	layer_background.draw()
@@ -20,6 +18,8 @@ BUG
 fix a glitch on LAPTOP or low resolutions (small black strip) for board when big window (bug already present in Scrabble V1) maybe due to to bad "round"
 > use smaller tile size ?
 
+On Win 10 problem with a second monitor (display by default at 150%) need to update doc
+
 
 TO KEEP IN MIND
 
@@ -35,7 +35,7 @@ find a better way to initialize game variables by using their real type
 
 display error message on UI when invalid move
 
-possibilility to change value for "points for a scrabble" + 
+possibilility to change value for "points for a scrabble"
 
 restrict length of player name
 

@@ -28,6 +28,11 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 		for s in self.sprites():
 			s.resize(*args)
 
+	def getByIndex(self, value):
+		for l in self.sprites():
+			if l.id == value :
+				return l
+
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
@@ -159,12 +164,15 @@ def indexInHandHolder(cursor_pos_x):
 #----- ResizableSprite -----
 #add native capacity to be resized
 class ResizableSprite(pygame.sprite.Sprite):
-	nb_letters_instances = 0
+	nb_created_instances = 0
 	#received coordinates are expresed in tiles
 	def __init__(self, name, pos_x, pos_y):
 		#super class constructor
 		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
 
+		#unique id
+		ResizableSprite.nb_created_instances += 1
+		self.id = ResizableSprite.nb_created_instances
 		#name and type
 		self.name = name
 		#position
@@ -279,11 +287,6 @@ class Letter(ResizableSprite):
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)		
 
-		#add a instance in the class counter
-		ResizableSprite.nb_letters_instances += 1
-		#and use it to define the id
-		self.id = ResizableSprite.nb_letters_instances	
-
 		self.points = POINTS_FOR[name]
 
 	#move a letter at a given position expressed in tiles
@@ -384,15 +387,28 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 def drawText():
 
 	#TODO to improve
+
+	#Current player hand
 	text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
 	window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
 
-	text = ui_next_player_hand.font.render( ui_next_player_hand.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+	#Next player hand header
+	text = ui_next_player_hand_header.font.render( ui_next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+	window.blit(text, (ui_next_player_hand_header.pos_x, ui_next_player_hand_header.pos_y))
+
+	#Next player hand content
+	str_hand = ""
+	for index in var.current_player.next().hand_state :
+		str_hand += str ( var.current_player.next().hand.getByIndex(index).name ) + "  " 
+
+	text = ui_next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
 	window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
 
+	#Scores header
 	text = ui_scores.font.render( ui_scores.text, 1, COLOR_LIGHT_GREY )
 	window.blit(text, (ui_scores.pos_x, ui_scores.pos_y))
 
+	#score of each player
 	pos_y_delta = 0
 	for player in PLAYERS :
 		if ( player == var.current_player ) :
@@ -799,16 +815,18 @@ ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
 ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
 ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 """
+ui_text_left_limit = (DELTA+TILES_PER_LINE+DELTA+1)
 
-ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( (DELTA+TILES_PER_LINE+DELTA+1), 2) )
+ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( ui_text_left_limit, 2) )
 
-ui_next_player_hand = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_LINE+DELTA+1), ui_current_player_turn.pos_y_tiles+1+2) )
+ui_next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_current_player_turn.pos_y_tiles+1+2) )
 
+ui_next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( ui_text_left_limit + 0.5, ui_next_player_hand_header.pos_y_tiles+1) )
 #TODO draw hand info
 
-ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( (DELTA+TILES_PER_LINE+DELTA+1), ui_next_player_hand.pos_y_tiles+3) )
+ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_next_player_hand.pos_y_tiles+2) )
 
-ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( (DELTA+TILES_PER_LINE+DELTA+1), 9.7) )
+ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( ui_text_left_limit + 0.5, ui_scores.pos_y_tiles+1) )
 
 
 #----- Window init -----
