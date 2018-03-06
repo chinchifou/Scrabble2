@@ -392,17 +392,20 @@ def drawText():
 	text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
 	window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
 
-	#Next player hand header
-	text = ui_next_player_hand_header.font.render( ui_next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
-	window.blit(text, (ui_next_player_hand_header.pos_x, ui_next_player_hand_header.pos_y))
+	#display next player hand
 
-	#Next player hand content
-	str_hand = ""
-	for index in var.current_player.next().hand_state :
-		str_hand += str ( var.current_player.next().hand.getByIndex(index).name ) + "  " 
+	if display_next_player_hand :
+		#Next player hand header
+		text = ui_next_player_hand_header.font.render( ui_next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+		window.blit(text, (ui_next_player_hand_header.pos_x, ui_next_player_hand_header.pos_y))
 
-	text = ui_next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
-	window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
+		#Next player hand content
+		str_hand = ""
+		for index in var.current_player.next().hand_state :
+			str_hand += str ( var.current_player.next().hand.getByIndex(index).name ) + "  " 
+
+		text = ui_next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
+		window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
 
 	#Scores header
 	text = ui_scores.font.render( ui_scores.text, 1, COLOR_LIGHT_GREY )
@@ -815,6 +818,9 @@ ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
 ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
 ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 """
+#UI text init
+#TODO create a class to store info and possibility to update at runtime
+
 ui_text_left_limit = (DELTA+TILES_PER_LINE+DELTA+1)
 
 ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( ui_text_left_limit, 2) )
@@ -822,9 +828,11 @@ ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][lan
 ui_next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_current_player_turn.pos_y_tiles+1+2) )
 
 ui_next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( ui_text_left_limit + 0.5, ui_next_player_hand_header.pos_y_tiles+1) )
-#TODO draw hand info
 
-ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_next_player_hand.pos_y_tiles+2) )
+if display_next_player_hand :
+	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_next_player_hand.pos_y_tiles+2) )
+else :
+	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_current_player_turn.pos_y_tiles+3) )
 
 ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( ui_text_left_limit + 0.5, ui_scores.pos_y_tiles+1) )
 
@@ -1222,4 +1230,3 @@ while game_is_running:
 logging.info("Game has ended")
 logging.info("")
 logging.info("_________END OF LOG___________")
-
