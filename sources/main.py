@@ -4,7 +4,7 @@
 #~~~~~~ IMPORTS ~~~~~~
 
 #Standard library imports
-from random import randint
+from random import randint, shuffle
 from math import floor
 from os import path
 
@@ -28,7 +28,11 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 		for s in self.sprites():
 			s.resize(*args)
 
-	def getByIndex(self, value):
+	def info(self, *args):
+		for s in self.sprites():
+			s.info(*args)
+
+	def findByIndex(self, value):
 		for l in self.sprites():
 			if l.id == value :
 				return l
@@ -208,6 +212,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 	def info(self) :
 		logging.debug("Sprite info :")
+		logging.debug("id : %s", self.id)
 		logging.debug("name : %s", self.name)
 		logging.debug("type : %s", self.type)
 		logging.debug("at position : %s, %s", self.pos_x, self.pos_y)
@@ -402,7 +407,7 @@ def drawText():
 		#Next player hand content
 		str_hand = ""
 		for index in var.current_player.next().hand_state :
-			str_hand += str ( var.current_player.next().hand.getByIndex(index).name ) + "  " 
+			str_hand += str ( var.current_player.next().hand.findByIndex(index).name ) + "  " 
 
 		text = ui_next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
 		window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
@@ -858,7 +863,7 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 for player_name in players_names :
 	start_hand = GroupOfSprites()
 	hand_state = []
-	pos_x = (TILES_PER_LINE+4)
+	pos_x = (ui_text_left_limit)
 	pos_y = ui_current_player_turn.pos_y_tiles+1
 	for i in range(number_of_letters_per_hand) :
 		random_int = randint(0,len(var.bag_of_letters)-1)
@@ -987,7 +992,33 @@ while game_is_running:
 			if ( key_pressed == pygame.K_ESCAPE ) :
 				logging.info("ESCAPE key pressed")
 				game_is_running = False #exit the game
-			
+
+			elif ( key_pressed == pygame.K_s ) :
+				shuffle(var.current_player.hand_state)
+
+				pos_x = (ui_text_left_limit)
+				pos_y = ui_current_player_turn.pos_y_tiles+1
+
+				for index in var.current_player.hand_state :
+
+					if index != 0:
+						var.current_player.hand.findByIndex(index).moveAtTile(pos_x, pos_y)
+					pos_x = pos_x + 1
+
+				layers.background.draw(window)
+				layers.tiles.draw(window)
+				layers.hand_holder.draw(window)
+				layers.buttons.draw(window)
+				var.background_no_letter = window.copy()
+				layers.letters_on_board.draw(window)
+				layers.letters_just_played.draw(window)
+				var.current_player.hand.draw(window)
+				var.current_background_no_text = window.copy()
+				drawText()
+				var.current_background = window.copy()
+				layers.selected_letter.draw(window)
+				
+				pygame.display.update()
 
 		#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
 		elif ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
