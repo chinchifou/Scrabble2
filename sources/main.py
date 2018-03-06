@@ -28,11 +28,6 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 		for s in self.sprites():
 			s.resize(*args)
 
-	#for each sprite in this GroupOfSprites, call the drawText() function
-	def drawText(self, *args):
-		for s in self.sprites():
-			s.drawText(*args)
-
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
 
@@ -201,7 +196,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
 		if self.type == "board":
-			self.drawText()
+			drawText()
 
 	def info(self) :
 		logging.debug("Sprite info :")
@@ -224,30 +219,6 @@ class Board(ResizableSprite):
 		self.path = path_background
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
-
-	def drawText(self):
-
-		#TODO to improve
-		text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
-		window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
-
-		text = ui_next_player_hand.font.render( ui_next_player_hand.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
-		window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
-
-		text = ui_scores.font.render( ui_scores.text, 1, COLOR_LIGHT_GREY )
-		window.blit(text, (ui_scores.pos_x, ui_scores.pos_y))
-
-		pos_y_delta = 0
-		for player in PLAYERS :
-			if ( player == var.current_player ) :
-				ui_player_score.font.set_bold(1)
-				text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
-				ui_player_score.font.set_bold(0)
-				window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-			else :
-				text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
-				window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-			pos_y_delta += 0.8
 
 
 #----- Hand holder -----
@@ -408,6 +379,31 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	pygame.event.clear(pygame.VIDEORESIZE) #remove the event pygame.VIDEORESIZE from the queue
 
 	return window
+
+#Draw UI text
+def drawText():
+
+	#TODO to improve
+	text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
+	window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
+
+	text = ui_next_player_hand.font.render( ui_next_player_hand.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+	window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
+
+	text = ui_scores.font.render( ui_scores.text, 1, COLOR_LIGHT_GREY )
+	window.blit(text, (ui_scores.pos_x, ui_scores.pos_y))
+
+	pos_y_delta = 0
+	for player in PLAYERS :
+		if ( player == var.current_player ) :
+			ui_player_score.font.set_bold(1)
+			text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+			ui_player_score.font.set_bold(0)
+			window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+		else :
+			text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+			window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+		pos_y_delta += 0.8
 
 #Load image
 def loadImage(complete_path):
@@ -897,7 +893,7 @@ var.background_no_letter = window.copy()
 var.current_player.hand.draw(window)
 var.current_background_no_text = window.copy()
 
-layers.background.drawText()
+drawText()
 var.current_background = window.copy()
 
 pygame.display.update()
@@ -951,7 +947,7 @@ while game_is_running:
 			layers.letters_just_played.draw(window)
 			var.current_player.hand.draw(window)
 			var.current_background_no_text = window.copy()
-			layers.background.drawText()
+			drawText()
 			var.current_background = window.copy()
 			layers.selected_letter.draw(window)
 			
@@ -1147,7 +1143,7 @@ while game_is_running:
 
 						var.current_player.hand.draw(window)
 						var.current_background_no_text = window.copy()
-						layers.background.drawText()
+						drawText()
 						var.current_background = window.copy()
 
 						pygame.display.update()
