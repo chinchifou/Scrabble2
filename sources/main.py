@@ -137,7 +137,7 @@ class UserInterfaceText():
 def tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(var.tile_size) ), round( value_in_pixels2/float(var.tile_size) ) )
 
-def solo_tiles(value_in_pixels) :
+def tiles1(value_in_pixels) :
 	return ( round( value_in_pixels/float(var.tile_size) ) )
 
 def pixels(value1_in_tiles, value2_in_tiles) :
@@ -737,6 +737,17 @@ cfg_double_buffer = display_settings['enable_double_buffer']
 cfg_custom_window_height = display_settings['custom_window_height']
 cfg_max_fps = display_settings['max_fps']
 
+#logging configuration
+logging.info("DISPLAY SETTINGS")
+logging.info("Fullscreen : %s", cfg_fullscreen)
+logging.info("Resizable : %s", cfg_resizable)
+logging.info("Resolution auto : %s", cfg_resolution_auto)
+logging.info("Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
+logging.info("Custom window height : %s", cfg_custom_window_height)
+logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
+logging.info("Double buffer : %s", cfg_double_buffer)
+logging.info("")
+
 #Game settings
 game_settings = config_reader.h_rules_params
 number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
@@ -755,20 +766,19 @@ elif LETTERS_LANGUAGE == 'french':
 	POINTS_FOR = rules.points_french
 	path_letters = path_letters_french
 
-#logging configuration
-logging.info("DISPLAY SETTINGS")
-logging.info("Fullscreen : %s", cfg_fullscreen)
-logging.info("Resizable : %s", cfg_resizable)
-logging.info("Resolution auto : %s", cfg_resolution_auto)
-logging.info("Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
-logging.info("Custom window height : %s", cfg_custom_window_height)
-logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
-logging.info("Double buffer : %s", cfg_double_buffer)
-logging.info("")
+#Data validation
+forced = ""
+if number_of_letters_per_hand < 5:
+	number_of_letters_per_hand = 5
+	forced = 'forced to '
+elif number_of_letters_per_hand > 9 :
+	number_of_letters_per_hand = 9
+	forced = 'forced to '
+
 logging.info("GAMES RULES")
 logging.info("Language : %s", LETTERS_LANGUAGE)
 logging.info("Players : %s", players_names)
-logging.info("Number of letters per_hand : %s", number_of_letters_per_hand)
+logging.info("Number of letters per_hand %s: %s", forced, number_of_letters_per_hand)
 logging.info("Display next player hand : %s", display_next_player_hand)
 logging.info("")
 
@@ -911,7 +921,7 @@ for row in range(0,TILES_PER_LINE) :
 	y_pos += 1
 
 #create button END TURN
-button_end_turn = Button("end_turn", solo_tiles(hand_holder.rect.x)+8, ui_current_player_turn.pos_y_tiles+1)
+button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+number_of_letters_per_hand+0.75, ui_current_player_turn.pos_y_tiles+1)
 
 #first image
 layers.background.draw(window)
@@ -1187,7 +1197,7 @@ while game_is_running:
 								random_int = randint(0,len(var.bag_of_letters)-1)
 								drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
 								var.current_player.hand_state[index_hand] = drawn_letter.id
-								delta_x, delta_y = solo_tiles(hand_holder.rect.x), ui_current_player_turn.pos_y_tiles+1
+								delta_x, delta_y = tiles1(hand_holder.rect.x), ui_current_player_turn.pos_y_tiles+1
 								drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
 								var.current_player.hand.add(drawn_letter)								
 							index_hand += 1
