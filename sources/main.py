@@ -4,9 +4,9 @@
 #~~~~~~ IMPORTS ~~~~~~
 
 #Standard library imports
-from random import randint, shuffle
-from math import floor
 from os import path
+from math import floor
+from random import randint, shuffle
 
 #Modules imports
 import pygame
@@ -110,7 +110,7 @@ class Layer():
 
 layers = Layer()
 
-#class storing user interface data
+#class used to create interface text
 class UserInterfaceText():
 	all = []
 	def __init__(self, text, ligne_heigh, bold, pos_in_tiles):
@@ -133,6 +133,87 @@ class UserInterfaceText():
 		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
 
 
+#class storing userface interface text and displaying them
+class UserInterfaceTextPrinter():
+
+	def __init__(self, ui_content):
+
+		#TODO to refactor
+		"""
+		ui.previous_turn_summary = ui_content['previous_turn_summary'][language_id]
+		ui.word_and_points = ui_content['word_and_points'][language_id]
+		ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
+		ui.nothing_played = ui_content['nothing_played'][language_id]
+		ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
+		ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
+		ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
+		"""
+
+		#UI text init
+
+		self.left_limit = (DELTA+TILES_PER_LINE+DELTA+0.5)
+
+		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( self.left_limit, 2) )
+
+		self.next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( self.left_limit, self.current_player_turn.pos_y_tiles+1+2) )
+
+		self.next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( self.left_limit + 0.5, self.next_player_hand_header.pos_y_tiles+1) )
+
+		if display_next_player_hand :
+			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( self.left_limit, self.next_player_hand.pos_y_tiles+2) )
+		else :
+			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( self.left_limit, self.current_player_turn.pos_y_tiles+3) )
+
+		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( self.left_limit + 0.5, self.scores.pos_y_tiles+1) )
+
+
+
+	#Draw UI text
+	def drawText(self):
+
+		#TODO to improve
+
+		#Current player hand
+		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
+		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))
+
+		#display next player hand
+
+		if display_next_player_hand :
+			#Next player hand header
+			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+			window.blit(text, (self.next_player_hand_header.pos_x, self.next_player_hand_header.pos_y))
+
+			#Next player hand content
+			str_hand = ""
+			for index in var.current_player.next().hand_state :
+				str_hand += str ( var.current_player.next().hand.findByIndex(index).name ) + "  " 
+
+			text = self.next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
+			window.blit(text, (self.next_player_hand.pos_x, self.next_player_hand.pos_y))
+
+		#Scores header
+		text = self.scores.font.render( self.scores.text, 1, COLOR_LIGHT_GREY )
+		window.blit(text, (self.scores.pos_x, self.scores.pos_y))
+
+		#score of each player
+		pos_y_delta = 0
+		for player in PLAYERS :
+			if ( player == var.current_player ) :
+				self.player_score.font.set_bold(1)
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+				self.player_score.font.set_bold(0)
+				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+			else :
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+			pos_y_delta += 0.8
+
+
+
+#TODO refactoring in progress
+
+
 #~~~~~~ CONVERTION ~~~~~~
 
 #----- convert bewten tiles numbers and pixels -----
@@ -152,8 +233,8 @@ def int_pixels(value1_in_tiles, value2_in_tiles) :
 	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
 def indexInHandHolder(cursor_pos_x):
-	delta_x_hand_holder = round ( (layers.hand_holder.sprites()[0].rect.x - ui_left_limit ) / float(var.tile_size) )
-	index_in_hand = int( floor( ( cursor_pos_x - ui_left_limit ) / float(var.tile_size) ) - delta_x_hand_holder )
+	delta_x_hand_holder = round ( (layers.hand_holder.sprites()[0].rect.x - ui_text.left_limit ) / float(var.tile_size) )
+	index_in_hand = int( floor( ( cursor_pos_x - ui_text.left_limit ) / float(var.tile_size) ) - delta_x_hand_holder )
 
 	#fix value on the edges
 	if index_in_hand == -1:
@@ -210,7 +291,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
 		if self.type == "board":
-			drawText()
+			ui_text.drawText()
 
 	def info(self) :
 		logging.debug("Sprite info :")
@@ -389,47 +470,6 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	pygame.event.clear(pygame.VIDEORESIZE) #remove the event pygame.VIDEORESIZE from the queue
 
 	return window
-
-#Draw UI text
-def drawText():
-
-	#TODO to improve
-
-	#Current player hand
-	text = ui_current_player_turn.font.render( ui_current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
-	window.blit(text, (ui_current_player_turn.pos_x, ui_current_player_turn.pos_y))
-
-	#display next player hand
-
-	if display_next_player_hand :
-		#Next player hand header
-		text = ui_next_player_hand_header.font.render( ui_next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
-		window.blit(text, (ui_next_player_hand_header.pos_x, ui_next_player_hand_header.pos_y))
-
-		#Next player hand content
-		str_hand = ""
-		for index in var.current_player.next().hand_state :
-			str_hand += str ( var.current_player.next().hand.findByIndex(index).name ) + "  " 
-
-		text = ui_next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
-		window.blit(text, (ui_next_player_hand.pos_x, ui_next_player_hand.pos_y))
-
-	#Scores header
-	text = ui_scores.font.render( ui_scores.text, 1, COLOR_LIGHT_GREY )
-	window.blit(text, (ui_scores.pos_x, ui_scores.pos_y))
-
-	#score of each player
-	pos_y_delta = 0
-	for player in PLAYERS :
-		if ( player == var.current_player ) :
-			ui_player_score.font.set_bold(1)
-			text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
-			ui_player_score.font.set_bold(0)
-			window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-		else :
-			text = ui_player_score.font.render( ui_player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
-			window.blit(text, (ui_player_score.pos_x, ui_player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-		pos_y_delta += 0.8
 
 #Load image
 def loadImage(complete_path):
@@ -821,37 +861,8 @@ else :
 #User interface content
 ui_content = config_reader.h_ui_params
 
-#TODO to refactor
-"""
-#ui.current_player_turn = ui_content['current_player_turn'][language_id]
-#ui.next_player_hand = ui_content['next_player_hand'][language_id]
-ui.scores = ui_content['scores'][language_id]
-ui.player_score = ui_content['player_score'][language_id]
-ui.previous_turn_summary = ui_content['previous_turn_summary'][language_id]
-ui.word_and_points = ui_content['word_and_points'][language_id]
-ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
-ui.nothing_played = ui_content['nothing_played'][language_id]
-ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
-ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
-ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
-"""
-#UI text init
-#TODO create a class to store info and possibility to update at runtime
-
-ui_left_limit = (DELTA+TILES_PER_LINE+DELTA+0.5)
-
-ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( ui_left_limit, 2) )
-
-ui_next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( ui_left_limit, ui_current_player_turn.pos_y_tiles+1+2) )
-
-ui_next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( ui_left_limit + 0.5, ui_next_player_hand_header.pos_y_tiles+1) )
-
-if display_next_player_hand :
-	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_left_limit, ui_next_player_hand.pos_y_tiles+2) )
-else :
-	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_left_limit, ui_current_player_turn.pos_y_tiles+3) )
-
-ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( ui_left_limit + 0.5, ui_scores.pos_y_tiles+1) )
+#Initialize userface texts
+ui_text = UserInterfaceTextPrinter(ui_content)
 
 
 #----- Window init -----
@@ -875,8 +886,8 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 for player_name in players_names :
 	start_hand = GroupOfSprites()
 	hand_state = []
-	pos_x = (ui_left_limit)
-	pos_y = ui_current_player_turn.pos_y_tiles+1
+	pos_x = (ui_text.left_limit)
+	pos_y = ui_text.current_player_turn.pos_y_tiles+1
 	for i in range(var.number_of_letters_per_hand) :
 		random_int = randint(0,len(var.bag_of_letters)-1)
 		letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
@@ -898,7 +909,7 @@ var.current_player.info()
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
 #create hand_holder
-hand_holder = Hand_holder("hand_holder", ui_left_limit - 0.1, ui_current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", ui_text.left_limit - 0.1, ui_text.current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
 
 #create tiles
 DELTA = 1.5
@@ -923,7 +934,7 @@ for row in range(0,TILES_PER_LINE) :
 	y_pos += 1
 
 #create button END TURN
-button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand+0.75, ui_current_player_turn.pos_y_tiles+1)
+button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
 
 #first image
 layers.background.draw(window)
@@ -936,7 +947,7 @@ var.background_no_letter = window.copy()
 var.current_player.hand.draw(window)
 var.current_background_no_text = window.copy()
 
-drawText()
+ui_text.drawText()
 var.current_background = window.copy()
 
 pygame.display.update()
@@ -990,7 +1001,7 @@ while game_is_running:
 			layers.letters_just_played.draw(window)
 			var.current_player.hand.draw(window)
 			var.current_background_no_text = window.copy()
-			drawText()
+			ui_text.drawText()
 			var.current_background = window.copy()
 			layers.selected_letter.draw(window)
 			
@@ -1008,8 +1019,8 @@ while game_is_running:
 			elif ( key_pressed == pygame.K_s ) :
 				shuffle(var.current_player.hand_state)
 
-				pos_x = (ui_left_limit)
-				pos_y = ui_current_player_turn.pos_y_tiles+1
+				pos_x = (ui_text.left_limit)
+				pos_y = ui_text.current_player_turn.pos_y_tiles+1
 
 				for index in var.current_player.hand_state :
 
@@ -1026,7 +1037,7 @@ while game_is_running:
 				layers.letters_just_played.draw(window)
 				var.current_player.hand.draw(window)
 				var.current_background_no_text = window.copy()
-				drawText()
+				ui_text.drawText()
 				var.current_background = window.copy()
 				layers.selected_letter.draw(window)
 				
@@ -1199,7 +1210,7 @@ while game_is_running:
 								random_int = randint(0,len(var.bag_of_letters)-1)
 								drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
 								var.current_player.hand_state[index_hand] = drawn_letter.id
-								delta_x, delta_y = tiles1(hand_holder.rect.x), ui_current_player_turn.pos_y_tiles+1
+								delta_x, delta_y = tiles1(hand_holder.rect.x), ui_text.current_player_turn.pos_y_tiles+1
 								drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
 								var.current_player.hand.add(drawn_letter)								
 							index_hand += 1
@@ -1212,7 +1223,7 @@ while game_is_running:
 
 						var.current_player.hand.draw(window)
 						var.current_background_no_text = window.copy()
-						drawText()
+						ui_text.drawText()
 						var.current_background = window.copy()
 
 						pygame.display.update()
