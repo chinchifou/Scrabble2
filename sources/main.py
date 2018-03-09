@@ -79,6 +79,8 @@ class GameVariable():
 		self.tile_size = 0.0
 		self.delta_pos_on_tile = 0.0
 
+		self.number_of_letters_per_hand = 7
+
 		self.bag_of_letters = []
 		self.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ] 
 		
@@ -150,14 +152,14 @@ def int_pixels(value1_in_tiles, value2_in_tiles) :
 	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
 def indexInHandHolder(cursor_pos_x):
-	delta_x_hand_holder = round( layers.hand_holder.sprites()[0].rect.x/float(var.tile_size))
-	index_in_hand = int( floor( cursor_pos_x/float(var.tile_size) ) - delta_x_hand_holder )
+	delta_x_hand_holder = round ( (layers.hand_holder.sprites()[0].rect.x - ui_left_limit ) / float(var.tile_size) )
+	index_in_hand = int( floor( ( cursor_pos_x - ui_left_limit ) / float(var.tile_size) ) - delta_x_hand_holder )
 
 	#fix value on the edges
 	if index_in_hand == -1:
 		index_in_hand = 0
-	elif index_in_hand == 7 :
-		index_in_hand = 6
+	elif index_in_hand == var.number_of_letters_per_hand :
+		index_in_hand = var.number_of_letters_per_hand - 1
 
 	return index_in_hand
 
@@ -238,7 +240,7 @@ class Board(ResizableSprite):
 class Hand_holder(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'hand_holder'
-		self.width, self.height = 7.2, 1.2
+		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
 		self.path = path_background
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
@@ -750,7 +752,7 @@ logging.info("")
 
 #Game settings
 game_settings = config_reader.h_rules_params
-number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
+var.number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
 display_next_player_hand = game_settings['display_next_player_hand']
 LETTERS_LANGUAGE = game_settings['letters_language']
 UI_LANGUAGE = game_settings['ui_language']
@@ -768,17 +770,17 @@ elif LETTERS_LANGUAGE == 'french':
 
 #Data validation
 forced = ""
-if number_of_letters_per_hand < 5:
-	number_of_letters_per_hand = 5
+if var.number_of_letters_per_hand < 5:
+	var.number_of_letters_per_hand = 5
 	forced = 'forced to '
-elif number_of_letters_per_hand > 9 :
-	number_of_letters_per_hand = 9
+elif var.number_of_letters_per_hand > 9 :
+	var.number_of_letters_per_hand = 9
 	forced = 'forced to '
 
 logging.info("GAMES RULES")
 logging.info("Language : %s", LETTERS_LANGUAGE)
 logging.info("Players : %s", players_names)
-logging.info("Number of letters per_hand %s: %s", forced, number_of_letters_per_hand)
+logging.info("Number of letters per_hand %s: %s", forced, var.number_of_letters_per_hand)
 logging.info("Display next player hand : %s", display_next_player_hand)
 logging.info("")
 
@@ -836,20 +838,20 @@ ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
 #UI text init
 #TODO create a class to store info and possibility to update at runtime
 
-ui_text_left_limit = (DELTA+TILES_PER_LINE+DELTA+1)
+ui_left_limit = (DELTA+TILES_PER_LINE+DELTA+0.5)
 
-ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( ui_text_left_limit, 2) )
+ui_current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( ui_left_limit, 2) )
 
-ui_next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_current_player_turn.pos_y_tiles+1+2) )
+ui_next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( ui_left_limit, ui_current_player_turn.pos_y_tiles+1+2) )
 
-ui_next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( ui_text_left_limit + 0.5, ui_next_player_hand_header.pos_y_tiles+1) )
+ui_next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( ui_left_limit + 0.5, ui_next_player_hand_header.pos_y_tiles+1) )
 
 if display_next_player_hand :
-	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_next_player_hand.pos_y_tiles+2) )
+	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_left_limit, ui_next_player_hand.pos_y_tiles+2) )
 else :
-	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_text_left_limit, ui_current_player_turn.pos_y_tiles+3) )
+	ui_scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( ui_left_limit, ui_current_player_turn.pos_y_tiles+3) )
 
-ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( ui_text_left_limit + 0.5, ui_scores.pos_y_tiles+1) )
+ui_player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( ui_left_limit + 0.5, ui_scores.pos_y_tiles+1) )
 
 
 #----- Window init -----
@@ -873,9 +875,9 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 for player_name in players_names :
 	start_hand = GroupOfSprites()
 	hand_state = []
-	pos_x = (ui_text_left_limit)
+	pos_x = (ui_left_limit)
 	pos_y = ui_current_player_turn.pos_y_tiles+1
-	for i in range(number_of_letters_per_hand) :
+	for i in range(var.number_of_letters_per_hand) :
 		random_int = randint(0,len(var.bag_of_letters)-1)
 		letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
 		start_hand.add(letter)
@@ -894,9 +896,9 @@ var.current_player.info()
 
 #create background
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
+
 #create hand_holder
-#hand_holder = Hand_holder("hand_holder", 18.9, 3.4)#automatically stored in the corresponding layer
-hand_holder = Hand_holder("hand_holder", (DELTA+TILES_PER_LINE+DELTA+0.9), ui_current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", ui_left_limit - 0.1, ui_current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
 
 #create tiles
 DELTA = 1.5
@@ -921,7 +923,7 @@ for row in range(0,TILES_PER_LINE) :
 	y_pos += 1
 
 #create button END TURN
-button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+number_of_letters_per_hand+0.75, ui_current_player_turn.pos_y_tiles+1)
+button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand+0.75, ui_current_player_turn.pos_y_tiles+1)
 
 #first image
 layers.background.draw(window)
@@ -1006,7 +1008,7 @@ while game_is_running:
 			elif ( key_pressed == pygame.K_s ) :
 				shuffle(var.current_player.hand_state)
 
-				pos_x = (ui_text_left_limit)
+				pos_x = (ui_left_limit)
 				pos_y = ui_current_player_turn.pos_y_tiles+1
 
 				for index in var.current_player.hand_state :
@@ -1192,7 +1194,7 @@ while game_is_running:
 
 						#redraw letters
 						index_hand = 0
-						while len(var.bag_of_letters) > 0 and index_hand < number_of_letters_per_hand :
+						while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
 							if var.current_player.hand_state[index_hand] == 0 :
 								random_int = randint(0,len(var.bag_of_letters)-1)
 								drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
