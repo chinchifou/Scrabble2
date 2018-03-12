@@ -42,21 +42,15 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 
 #----- Constants -----
 #define global scope for variables
-global REFERENCE_TILE_SIZE, TILES_PER_LINE, DELTA, TITLE_LINE_HEIGHT, LINE_HEIGHT, COLOR_LIGHT_GREY, COLOR_BLACK, PLAYERS
+global REFERENCE_TILE_SIZE, TILES_PER_LINE, DELTA, PLAYERS
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
 TILES_PER_LINE = 15
 #delta expressed in tiles from top left corner of the Window
 DELTA = 1.5
-#size of the ui text used for titke expressed in tile
-TITLE_LINE_HEIGHT = 0.9
-#size of the common ui text expressed in tile
-LINE_HEIGHT = 0.6
-#color use for text rendering
-COLOR_LIGHT_GREY = (143,144,138)
-#color use for text rendering
-COLOR_BLACK = (0,0,0)
+
+
 #all players
 PLAYERS = []
 
@@ -96,6 +90,37 @@ class GameVariable():
 		self.points_for_scrabble = 50
 
 var = GameVariable()
+
+
+#class to store the different colors used in the game
+class ColorPannel():
+	def __init__(self):
+		self.BLACK = (0,0,0)
+		self.GREY = (143,144,138)
+
+		self.BLUE_DEEP = (21, 109, 255)
+		self.BLUE_LIGHT = (113, 201, 249)
+		self.RED_DEEP = (239, 69, 86)
+		self.RED_LIGHT = (249, 179, 162)
+		self.GREEN = (0, 155, 151)
+
+		self.WHITE= (255, 255, 255)
+
+COLOR = ColorPannel()
+
+
+#class used to store line heigh used in the game
+class LineHeights():
+	def __init__(self):
+		#size of the ui text used for title expressed in tile
+		self.TITLE = 0.9
+		#size of the common ui text expressed in tile
+		self.NORMAL = 0.6		
+		#size for small pop up
+		self.POP_UP = 0.4
+
+LINE_HEIGHT = LineHeights()
+
 
 #class to create rendering layers used for display
 class Layer():
@@ -138,14 +163,6 @@ class UserInterfaceText():
 		self.pos_x, self.pos_y = pos_x, pos_y
 		self.pos_x_tiles, self.pos_y_tiles = tiles(self.pos_x, self.pos_y)
 
-	def drawAt(self, cursor_pos_x, cursor_pos_y):
-
-		self.moveAtPixels(cursor_pos_x, cursor_pos_y)	
-
-		text = self.font.render(self.text, 1, COLOR_BLACK )
-
-		window.blit( text, (self.pos_x, self.pos_y) )
-
 	def info(self):
 		logging.debug("UI Text")
 		logging.debug("Text : %s", self.text)
@@ -155,6 +172,20 @@ class UserInterfaceText():
 		logging.debug("Position in tiles : %s, %s", self.pos_x_tiles, self.pos_y_tiles)
 		logging.debug("Position in pixels : %s, %s", self.pos_x, self.pos_y)
 
+
+#class used to diaply text pop up to the user
+class UserInterFacePopUp(UserInterfaceText):
+
+	def __init__(self, text, line_heigh, bold, pos_in_tiles, text_color, background_color):
+		UserInterfaceText.__init__(self, text, line_heigh, bold, pos_in_tiles)
+		self.text_color = text_color
+		self.background_color = background_color
+
+	def drawAt(self, cursor_pos_x, cursor_pos_y):
+
+		self.moveAtPixels(cursor_pos_x, cursor_pos_y)	
+		text = self.font.render(self.text, 1, self.text_color, self.background_color )
+		window.blit( text, (self.pos_x, self.pos_y) )
 
 
 #class storing userface interface text and displaying them
@@ -177,28 +208,28 @@ class UserInterfaceTextPrinter():
 
 		self.left_limit = (DELTA+TILES_PER_LINE+DELTA+1.0)
 
-		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( self.left_limit, 2) )
+		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( self.left_limit, 2) )
 
-		self.next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT, True, ( self.left_limit, self.current_player_turn.pos_y_tiles+1+2) )
+		self.next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( self.left_limit, self.current_player_turn.pos_y_tiles+1+2) )
 
-		self.next_player_hand = UserInterfaceText("", LINE_HEIGHT, False, ( self.left_limit + 0.5, self.next_player_hand_header.pos_y_tiles+1) )
+		self.next_player_hand = UserInterfaceText("", LINE_HEIGHT.NORMAL, False, ( self.left_limit + 0.5, self.next_player_hand_header.pos_y_tiles+1) )
 
 		if display_next_player_hand :
-			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( self.left_limit, self.next_player_hand.pos_y_tiles+2) )
+			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( self.left_limit, self.next_player_hand.pos_y_tiles+2) )
 		else :
-			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT, True, ( self.left_limit, self.current_player_turn.pos_y_tiles+3) )
+			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( self.left_limit, self.current_player_turn.pos_y_tiles+3) )
 
-		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( self.left_limit + 0.5, self.scores.pos_y_tiles+1) )
+		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( self.left_limit + 0.5, self.scores.pos_y_tiles+1) )
 
 
 		#hardcoded help pop-up
 		self.help_pop_up_displayed = False
 
-		self.double_letter = UserInterfaceText( ("Double Letter"), LINE_HEIGHT, False, (0, 0) )
-		self.triple_letter = UserInterfaceText( ("Triple Letter"), LINE_HEIGHT, False, (0, 0) )
+		self.double_letter = UserInterFacePopUp( ("Double Letter"), LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
+		self.triple_letter = UserInterFacePopUp( ("Triple Letter"), LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
 
-		self.double_word = UserInterfaceText( ("Double Word"), LINE_HEIGHT, False, (0, 0) )
-		self.triple_word = UserInterfaceText( ("Triple Word"), LINE_HEIGHT, False, (0, 0) )
+		self.double_word = UserInterFacePopUp( ("Double Word"), LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
+		self.triple_word = UserInterFacePopUp( ("Triple Word"), LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
 
 
 	#Draw UI text
@@ -207,14 +238,14 @@ class UserInterfaceTextPrinter():
 		#TODO to improve
 
 		#Current player hand
-		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR_LIGHT_GREY )
+		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY )
 		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))
 
 		#display next player hand
 
 		if display_next_player_hand :
 			#Next player hand header
-			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR_LIGHT_GREY )
+			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR.GREY )
 			window.blit(text, (self.next_player_hand_header.pos_x, self.next_player_hand_header.pos_y))
 
 			#Next player hand content
@@ -222,11 +253,11 @@ class UserInterfaceTextPrinter():
 			for index in var.current_player.next().hand_state :
 				str_hand += str ( var.current_player.next().hand.findByIndex(index).name ) + "  " 
 
-			text = self.next_player_hand.font.render( str_hand , 1, COLOR_LIGHT_GREY )
+			text = self.next_player_hand.font.render( str_hand , 1, COLOR.GREY )
 			window.blit(text, (self.next_player_hand.pos_x, self.next_player_hand.pos_y))
 
 		#Scores header
-		text = self.scores.font.render( self.scores.text, 1, COLOR_LIGHT_GREY )
+		text = self.scores.font.render( self.scores.text, 1, COLOR.GREY )
 		window.blit(text, (self.scores.pos_x, self.scores.pos_y))
 
 		#score of each player
@@ -234,11 +265,11 @@ class UserInterfaceTextPrinter():
 		for player in PLAYERS :
 			if ( player == var.current_player ) :
 				self.player_score.font.set_bold(1)
-				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY )
 				self.player_score.font.set_bold(0)
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			else :
-				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY )
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			pos_y_delta += 0.8
 
@@ -1310,11 +1341,18 @@ while game_is_running:
 			if not ui_text.help_pop_up_displayed :
 				for tile in layers.tiles :
 					if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-						if tile.name == "double_letter":
-							ui_text.double_letter.drawAt(cursor_pos_x, cursor_pos_y)
+						if  ( ( tile.name != 'empty' ) and ( tile.name != 'start' ) ) :
+							if tile.name == 'double_letter':
+								ui_text.double_letter.drawAt(cursor_pos_x, cursor_pos_y)
+							elif tile.name == 'triple_letter':
+								ui_text.triple_letter.drawAt(cursor_pos_x, cursor_pos_y)
+							elif tile.name == 'double_word':
+								ui_text.double_word.drawAt(cursor_pos_x, cursor_pos_y)
+							elif tile.name == 'triple_word':
+								ui_text.triple_word.drawAt(cursor_pos_x, cursor_pos_y)
+
 							pygame.display.update()
 							ui_text.help_pop_up_displayed = True
-
 
 
 
