@@ -42,7 +42,7 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 
 #----- Constants -----
 #define global scope for variables
-global REFERENCE_TILE_SIZE, TILES_PER_LINE, DELTA, TITLE_LINE_HEIGHT, LINE_HEIGHT, COLOR_LIGHT_GREY, PLAYERS
+global REFERENCE_TILE_SIZE, TILES_PER_LINE, DELTA, TITLE_LINE_HEIGHT, LINE_HEIGHT, COLOR_LIGHT_GREY, COLOR_BLACK, PLAYERS
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
@@ -55,6 +55,8 @@ TITLE_LINE_HEIGHT = 0.9
 LINE_HEIGHT = 0.6
 #color use for text rendering
 COLOR_LIGHT_GREY = (143,144,138)
+#color use for text rendering
+COLOR_BLACK = (0,0,0)
 #all players
 PLAYERS = []
 
@@ -113,12 +115,12 @@ layers = Layer()
 #class used to create interface text
 class UserInterfaceText():
 	all = []
-	def __init__(self, text, ligne_heigh, bold, pos_in_tiles):
+	def __init__(self, text, line_heigh, bold, pos_in_tiles):
 		self.text = text
-		self.ligne_heigh = ligne_heigh
+		self.line_heigh = line_heigh
 		self.bold = int(bold)	
 
-		self.font = pygame.font.SysFont("Calibri", floor(self.ligne_heigh*var.tile_size))
+		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
 		self.font.set_bold(self.bold)
 
 		self.pos_x_tiles, self.pos_y_tiles = pos_in_tiles[0], pos_in_tiles[1]
@@ -127,10 +129,32 @@ class UserInterfaceText():
 		UserInterfaceText.all.append(self)
 
 	def resize(self):
-		self.font = pygame.font.SysFont("Calibri", floor(self.ligne_heigh*var.tile_size))
+		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
 		self.font.set_bold(self.bold)
 
 		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
+
+	def moveAtPixels(self, pos_x, pos_y):
+		self.pos_x, self.pos_y = pos_x, pos_y
+		self.pos_x_tiles, self.pos_y_tiles = tiles(self.pos_x, self.pos_y)
+
+	def drawAt(self, cursor_pos_x, cursor_pos_y):
+
+		self.moveAtPixels(cursor_pos_x, cursor_pos_y)	
+
+		text = self.font.render(self.text, 1, COLOR_BLACK )
+
+		window.blit( text, (self.pos_x, self.pos_y) )
+
+	def info(self):
+		logging.debug("UI Text")
+		logging.debug("Text : %s", self.text)
+		logging.debug("Line heigh : %s", str(self.line_heigh))
+		logging.debug("Bold : %s", str(self.bold))
+		logging.debug("Font : %s", str(self.font.size))
+		logging.debug("Position in tiles : %s, %s", self.pos_x_tiles, self.pos_y_tiles)
+		logging.debug("Position in pixels : %s, %s", self.pos_x, self.pos_y)
+
 
 
 #class storing userface interface text and displaying them
@@ -151,7 +175,7 @@ class UserInterfaceTextPrinter():
 
 		#UI text init
 
-		self.left_limit = (DELTA+TILES_PER_LINE+DELTA+0.5)
+		self.left_limit = (DELTA+TILES_PER_LINE+DELTA+1.0)
 
 		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], TITLE_LINE_HEIGHT, True, ( self.left_limit, 2) )
 
@@ -166,6 +190,15 @@ class UserInterfaceTextPrinter():
 
 		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT, False, ( self.left_limit + 0.5, self.scores.pos_y_tiles+1) )
 
+
+		#hardcoded help pop-up
+		self.help_pop_up_displayed = False
+
+		self.double_letter = UserInterfaceText( ("Double Letter"), LINE_HEIGHT, False, (0, 0) )
+		self.triple_letter = UserInterfaceText( ("Triple Letter"), LINE_HEIGHT, False, (0, 0) )
+
+		self.double_word = UserInterfaceText( ("Double Word"), LINE_HEIGHT, False, (0, 0) )
+		self.triple_word = UserInterfaceText( ("Triple Word"), LINE_HEIGHT, False, (0, 0) )
 
 
 	#Draw UI text
@@ -208,6 +241,7 @@ class UserInterfaceTextPrinter():
 				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR_LIGHT_GREY )
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			pos_y_delta += 0.8
+
 
 
 
@@ -1255,6 +1289,7 @@ while game_is_running:
 			cursor_pos_x = mouse_pos[0]
 			cursor_pos_y = mouse_pos[1]
 
+			#SELECT A LETTER
 			#change appearance of button
 			if var.current_action == 'SELECT_A_LETTER' :
 				buttons_changed = False
@@ -1271,6 +1306,19 @@ while game_is_running:
 
 					pygame.display.update()
 
+			#display real time help about tiles
+			if not ui_text.help_pop_up_displayed :
+				for tile in layers.tiles :
+					if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+						if tile.name == "double_letter":
+							ui_text.double_letter.drawAt(cursor_pos_x, cursor_pos_y)
+							pygame.display.update()
+							ui_text.help_pop_up_displayed = True
+
+
+
+
+			#PLAY A LETTER
 			if len(layers.selected_letter) == 1 :
 				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 

@@ -2,7 +2,11 @@ PRIMARY
 
 check TODO in code
 
-create class for UI content and positions
+Define text object as Assets
+
+display a legend / help for tile value
+
+display in real time points for current move
 
 create draw all() function ? see for background copy and buttons and scores ...
 def draw all()
