@@ -8,8 +8,8 @@ display a legend / help for tile value
 
 display in real time points for current move
 
-create draw all() function ? see for background copy and buttons and scores ...
-def draw all()
+create redrawAll() function to update the screnn ? 
+def redrawAll()
 	layer_background.draw()
 	layer_letters.draw()
 	...
