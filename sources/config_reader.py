@@ -119,7 +119,12 @@ ui_possible_values = (
 'nothing_played',
 'remaining_letters',
 'remaining_letter',
-'no_remaining_letter')
+'no_remaining_letter',
+'double_letter',
+'triple_letter',
+'double_word',
+'triple_word'
+)
 
 for line in open(path_conf_language_file, "r", encoding="utf8") :
 
@@ -127,7 +132,7 @@ for line in open(path_conf_language_file, "r", encoding="utf8") :
 
 	if text_found :
 		param = str(text_found.group(1))
-		text = []
+		values_array = []
 
 		if param in ui_possible_values:
 			start = line.index('=')+1
@@ -135,9 +140,8 @@ for line in open(path_conf_language_file, "r", encoding="utf8") :
 			all_values = all_values.strip().split('/')
 			for value in all_values :
 				if value != '' :
-					text.append(value)
-			h_ui_params [ param ] = text 
- 
+					values_array.append(value.strip())
+			h_ui_params [ param ] = values_array 
 
 #should be alright for accents ... PROOF :
 '''

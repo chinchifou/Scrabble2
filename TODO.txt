@@ -2,13 +2,10 @@ PRIMARY
 
 check TODO in code
 
-restrict length of player name
-
-display a legend / help for tile value
 
 display in real time points for current move
 
-create redrawAll() function to update the screnn ? 
+create redrawAll() function to update the screen ? 
 def redrawAll()
 	layer_background.draw()
 	layer_letters.draw()
@@ -21,8 +18,6 @@ use save game
 SECONDARY
 
 play music if "SCRABBLE"
-
-use relative positionning for hand holder en end button to allow hands of more than 7 letters
 
 find a better way to initialize game variables by using their real type
 
