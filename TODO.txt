@@ -21,6 +21,10 @@ play music if "SCRABBLE"
 
 find a better way to initialize game variables by using their real type
 
+declare as global vars:
+window
+language_id
+
 display error message on UI when invalid move
 
 possibilility to change value for "points for a scrabble"
