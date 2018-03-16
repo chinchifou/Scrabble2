@@ -2,7 +2,7 @@ PRIMARY
 
 check TODO in code
 
-create local var "bottom" for UserInterfaceText
+Draw Letter
 
 display in real time points for current move
 
@@ -26,6 +26,8 @@ UI - switch "scores" and "previous turn summary"
 
 find a better way to initialize game variables by using their real type
 
+allow to change display settings while game is running
+
 declare as global vars:
 window
 language_id
@@ -34,19 +36,7 @@ display error message on UI when invalid move
 
 possibilility to change value for "points for a scrabble"
 
-create a class Action()
-
-create function for log ?
-
-possibility to save different games rules (board layout, letters in bag)
-
 create "update" for buttons to update state base on mouse cursor position
-
-allow to change display settings while game is running
-
-play music if "SCRABBLE"
-
-The event queue offers some simple filtering. This can help performance slightly by blocking certain event types from the queue, use the pygame.event.set_allowed() and pygame.event.set_blocked() to work with this filtering
 
 
 
@@ -55,6 +45,12 @@ TO SEE
 add a priority level for layer ?
 
 tile size 2 times smaller ??
+
+create function for log ?
+
+create a class Action() ?
+
+possibility to save different games rules (board layout, letters in bag) ?
 
 
 BUG
@@ -70,3 +66,4 @@ TO KEEP IN MIND
 /!\ warning for "PLAY_LETTER", the letter must not always go where the player release the click. More calculation to do use collidelistall()
 /!\ warning for "PLAY_LETTER", when clicking on a butioon and relaesing the clic above a letter
 
+The event queue offers some simple filtering. This can help performance slightly by blocking certain event types from the queue, use the pygame.event.set_allowed() and pygame.event.set_blocked() to work with this filtering
