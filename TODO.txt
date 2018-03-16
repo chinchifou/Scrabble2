@@ -20,6 +20,10 @@ SECONDARY
 
 play music if "SCRABBLE"
 
+Think of anonther display for "scrabble obtained"
+
+UI - switch "scores" and "previous turn summary"
+
 find a better way to initialize game variables by using their real type
 
 declare as global vars:

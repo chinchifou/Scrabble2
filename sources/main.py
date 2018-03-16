@@ -206,7 +206,6 @@ class UserInterfaceTextPrinter():
 
 		#TODO to refactor
 		"""
-		ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
 		ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
 		ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
 		ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
@@ -232,6 +231,7 @@ class UserInterfaceTextPrinter():
 
 		self.nothing_played = UserInterfaceText( ui_content['nothing_played'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.scores.pos_y_tiles+1+(0.8*len(players_names))+UI_INTERLIGNE) )
 
+		self.scrabble_obtained = UserInterfaceText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.pos_y_tiles+1) )
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
 		self.pop_up_displayed = False
@@ -284,27 +284,30 @@ class UserInterfaceTextPrinter():
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			pos_y_delta += 0.8
 
-
-
 		#previous turn summary
 		#TODO in progress
-		pos_y_delta = 0
+		
 		if len(var.last_words_and_scores) > 0 :
+
 			#header
 			text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
 			window.blit(text, (self.previous_turn_summary.pos_x, self.previous_turn_summary.pos_y))
 
+			pos_y_delta = 0
 			for association in var.last_words_and_scores :
-				text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
-				window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
+				if association[0] == "!! SCRABBLE !!" :
+					text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
+					window.blit(text, (self.scrabble_obtained.pos_x, self.scrabble_obtained.pos_y+(pos_y_delta*var.tile_size)))
+				else :
+					text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
+					window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
 				pos_y_delta += 0.8
-				
+
 		else :
 			#nothing played
 			text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
 			window.blit(text, (self.nothing_played.pos_x, self.nothing_played.pos_y) )
 		
-
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
 		if tile.name == 'double_letter' :
