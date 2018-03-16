@@ -42,16 +42,23 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 
 #----- Constants -----
 #define global scope for variables
-global REFERENCE_TILE_SIZE, TILES_PER_LINE, DELTA, UI_LEFT_LIMIT, PLAYERS
+global REFERENCE_TILE_SIZE, TILES_PER_LINE
 #reference tile size for a 1920*1080 resolution
 REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
 TILES_PER_LINE = 15
+
+global DELTA, UI_LEFT_LIMIT, UI_LEFT_INDENT, UI_INTERLIGNE
 #delta expressed in tiles from top left corner of the Window
 DELTA = 1.5
 #Left limit for text of the user interface
 UI_LEFT_LIMIT = DELTA + TILES_PER_LINE + DELTA + 1.0
+#Left limit with an identation in the user interface text
+UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
+#SIze expressed in tile of the space between two consecutive line of text
+UI_INTERLIGNE = 1.0
 
+global PLAYERS
 #all players
 PLAYERS = []
 
@@ -79,9 +86,12 @@ class GameVariable():
 		self.number_of_letters_per_hand = 7
 
 		self.bag_of_letters = []
-		self.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ] 
+		self.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+		self.last_words_and_scores = {}
 		
 		self.current_player = []
+
 		self.current_action = 'SELECT_A_LETTER'
 
 		self.background_no_letter = []
@@ -196,7 +206,6 @@ class UserInterfaceTextPrinter():
 
 		#TODO to refactor
 		"""
-		ui.word_and_points = ui_content['word_and_points'][language_id]
 		ui.scrabble_obtained = ui_content['scrabble_obtained'][language_id]
 		ui.nothing_played = ui_content['nothing_played'][language_id]
 		ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
@@ -205,21 +214,22 @@ class UserInterfaceTextPrinter():
 		"""
 
 		#UI text init
-		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2) )
+		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2*UI_INTERLIGNE) )
 
-		self.next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.pos_y_tiles+1+2) )
+		self.next_player_hand_header = UserInterfaceText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.pos_y_tiles+1+1.2+1*UI_INTERLIGNE) )
 
-		self.next_player_hand = UserInterfaceText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT + 0.5, self.next_player_hand_header.pos_y_tiles+1) )
+		self.next_player_hand = UserInterfaceText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.pos_y_tiles+1) )
 
 		if display_next_player_hand :
-			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.next_player_hand.pos_y_tiles+2) )
+			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.next_player_hand.pos_y_tiles+1+UI_INTERLIGNE) )
 		else :
-			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.pos_y_tiles+3) )
+			self.scores = UserInterfaceText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.pos_y_tiles+1+1+UI_INTERLIGNE) )
 
-		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT + 0.5, self.scores.pos_y_tiles+1) )
+		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.pos_y_tiles+1) )
 
-		self.previous_turn_summary = UserInterfaceText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.pos_y_tiles+1+(0.8*len(players_names))+1 ) )
-		
+		self.previous_turn_summary = UserInterfaceText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.pos_y_tiles+1+(0.8*len(players_names))+UI_INTERLIGNE ) )
+
+		self.word_and_points = UserInterfaceText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.previous_turn_summary.pos_y_tiles+1 )  )		
 
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
@@ -276,6 +286,15 @@ class UserInterfaceTextPrinter():
 		#previous turn summary
 		text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
 		window.blit(text, (self.previous_turn_summary.pos_x, self.previous_turn_summary.pos_y))
+
+		#words and points
+		#TODO in progress
+		pos_y_delta = 0
+		for association in var.last_words_and_scores :
+			text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
+			window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
+			pos_y_delta += 0.8
+
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
 		if tile.name == 'double_letter' :
@@ -1266,9 +1285,9 @@ while game_is_running:
 						layers.buttons.clear(window, var.current_background)
 						layers.buttons.draw(window)
 
-						last_words_and_scores = calculatePoints(layers.letters_just_played)
+						var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
-						for association in last_words_and_scores :
+						for association in var.last_words_and_scores :
 							var.current_player.score +=  association[1]
 
 						for letter in layers.letters_just_played :

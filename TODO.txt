@@ -2,6 +2,7 @@ PRIMARY
 
 check TODO in code
 
+create local var "bottom" for UserInterfaceText
 
 display in real time points for current move
 
