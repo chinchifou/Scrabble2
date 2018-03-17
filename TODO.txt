@@ -24,6 +24,16 @@ language_id
 
 create "update" for buttons to update state base on mouse cursor position
 
+add a priority level for layer ?
+
+tile size 2 times smaller ??
+
+create function for log ?
+
+create a class Action() ?
+
+possibility to save different games rules (board layout, letters in bag) ?
+
 
 
 __________  SECONDARY  __________
@@ -50,26 +60,10 @@ find a better way to initialize game variables by using their real type ?
 
 
 
-__________  TO SEE  __________ 
-
-add a priority level for layer ?
-
-tile size 2 times smaller ??
-
-create function for log ?
-
-create a class Action() ?
-
-possibility to save different games rules (board layout, letters in bag) ?
-
-
-
 __________  BUG  __________
 
 fix a glitch on LAPTOP or low resolutions (small black strip) for board when big window (bug already present in Scrabble V1) maybe due to to bad "round"
 > use smaller tile size ?
-
-On Win 10 problem with a second monitor (display by default at 150%) need to update doc
 
 
 

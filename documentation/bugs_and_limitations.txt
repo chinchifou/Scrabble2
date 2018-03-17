@@ -6,6 +6,17 @@ There is no dictionary to check the spelling. This means that misspellings will 
 RULES OF THE GAMES
 If you do not follow the standard rules of Scrabble, the game will crash (for example: write diagonally, write two words at a time ...)
 
+FULL SCREEN ON A SECONDARY MONITOR ON WINDOWS 10 (March 2018)
+By default on Windows 10, if you use a TV screen as a second monitor, Windows will force the zoom to 150%.
+Which is fine for most application, but unfortunatelly when launched on fullscreen this Scrabble game will work normally will mostly be rendered outside of the screen.
+To solve this problem you have to change the Windows configuration.
+To do so : right-clic on the Windows' desktop > Display settings > Upscaling and location
+
+
 _________________ Known Bugs _________________
 
-It seems impossible to run the game in full-screen mode on a secondary monitor. However, the windowed mode works correctly.
+CHANGING WNDOW RESOLUTION
+1/
+When changing the window resolution of the game some artefacts may appear instead of black stripes arround the game. The current fix does not seems to work for low resolution or slow computer on windows 10.
+2/
+On small resolutions the tiles on the board are not perfectly recovering the background.
