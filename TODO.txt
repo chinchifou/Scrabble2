@@ -1,4 +1,4 @@
-PRIMARY
+__________  PRIMARY  __________
 
 check TODO in code
 
@@ -6,17 +6,31 @@ Draw Letter
 
 display in real time points for current move
 
+use save game
+
+
+
+__________  REFACTORING  __________
+
 create redrawAll() function to update the screen ? 
 def redrawAll()
 	layer_background.draw()
 	layer_letters.draw()
 	...
 
-use save game
+declare as global vars:
+window
+language_id
+
+create "update" for buttons to update state base on mouse cursor position
 
 
 
-SECONDARY
+__________  SECONDARY  __________
+
+allow to change display settings while game is running
+
+display error message on UI when invalid move
 
 play music if "SCRABBLE"
 
@@ -24,23 +38,19 @@ Think of anonther display for "scrabble obtained"
 
 UI - switch "scores" and "previous turn summary"
 
-find a better way to initialize game variables by using their real type
-
-allow to change display settings while game is running
-
-declare as global vars:
-window
-language_id
-
-display error message on UI when invalid move
-
 possibilility to change value for "points for a scrabble"
 
-create "update" for buttons to update state base on mouse cursor position
+
+
+__________  PERFORMANCE  __________
+
+Separate the background into two parts to allow partial refreshof the content (board on the left and menu on the right)
+
+find a better way to initialize game variables by using their real type ?
 
 
 
-TO SEE 
+__________  TO SEE  __________ 
 
 add a priority level for layer ?
 
@@ -53,7 +63,8 @@ create a class Action() ?
 possibility to save different games rules (board layout, letters in bag) ?
 
 
-BUG
+
+__________  BUG  __________
 
 fix a glitch on LAPTOP or low resolutions (small black strip) for board when big window (bug already present in Scrabble V1) maybe due to to bad "round"
 > use smaller tile size ?
@@ -61,7 +72,8 @@ fix a glitch on LAPTOP or low resolutions (small black strip) for board when big
 On Win 10 problem with a second monitor (display by default at 150%) need to update doc
 
 
-TO KEEP IN MIND
+
+__________  TO KEEP IN MIND  __________
 
 /!\ warning for "PLAY_LETTER", the letter must not always go where the player release the click. More calculation to do use collidelistall()
 /!\ warning for "PLAY_LETTER", when clicking on a butioon and relaesing the clic above a letter
