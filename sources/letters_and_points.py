@@ -9,6 +9,7 @@ for i in range(12):
 	letters_english.append('E')
 for i in range(9):
 	letters_english.append('I')
+	letters_english.append('A')
 for i in range(8):
 	letters_english.append('O')
 for i in range(6):

@@ -2,6 +2,8 @@ __________  PRIMARY  __________
 
 check TODO in code
 
+pb hand holder delay x 
+
 Draw Letter
 
 display in real time points for current move

@@ -206,12 +206,6 @@ class UserInterfaceTextPrinter():
 
 	def __init__(self, ui_content):
 
-		#TODO to refactor
-		"""
-		ui.remaining_letters_in_bag = ui_content['remaining_letters'][language_id]
-		ui.remaining_letter_in_bag = ui_content['remaining_letter'][language_id]
-		ui.no_remaining_letter_in_bag = ui_content['no_remaining_letter'][language_id]
-		"""
 
 		#UI text init
 		self.current_player_turn = UserInterfaceText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2*UI_INTERLIGNE) )
@@ -234,6 +228,12 @@ class UserInterfaceTextPrinter():
 		self.nothing_played = UserInterfaceText( ui_content['nothing_played'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE) )
 
 		self.scrabble_obtained = UserInterfaceText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles) )
+		
+		self.remaining_letters = UserInterfaceText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+
+		self.remaining_letter = UserInterfaceText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+		
+		self.no_remaining_letter = UserInterfaceText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 		
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
@@ -265,7 +265,11 @@ class UserInterfaceTextPrinter():
 			#Next player hand content
 			str_hand = ""
 			for index in var.current_player.next().hand_state :
-				str_hand += str ( var.current_player.next().hand.findByIndex(index).name ) + "  " 
+				letter_to_display = var.current_player.next().hand.findByIndex(index) 
+				if letter_to_display == None :
+					str_hand += ' '
+				else :
+					str_hand += str ( letter_to_display.name ) + "  " 
 
 			text = self.next_player_hand.font.render( str_hand , 1, COLOR.GREY )
 			window.blit(text, (self.next_player_hand.pos_x, self.next_player_hand.pos_y))
@@ -288,8 +292,6 @@ class UserInterfaceTextPrinter():
 			pos_y_delta += 0.8
 
 		#previous turn summary
-		#TODO in progress
-		
 		if len(var.last_words_and_scores) > 0 :
 
 			#header
@@ -301,7 +303,7 @@ class UserInterfaceTextPrinter():
 				if association[0] == "!! SCRABBLE !!" :
 					text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
 					window.blit(text, (self.scrabble_obtained.pos_x, self.scrabble_obtained.pos_y+(pos_y_delta*var.tile_size)))
-				else :
+				else :		
 					text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
 					window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
 				pos_y_delta += 0.8
@@ -310,7 +312,31 @@ class UserInterfaceTextPrinter():
 			#nothing played
 			text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
 			window.blit(text, (self.nothing_played.pos_x, self.nothing_played.pos_y) )
-		
+
+		if len(var.bag_of_letters) == 0 :
+			text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY )
+				
+			if len(var.last_words_and_scores) > 0 :
+				window.blit(text, (self.no_remaining_letter.pos_x, self.no_remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+			else :
+				window.blit(text, (self.no_remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+
+		elif len(var.bag_of_letters) == 1 :
+			text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY )
+				
+			if len(var.last_words_and_scores) > 0 :
+				window.blit(text, (self.remaining_letter.pos_x, self.remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+			else :
+				window.blit(text, (self.remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+
+		else :
+			text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY )
+
+			if len(var.last_words_and_scores) > 0 :
+				window.blit(text, (self.remaining_letters.pos_x, self.remaining_letters.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+			else :
+				window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
 		if tile.name == 'double_letter' :
@@ -342,15 +368,8 @@ def int_pixels(value1_in_tiles, value2_in_tiles) :
 	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
 def indexInHandHolder(cursor_pos_x):
-	delta_x_hand_holder = round ( (layers.hand_holder.sprites()[0].rect.x - UI_LEFT_LIMIT ) / float(var.tile_size) )
-	index_in_hand = int( floor( ( cursor_pos_x - UI_LEFT_LIMIT ) / float(var.tile_size) ) - delta_x_hand_holder )
-
-	#fix value on the edges
-	if index_in_hand == -1:
-		index_in_hand = 0
-	elif index_in_hand == var.number_of_letters_per_hand :
-		index_in_hand = var.number_of_letters_per_hand - 1
-
+	delta_x_hand_holder_pix = layers.hand_holder.sprites()[0].rect.x
+	index_in_hand = int( floor( (cursor_pos_x - delta_x_hand_holder_pix) / float(var.tile_size) ) )
 	return index_in_hand
 
 
@@ -997,12 +1016,13 @@ for player_name in players_names :
 	pos_x = (UI_LEFT_LIMIT)
 	pos_y = ui_text.current_player_turn.pos_y_tiles+1
 	for i in range(var.number_of_letters_per_hand) :
-		random_int = randint(0,len(var.bag_of_letters)-1)
-		letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
-		start_hand.add(letter)
-		hand_state.append(letter.id)
-		del(var.bag_of_letters[random_int])
-		pos_x = pos_x+1
+		if len(var.bag_of_letters) > 0 :
+			random_int = randint(0,len(var.bag_of_letters)-1)
+			letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
+			start_hand.add(letter)
+			hand_state.append(letter.id)
+			del(var.bag_of_letters[random_int])
+			pos_x = pos_x+1
 
 	PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
 
@@ -1319,10 +1339,13 @@ while game_is_running:
 							if var.current_player.hand_state[index_hand] == 0 :
 								random_int = randint(0,len(var.bag_of_letters)-1)
 								drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
+								del(var.bag_of_letters[random_int])	
+
 								var.current_player.hand_state[index_hand] = drawn_letter.id
 								delta_x, delta_y = tiles1(hand_holder.rect.x), ui_text.current_player_turn.pos_y_tiles+1
 								drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
-								var.current_player.hand.add(drawn_letter)								
+								var.current_player.hand.add(drawn_letter)
+
 							index_hand += 1
 
 						var.current_player = var.current_player.next()
