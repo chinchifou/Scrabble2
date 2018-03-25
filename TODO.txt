@@ -2,7 +2,7 @@ __________  PRIMARY  __________
 
 check TODO in code
 
-Draw Letter
+Possibility to redraw Letter
 
 display in real time points for current move
 
@@ -42,8 +42,6 @@ allow to change display settings while game is running
 
 display error message on UI when invalid move
 
-play music if "SCRABBLE"
-
 Think of anonther display for "scrabble obtained"
 
 UI - switch "scores" and "previous turn summary"
@@ -54,7 +52,7 @@ possibilility to change value for "points for a scrabble"
 
 __________  PERFORMANCE  __________
 
-Separate the background into two parts to allow partial refreshof the content (board on the left and menu on the right)
+Separate the background into two parts to allow partial refresh of the content (board on the left and menu on the right)
 
 find a better way to initialize game variables by using their real type ?
 

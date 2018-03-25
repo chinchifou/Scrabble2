@@ -72,7 +72,7 @@ path_letters_french = path.abspath('../materials/images/assets/letters/french/')
 path_letters_english = path.abspath('../materials/images/assets/letters/english/')
 path_letters = path.abspath('../materials/images/assets/letters/')
 path_tiles = path.abspath('../materials/images/assets/tiles/')
-
+path_music = path.abspath('../materials/music/')
 
 #----- Changing a runtime -----
 #class to store game variable
@@ -102,7 +102,7 @@ class GameVariable():
 
 var = GameVariable()
 
-
+#class used to print error in console and log file
 class ErrorPrinter():
 
 	def not_enough_letters(self):
@@ -142,6 +142,11 @@ class ColorPannel():
 
 COLOR = ColorPannel()
 
+#class used to store sounds
+class Sounds():
+	def __init__(self):
+		self.victory = pygame.mixer.Sound(path.join(path_music, 'tf2_achievement_unlocked_sound.ogg'))
+		self.scrabble = pygame.mixer.Sound(path.join(path_music, 'victory_fanfare.ogg'))
 
 #class used to store line heigh used in the game
 class LineHeights():
@@ -272,14 +277,11 @@ class UserInterfaceTextPrinter():
 	#Draw UI text
 	def drawText(self):
 
-		#TODO to improve
-
 		#Current player hand
 		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY )
 		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))
 
 		#display next player hand
-
 		if display_next_player_hand :
 			#Next player hand header
 			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR.GREY )
@@ -692,6 +694,8 @@ def calculatePoints(layer_letters_played) :
 		if len(letters_played) == 7 : #is a SCRABBLE ?
 			words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
 
+			SOUNDS.victory.play()
+
 		if delta_x == 0 :
 
 			#find first letter
@@ -994,14 +998,18 @@ logging.info("GAME STARTED")
 logging.info("-------------------")
 logging.info("")
 
+#----- Load Sounds -----
+SOUNDS = Sounds()
+logging.info("SOUNDS loaded")
+logging.info("")
+
+#----- Window init -----
+
 #Add icon to the window
 icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
 icon = pygame.transform.scale(icon_image, (32, 32))
 pygame.display.set_icon(icon)
 pygame.display.set_caption('Scrabble')
-
-
-#----- Window init -----
 
 #Calculate window resolution
 width=0
