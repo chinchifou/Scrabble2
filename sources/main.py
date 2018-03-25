@@ -134,8 +134,11 @@ class ColorPannel():
 
 		self.BLUE_DEEP = (21, 109, 255)
 		self.BLUE_LIGHT = (113, 201, 249)
+		self.BLUE_SUPER_LIGHT = ( 124, 194, 191 )
+
 		self.RED_DEEP = (239, 69, 86)
 		self.RED_LIGHT = (249, 179, 162)
+
 		self.GREEN = (0, 155, 151)
 
 		self.WHITE= (255, 255, 255)
@@ -308,7 +311,7 @@ class UserInterfaceTextPrinter():
 		for player in PLAYERS :
 			if ( player == var.current_player ) :
 				self.player_score.font.set_bold(1)
-				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY )
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.BLUE_SUPER_LIGHT )
 				self.player_score.font.set_bold(0)
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			else :
