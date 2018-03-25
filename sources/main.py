@@ -103,6 +103,29 @@ class GameVariable():
 var = GameVariable()
 
 
+class ErrorPrinter():
+
+	def not_enough_letters(self):
+		logging.error('! ! ! . . . . . . . . ! ! !')
+		logging.error('INITIAL SETTINGS ERROR : not enough letters at game start.')
+		logging.error('Some player has less letters than the others.')
+		logging.error('Possible solutions :')
+		logging.error('  1. add more letters')
+		logging.error('  2. reduce number of letters authorized per player')
+		logging.error('  3. reduce the number of players')
+		logging.error('! ! ! . . . . . . . . ! ! !')
+
+		print('INITIAL SETTINGS ERROR : not enough letters at game start.')
+		print('Some player has less letters than the others.')
+		print('Possible solutions :')
+		print('  1. add more letters')
+		print('  2. reduce number of letters authorized per player')
+		print('  3. reduce the number of players')
+		print('')
+
+ERROR = ErrorPrinter()
+	
+
 #class to store the different colors used in the game
 class ColorPannel():
 	def __init__(self):
@@ -958,6 +981,8 @@ logging.info("")
 
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
+game_is_running = True
+
 fps_clock = pygame.time.Clock()
 clic_clock = pygame.time.Clock() #TODO to use
 logging.info("INITIALIZATION")
@@ -1010,85 +1035,92 @@ ui_text = UserInterfaceTextPrinter(ui_content)
 
 #----- Create players -----
 
-for player_name in players_names :
-	start_hand = GroupOfSprites()
-	hand_state = []
-	pos_x = (UI_LEFT_LIMIT)
-	pos_y = ui_text.current_player_turn.pos_y_tiles+1
-	for i in range(var.number_of_letters_per_hand) :
-		if len(var.bag_of_letters) > 0 :
-			random_int = randint(0,len(var.bag_of_letters)-1)
-			letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
-			start_hand.add(letter)
-			hand_state.append(letter.id)
-			del(var.bag_of_letters[random_int])
-			pos_x = pos_x+1
+enough_letters = len(players_names)*var.number_of_letters_per_hand < len(var.bag_of_letters)
 
-	PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
+if enough_letters :
 
-logPlayersInfo()
+	for player_name in players_names :
+		start_hand = GroupOfSprites()
+		hand_state = []
+		pos_x = (UI_LEFT_LIMIT)
+		pos_y = ui_text.current_player_turn.pos_y_tiles+1
+		for i in range(var.number_of_letters_per_hand) :
+			if len(var.bag_of_letters) > 0 :
+				random_int = randint(0,len(var.bag_of_letters)-1)
+				letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
+				start_hand.add(letter)
+				hand_state.append(letter.id)
+				del(var.bag_of_letters[random_int])
+				pos_x = pos_x+1
 
-var.current_player = PLAYERS[0]
-var.current_player.info()
+		PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
 
+	logPlayersInfo()
+
+	var.current_player = PLAYERS[0]
+	var.current_player.info()
+
+else :
+	game_is_running = False
+	ERROR.not_enough_letters()
 
 #----- Create board game -----
 
-#create background
-board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
+if game_is_running :
 
-#create hand_holder
-hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
+	#create background
+	board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
-#create tiles
-DELTA = 1.5
-x_pos = 0 + DELTA
-y_pos = 0 + DELTA
-for row in range(0,TILES_PER_LINE) :
-	for column in range(0, TILES_PER_LINE) :
-		if rules.BOARD_LAYOUT[row][column] == 0 :
-			Tile('start', x_pos, y_pos)
-		elif rules.BOARD_LAYOUT[row][column] == 1 :
-			Tile('empty', x_pos, y_pos)
-		elif rules.BOARD_LAYOUT[row][column] == 2 :
-			Tile('double_letter', x_pos, y_pos)
-		elif rules.BOARD_LAYOUT[row][column] == 3 :
-			Tile('triple_letter', x_pos, y_pos)
-		elif rules.BOARD_LAYOUT[row][column] == 4 :
-			Tile('double_word', x_pos, y_pos)
-		elif rules.BOARD_LAYOUT[row][column] == 5 :
-			Tile('triple_word', x_pos, y_pos)
-		x_pos += 1
+	#create hand_holder
+	hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
+
+	#create tiles
+	DELTA = 1.5
 	x_pos = 0 + DELTA
-	y_pos += 1
+	y_pos = 0 + DELTA
+	for row in range(0,TILES_PER_LINE) :
+		for column in range(0, TILES_PER_LINE) :
+			if rules.BOARD_LAYOUT[row][column] == 0 :
+				Tile('start', x_pos, y_pos)
+			elif rules.BOARD_LAYOUT[row][column] == 1 :
+				Tile('empty', x_pos, y_pos)
+			elif rules.BOARD_LAYOUT[row][column] == 2 :
+				Tile('double_letter', x_pos, y_pos)
+			elif rules.BOARD_LAYOUT[row][column] == 3 :
+				Tile('triple_letter', x_pos, y_pos)
+			elif rules.BOARD_LAYOUT[row][column] == 4 :
+				Tile('double_word', x_pos, y_pos)
+			elif rules.BOARD_LAYOUT[row][column] == 5 :
+				Tile('triple_word', x_pos, y_pos)
+			x_pos += 1
+		x_pos = 0 + DELTA
+		y_pos += 1
 
-#create button END TURN
-button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
+	#create button END TURN
+	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
 
 
 #----- first image -----
-layers.background.draw(window)
-layers.tiles.draw(window)
-layers.hand_holder.draw(window)
-layers.buttons.draw(window)
 
-var.background_no_letter = window.copy()
+if game_is_running :
 
-var.current_player.hand.draw(window)
-var.current_background_no_text = window.copy()
+	layers.background.draw(window)
+	layers.tiles.draw(window)
+	layers.hand_holder.draw(window)
+	layers.buttons.draw(window)
 
-ui_text.drawText()
-var.current_background = window.copy()
+	var.background_no_letter = window.copy()
 
-pygame.display.update()
+	var.current_player.hand.draw(window)
+	var.current_background_no_text = window.copy()
+
+	ui_text.drawText()
+	var.current_background = window.copy()
+
+	pygame.display.update()
 
 
 #~~~~~~ MAIN  ~~~~~~
-
-#----- Start -----
-
-#Game is running
-game_is_running = True
 
 #Main loop
 while game_is_running:
@@ -1330,7 +1362,7 @@ while game_is_running:
 							layers.letters_on_board.add(letter)
 
 						layers.letters_just_played.empty()
-						window.blit(var.current_background_no_text, (0,0))
+						window.blit(var.background_no_letter, (0,0))
 						var.current_player.hand.clear(window, var.background_no_letter)
 
 						#redraw letters
@@ -1351,7 +1383,7 @@ while game_is_running:
 						var.current_player = var.current_player.next()
 						var.current_player.info()
 
-						layers.letters_just_played.clear(window, var.current_background_no_text)
+						layers.letters_just_played.clear(window, var.background_no_letter)
 						layers.letters_on_board.draw(window)
 
 						var.current_player.hand.draw(window)
