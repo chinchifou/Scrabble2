@@ -5,6 +5,7 @@
 
 #Standard library imports
 from os import path
+from os import makedirs
 from math import floor
 from random import randint, shuffle
 
@@ -73,6 +74,9 @@ path_letters_english = path.abspath('../materials/images/assets/letters/english/
 path_letters = path.abspath('../materials/images/assets/letters/')
 path_tiles = path.abspath('../materials/images/assets/tiles/')
 path_music = path.abspath('../materials/music/')
+
+if not path.exists(path_log_folder):
+	makedirs(path_log_folder)
 
 #----- Changing a runtime -----
 #class to store game variable
