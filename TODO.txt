@@ -48,6 +48,8 @@ UI - switch "scores" and "previous turn summary"
 
 possibilility to change value for "points for a scrabble"
 
+set logger to different levels from a file
+
 
 
 __________  PERFORMANCE  __________

@@ -6,8 +6,13 @@
 #Standard library imports
 from os import path
 from os import makedirs
+
 from math import floor
 from random import randint, shuffle
+
+import platform
+
+import ctypes
 
 #Modules imports
 import pygame
@@ -935,21 +940,23 @@ display_settings = config_reader.h_display_params
 cfg_fullscreen = display_settings['fullscreen']
 cfg_resizable = display_settings['resizable']
 cfg_resolution_auto = display_settings['resolution_auto']
+cfg_custom_window_height = display_settings['custom_window_height']
+cfg_enable_windows_ten_upscaling = display_settings['enable_windows_ten_upscaling']
 cfg_hardware_accelerated = display_settings['enable_hardware_accelerated']
 cfg_double_buffer = display_settings['enable_double_buffer']
-cfg_custom_window_height = display_settings['custom_window_height']
 cfg_max_fps = display_settings['max_fps']
 
 #logging configuration
-logging.info("DISPLAY SETTINGS")
-logging.info("Fullscreen : %s", cfg_fullscreen)
-logging.info("Resizable : %s", cfg_resizable)
-logging.info("Resolution auto : %s", cfg_resolution_auto)
-logging.info("Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
-logging.info("Custom window height : %s", cfg_custom_window_height)
-logging.info("Hardware accelerated : %s", cfg_hardware_accelerated)
-logging.info("Double buffer : %s", cfg_double_buffer)
-logging.info("")
+logging.debug("DISPLAY SETTINGS")
+logging.debug("Fullscreen : %s", cfg_fullscreen)
+logging.debug("Resizable : %s", cfg_resizable)
+logging.debug("Resolution auto : %s", cfg_resolution_auto)
+logging.debug("Enable Windows 10 upscaling : %s", cfg_enable_windows_ten_upscaling)
+logging.debug("Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
+logging.debug("Custom window height : %s", cfg_custom_window_height)
+logging.debug("Hardware accelerated : %s", cfg_hardware_accelerated)
+logging.debug("Double buffer : %s", cfg_double_buffer)
+logging.debug("")
 
 #Game settings
 game_settings = config_reader.h_rules_params
@@ -978,17 +985,42 @@ elif var.number_of_letters_per_hand > 9 :
 	var.number_of_letters_per_hand = 9
 	forced = 'forced to '
 
-logging.info("GAMES RULES")
-logging.info("Language : %s", LETTERS_LANGUAGE)
-logging.info("Players : %s", players_names)
-logging.info("Number of letters per_hand %s: %s", forced, var.number_of_letters_per_hand)
-logging.info("Display next player hand : %s", display_next_player_hand)
-logging.info("")
+logging.debug("GAMES RULES")
+logging.debug("Language : %s", LETTERS_LANGUAGE)
+logging.debug("Players : %s", players_names)
+logging.debug("Number of letters per_hand %s: %s", forced, var.number_of_letters_per_hand)
+logging.debug("Display next player hand : %s", display_next_player_hand)
+logging.debug("")
 
 
 #~~~~~~ GAME INITIALIAZATION ~~~~~~
 
+
+#----- OS verification and DPI scaling -----
+
+
+os_name = platform.system()
+os_version = platform.release()
+
+if cfg_enable_windows_ten_upscaling == False :
+	if ( os_name == "Windows" and os_version == "10" ):
+		# Query DPI Awareness (Windows 10 and 8)
+		awareness = ctypes.c_int()
+		errorCode = ctypes.windll.shcore.GetProcessDpiAwareness(0, ctypes.addressof(awareness))
+
+		if awareness.value == 0 :
+			logging.debug("DPI scaling")
+			logging.debug("Applications' resolutions are overriden by Windows 10")
+			logging.debug("Changing this behaviour for this pygame app instance ...")
+
+			# Set DPI Awareness  (Windows 10 and 8)
+			errorCode = ctypes.windll.shcore.SetProcessDpiAwareness(2)
+			logging.debug("Pygame's window resolution is now handled by itself")
+			logging.debug("")
+
+
 #----- Launch Pygame -----
+
 
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
@@ -996,10 +1028,10 @@ game_is_running = True
 
 fps_clock = pygame.time.Clock()
 clic_clock = pygame.time.Clock() #TODO to use
-logging.info("INITIALIZATION")
-logging.info("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
-logging.info("Pygame started")
-logging.info("")
+logging.debug("INITIALIZATION")
+logging.debug("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
+logging.debug("Pygame started")
+logging.debug("")
 logging.info("-------------------")
 logging.info("GAME STARTED")
 logging.info("-------------------")
@@ -1007,8 +1039,8 @@ logging.info("")
 
 #----- Load Sounds -----
 SOUNDS = Sounds()
-logging.info("SOUNDS loaded")
-logging.info("")
+logging.debug("SOUNDS loaded")
+logging.debug("")
 
 #----- Window init -----
 
@@ -1186,11 +1218,11 @@ while game_is_running:
 			
 		#~~~~~~ KEY PRESSED ~~~~~~			
 		elif ( event_type == pygame.KEYDOWN ) :
-			logging.info("Key pressed")
+			logging.debug("Key pressed")
 			key_pressed = event.key
 			
 			if ( key_pressed == pygame.K_ESCAPE ) :
-				logging.info("ESCAPE key pressed")
+				logging.debug("ESCAPE key pressed")
 				game_is_running = False #exit the game
 
 			elif ( key_pressed == pygame.K_s ) :
@@ -1522,7 +1554,7 @@ while game_is_running:
 					ui_text.id_tile_pop_up = 0
 					ui_text.pop_up_displayed = False
 
-
+logging.info("")
 logging.info("Game has ended")
 logging.info("")
 logging.info("_________END OF LOG___________")

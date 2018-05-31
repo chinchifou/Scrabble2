@@ -64,6 +64,8 @@ for line in open(path_conf_disp_file, "r", encoding="utf8") :
 		if param == 'resizable' :
 			h_display_params[ param ] = value		
 		if param == 'resolution_auto' :
+			h_display_params[ param ] = value
+		if param == 'enable_windows_ten_upscaling' :
 			h_display_params[ param ] = value		
 		if param == 'enable_hardware_accelerated' :
 			h_display_params[ param ] = value	
@@ -142,6 +144,7 @@ for line in open(path_conf_language_file, "r", encoding="utf8") :
 				if value != '' :
 					values_array.append(value.strip())
 			h_ui_params [ param ] = values_array 
+
 
 #should be alright for accents ... PROOF :
 '''
