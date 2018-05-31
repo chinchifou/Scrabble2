@@ -1145,6 +1145,7 @@ if game_is_running :
 
 	#create button END TURN
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
+	button_draw_tiles = Button("draw", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
 
 #----- first image -----
@@ -1312,18 +1313,17 @@ while game_is_running:
 							pygame.display.update()
 
 							var.current_action = "PLAY_A_LETTER"
+					
+					#------ CLIC ON BUTTONS -------
 
-					#------ CLIC ON END TURN -------
-					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
-						#change button state
-						button_end_turn.is_highlighted = False
-						button_end_turn.push()
-						layers.buttons.clear(window, var.current_background)
-						layers.buttons.draw(window)
-
-						var.current_background = window.copy()
-						pygame.display.update()
-
+					for button in layers.buttons :
+						if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+							#change button state
+							button.is_highlighted = False
+							button.push()
+							layers.buttons.clear(window, var.current_background)
+							layers.buttons.draw(window) 
+					pygame.display.update()
 
 				#------ PLAY A LETTER -------
 				elif var.current_action == 'PLAY_A_LETTER' :
@@ -1394,11 +1394,18 @@ while game_is_running:
 				#------ SELECT A LETTER -------
 				if var.current_action == 'SELECT_A_LETTER' :
 
+				
+					#------ RELEASE CLIC ON A BUTTON -------
+					for button in layers.buttons :
+
+						if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+							button.turnOnHighlighted()
+							layers.buttons.clear(window, var.current_background)
+							layers.buttons.draw(window)
+
+
 					#------ RELEASE CLIC ON END TURN BUTTON -------
-					if button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
-						button_end_turn.turnOnHighlighted()
-						layers.buttons.clear(window, var.current_background)
-						layers.buttons.draw(window)
+					if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 						var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
@@ -1430,15 +1437,25 @@ while game_is_running:
 						var.current_player = var.current_player.next()
 						var.current_player.info()
 
+						#display
 						layers.letters_just_played.clear(window, var.background_no_letter)
 						layers.letters_on_board.draw(window)
 
 						var.current_player.hand.draw(window)
+
 						var.current_background_no_text = window.copy()
 						ui_text.drawText()
-						var.current_background = window.copy()
 
-						pygame.display.update()
+					#TODO toremove in accord with RELEASE CLIC AWAY FROM BUTTON 
+					var.current_background = window.copy()
+					pygame.display.update()
+
+
+					#------ RELEASE CLIC ON END TURN BUTTON -------
+					if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
+						#TODO
+						pass
+
 
 				#------ RELEASE CLIC AWAY FROM BUTTON -------
 				for button in layers.buttons :
@@ -1448,16 +1465,17 @@ while game_is_running:
 							button.turnOnHighlighted()
 						else :
 							button.turnOffHighlighted()
+
 						layers.buttons.clear(window, var.current_background)
 						layers.buttons.draw(window)
-
-						#TO DO - prevent artefact
-
+						
+						#TO DO - prevent artefact see line 1287 ?
 						layers.selected_letter.clear(window, var.current_background)
 						var.current_background = window.copy()
 						layers.selected_letter.draw(window)
-
+						
 						pygame.display.update()
+
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
@@ -1470,19 +1488,22 @@ while game_is_running:
 			#------ SELECT A LETTER ------ 
 			#change appearance of button
 			if var.current_action == 'SELECT_A_LETTER' :
+
 				buttons_changed = False
 				for button in layers.buttons :
 					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 						button.turnOnHighlighted()
 						buttons_changed = True
-					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ):
-						button_end_turn.turnOffHighlighted()
+					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+						button.turnOffHighlighted()
 						buttons_changed = True
+
 				if buttons_changed :
 					layers.buttons.clear(window, var.current_background)
 					layers.buttons.draw(window)
 
 					pygame.display.update()
+
 
 			#------ PLAY A LETTER ------ 
 			if len(layers.selected_letter) == 1 :
