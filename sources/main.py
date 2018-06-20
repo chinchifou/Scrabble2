@@ -98,6 +98,7 @@ class GameVariable():
 		self.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
 		self.last_words_and_scores = {}
+		self.predicted_score = 0
 		
 		self.current_player = []
 
@@ -320,7 +321,10 @@ class UserInterfaceTextPrinter():
 		for player in PLAYERS :
 			if ( player == var.current_player ) :
 				self.player_score.font.set_bold(1)
-				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.BLUE_SUPER_LIGHT )
+				if var.predicted_score == 0 : #move does not give points
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.BLUE_SUPER_LIGHT )
+				else :
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, COLOR.BLUE_SUPER_LIGHT )
 				self.player_score.font.set_bold(0)
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			else :
@@ -1354,7 +1358,38 @@ while game_is_running:
 									layers.selected_letter.clear(window, var.current_background)
 									var.current_player.hand.draw(window)
 
-									var.current_background = window.copy()	
+
+
+
+
+
+
+									#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
+
+									var.predicted_score = 0
+									for h_word_point in calculatePoints(layers.letters_just_played) :
+										var.predicted_score = var.predicted_score + h_word_point[1]									
+
+
+									#TODO SIMPLIFY (separate stuff)
+									#TODO CREATE A FUNCTION
+									#remove previously displayed text
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons.draw(window)
+									var.background_no_letter = window.copy()
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									ui_text.drawText()
+									var.current_background = window.copy()
+
+
+
+
+
 									pygame.display.update()
 
 									var.current_action = "SELECT_A_LETTER"
@@ -1382,7 +1417,35 @@ while game_is_running:
 									layers.selected_letter.clear(window, var.current_background)	
 									layers.letters_just_played.draw(window)
 
-									var.current_background = window.copy()	
+
+
+
+
+
+									#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
+
+									var.predicted_score = 0
+									for h_word_point in calculatePoints(layers.letters_just_played) :
+										var.predicted_score = var.predicted_score + h_word_point[1]									
+
+									#remove previously displayed text
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons.draw(window)
+									var.background_no_letter = window.copy()
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									ui_text.drawText()
+									var.current_background = window.copy()
+
+
+
+
+
+
 									pygame.display.update()
 
 									var.current_action = "SELECT_A_LETTER"
@@ -1407,11 +1470,15 @@ while game_is_running:
 					#------ RELEASE CLIC ON END TURN BUTTON -------
 					if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
+						#scores
 						var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
 						for association in var.last_words_and_scores :
 							var.current_player.score +=  association[1]
+						
+						var.predicted_score = 0
 
+						#letters
 						for letter in layers.letters_just_played :
 							layers.letters_on_board.add(letter)
 
@@ -1449,12 +1516,6 @@ while game_is_running:
 					#TODO toremove in accord with RELEASE CLIC AWAY FROM BUTTON 
 					var.current_background = window.copy()
 					pygame.display.update()
-
-
-					#------ RELEASE CLIC ON END TURN BUTTON -------
-					if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
-						#TODO
-						pass
 
 
 				#------ RELEASE CLIC AWAY FROM BUTTON -------
