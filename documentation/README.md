@@ -1,5 +1,58 @@
 # How to start ?
 
+
+------------
+## On Linux:
+
+
+
+### Installing the game
+
+#### Python version > 3.4
+Type these command lines :
+```shell  
+sudo apt-get update
+sudo apt-get install python3	
+pip3 install lxml
+pip3 install pygame
+```
+_go to the desired installation folder and then :_
+```shell 
+git clone https://github.com/chinchifou/Scrabble2.git
+```
+
+#### Python version < 3.4
+```shell
+sudo apt-get update
+sudo apt-get install python3.0	
+sudo apt-get install python3-lxml
+```
+_go to the desired installation folder and then :_
+```shell
+git clone https://github.com/chinchifou/Scrabble2.git
+```
+
+
+### Setting up the game
+
+To change your peferences go to the '/Scrabble2/config' folder.
+* Edit "game_rules.ini" to change the players and to create custom rules.
+* Edit "display_settings.ini" to change your display settings preferences (default is fullscreen - resolution auto)
+
+_More information in the README.md in the '/Scrabble2/documentation' folder._
+
+
+### Launching the game
+
+Launch 'main.py' located in the '/sources/' folder.
+To do so, from the main folder, type in a console :
+```shell  
+cd /sources
+python3 main.py
+```
+
+
+
 --------------
 ## On Windows:
 
@@ -103,53 +156,3 @@ A windows desktop shortcut named 'Scrabble.lnk' is already provided in the game 
 * Double-click on it.
 
 _You can also recreate your own Windows shortcut by using the icon stored in '/materials/images/icon'_
-
-
-------------
-## On Linux:
-
-
-
-### Installing the game
-
-Type these command lines :
-```shell  
-sudo apt-get update
-sudo apt-get install python3	
-pip3 install lxml
-pip3 install pygame
-```
-_go to the desired installation folder_
-```shell 
-git clone https://github.com/chinchifou/Scrabble2.git
-```
-
-Alternative methods if you want to use a python vresion prior to 3.4
-```shell
-sudo apt-get update
-sudo apt-get install python3.0	
-sudo apt-get install python3-lxml
-```
-_go to the desired installation folder_
-```shell
-git clone https://github.com/chinchifou/Scrabble2.git
-```
-
-
-### Setting up the game
-
-To change your peferences go to the '/Scrabble2/config' folder.
-* Edit "game_rules.ini" to change the players and to create custom rules.
-* Edit "display_settings.ini" to change your display settings preferences (default is fullscreen - resolution auto)
-
-_More information in the README.md in the '/Scrabble2/documentation' folder._
-
-
-### Launching the game
-
-Launch 'main.py' located in the '/sources/' folder.
-To do so, from the main folder, type in a console :
-```shell  
-cd /sources
-python3 main.py
-```
