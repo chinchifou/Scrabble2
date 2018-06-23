@@ -48,9 +48,9 @@ _Use this solution if either solution 1 failed or if you are using a python vers
 * Install it.
 
 To check the installation, type in a console :
-'''
-	python -v
-'''
+```bash
+python -v
+```
 _If you get a version number and no error message, everything is fine._
 
 
@@ -113,26 +113,27 @@ _You can also recreate your own Windows shortcut by using the icon stored in '/m
 ### Installing the game
 
 Type these command lines :
-'''  
-	sudo apt-get update
-	sudo apt-get install python3	
-	pip3 install lxml
-	pip3 install pygame
-'''
+```bash  
+sudo apt-get update
+sudo apt-get install python3	
+pip3 install lxml
+pip3 install pygame
+```
 _go to the desired installation folder_
-''' 
-	git clone https://github.com/chinchifou/Scrabble2.git
-'''
+```bash 
+git clone https://github.com/chinchifou/Scrabble2.git
+```
 
 Alternative methods if you want to use a python vresion prior to 3.4
-''' 
-	sudo apt-get update
-	sudo apt-get install python3.0	
-	sudo apt-get install python3-lxml
-'''
+```bash
+sudo apt-get update
+sudo apt-get install python3.0	
+sudo apt-get install python3-lxml
+```
 _go to the desired installation folder_
-	git clone https://github.com/chinchifou/Scrabble2.git	sudo apt-get install python-pygame
-'''
+```bash
+git clone https://github.com/chinchifou/Scrabble2.git	sudo apt-get install python-pygame
+```
 
 
 ### Setting up the game
@@ -148,7 +149,7 @@ _More information in the README.md in the '/Scrabble2/documentation' folder._
 
 Launch 'main.py' located in the '/sources/' folder.
 To do so, from the main folder, type in a console :
-'''  
+```bash  
 cd /sources
 python3 main.py
-'''
+```

@@ -136,8 +136,8 @@ To add a new language, you need to :
 	current_player_turn = <CURRENT_PLAYER>'s turn / Tour de <CURRENT_PLAYER> / <CURRENT_PLAYER>s tur
 * In the file '/config/game_settings.ini' change the value of 'ui_language' to the value of the added language. For instance :
 	ui_language = svenska
-* Edit the file 'sources/main.py' like this :
-'''python
+* Edit the file 'sources/main.py' like this :  
+```python
 #User interface language
 if UI_LANGUAGE == 'english' :
 	language_id = 0
@@ -147,5 +147,5 @@ elif UI_LANGUAGE == 'svenska' :
 	language_id = 2
 else :
 	language_id = 0
-'''
+```
 _This language_id  tells the system wich value to take for each parameters. This language_id respects the order given in the 'ui_content.ini' file_
