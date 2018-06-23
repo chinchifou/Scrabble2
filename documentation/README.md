@@ -113,26 +113,26 @@ _You can also recreate your own Windows shortcut by using the icon stored in '/m
 ### Installing the game
 
 Type these command lines :
-```bash  
+```shell  
 sudo apt-get update
 sudo apt-get install python3	
 pip3 install lxml
 pip3 install pygame
 ```
 _go to the desired installation folder_
-```bash 
+```shell 
 git clone https://github.com/chinchifou/Scrabble2.git
 ```
 
 Alternative methods if you want to use a python vresion prior to 3.4
-```bash
+```shell
 sudo apt-get update
 sudo apt-get install python3.0	
 sudo apt-get install python3-lxml
 ```
 _go to the desired installation folder_
-```bash
-git clone https://github.com/chinchifou/Scrabble2.git	sudo apt-get install python-pygame
+```shell
+git clone https://github.com/chinchifou/Scrabble2.git
 ```
 
 
@@ -149,7 +149,7 @@ _More information in the README.md in the '/Scrabble2/documentation' folder._
 
 Launch 'main.py' located in the '/sources/' folder.
 To do so, from the main folder, type in a console :
-```bash  
+```shell  
 cd /sources
 python3 main.py
 ```

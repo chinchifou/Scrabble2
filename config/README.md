@@ -132,9 +132,9 @@ Rules to respect to edit the file :
 _The begining and trailling blank spaces of each text value will be dismissed when displayed on the UI._
 
 To add a new language, you need to :
-* Add the value for this language for each parameter by respecting the formatting rules and not changing the existing order. For instance :
+* Add the value for this language for each parameter by respecting the formatting rules and not changing the existing order. For instance :  
 	current_player_turn = <CURRENT_PLAYER>'s turn / Tour de <CURRENT_PLAYER> / <CURRENT_PLAYER>s tur
-* In the file '/config/game_settings.ini' change the value of 'ui_language' to the value of the added language. For instance :
+* In the file '/config/game_settings.ini' change the value of 'ui_language' to the value of the added language. For instance :  
 	ui_language = svenska
 * Edit the file 'sources/main.py' like this :  
 ```python
