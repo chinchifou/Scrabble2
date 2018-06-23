@@ -1064,6 +1064,7 @@ if cfg_resolution_auto :
 else :
 	width = round (cfg_custom_window_height * (16/9.0) )
 	height = cfg_custom_window_height
+	var.monitor_resolution = pygame.display.Info()
 
 #Initialize game window
 window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
