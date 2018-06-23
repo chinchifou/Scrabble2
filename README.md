@@ -1,28 +1,28 @@
 # Local multiplayer Scrabble using Pygame
 
 
-## Features
+## Main features
 
-* Multiplatforms : Windows, Linux
-* Multi-languages : English, French (UI and Scrabble letters)
-* Multiplayers : Up to 6 players
-* Multiresolution : Fullscreen (1080p) or windowed
-* Configurable : Change everything you want (rules, board layout, code ...)
+* Multiplatforms : Windows and Linux.
+* Multi-languages : English and French. _(UI and Scrabble letters)_
+* Multiplayers : Up to 6 players. _(hotseat)_
+* Multiresolution : Fullscreen or windowed up to 1920x1080.
+* Configurable : Open code. Change everything you want.
 
 
 ## Main limitations
 
 * There is no dictionary to check the spelling. This means that misspellings will not be invalidated by the game.
-* If you do not follow the standard rules of Scrabble, the game will crash (for example: write diagonally, write two words at a time ...)
+* Crash if you do do not respect the basic Scrabble rules. _(Do not write diagonally or two words at a time)_
 
 
 ## Requirements for installation
 
 * python 3
-* lxml (python module for XML parsing) (installation.html)
-* pygame (python module for games)(https://www.pygame.org/download.shtml)
+* lxml _(python module for XML parsing)_
+* pygame _(python module for games)_
 
-_See : '/documentation/how_to_start.md' located in the /documentation folder for further information._
+**See : '/documentation/README.md' for further information about installation.**
 
 
-# Have fun !
+# Enjoy !
