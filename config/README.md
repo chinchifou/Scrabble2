@@ -137,13 +137,15 @@ To add a new language, you need to :
 * In the file '/config/game_settings.ini' change the value of 'ui_language' to the value of the added language. For instance :
 	ui_language = svenska
 * Edit the file 'sources/main.py' like this :
-	#User interface language
-	if UI_LANGUAGE == 'english' :
-		language_id = 0
-	elif UI_LANGUAGE == 'french' :
-		language_id = 1
-	elif UI_LANGUAGE == 'svenska' :
-		language_id = 2
-	else :
-		language_id = 0
+'''python
+#User interface language
+if UI_LANGUAGE == 'english' :
+	language_id = 0
+elif UI_LANGUAGE == 'french' :
+	language_id = 1
+elif UI_LANGUAGE == 'svenska' :
+	language_id = 2
+else :
+	language_id = 0
+'''
 _This language_id  tells the system wich value to take for each parameters. This language_id respects the order given in the 'ui_content.ini' file_
