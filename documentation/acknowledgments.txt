@@ -1,9 +1,0 @@
-I deeply thank these websites and their communities :
-
-https://stackoverflow.com/
-
-https://www.pygame.org/
-
-https://www.quora.com/
-
-https://fr.wikipedia.org/
