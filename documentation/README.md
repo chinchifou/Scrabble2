@@ -1,8 +1,7 @@
 # How to start ?
 
-
-## On Windows:
 --------------
+## On Windows:
 
 
 ### Installing the game
@@ -17,7 +16,7 @@
 * Install it.
 
 
-#### 2. Download and install lxml module for Pyhton:
+##### 2. Download and install lxml module for Pyhton:
 
 * Open a console as and administrator.
 * Execute the command line :
@@ -39,7 +38,7 @@
 
 #### Solution 2 _(alternative methods)_:
 
-_To use either if solution 1 failed or if you are using a python version prior to 3.4._
+_Use this solution if either solution 1 failed or if you are using a python version prior to 3.4._
 
 
 ##### 1. Download and install Python 3
@@ -53,7 +52,7 @@ To check the installation, type in a console :
 _If you get a version number and no error message, everything is fine._
 
 
-#### 2. Download and install lxml module for Pyhton:
+##### 2. Download and install lxml module for Pyhton:
 
 * Go to : https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
 * Download the latest version depending on your system :
@@ -81,7 +80,7 @@ To change your peferences go to the '/Scrabble2/config' folder.
 * Edit "game_rules.ini" to change the players and to create custom rules.
 * Edit "display_settings.ini" to change your display settings preferences (default is fullscreen - resolution auto)
 
-_More information in the README.md in the '/Scrabble2/documentation' folder._
+**_More information in the README.md in the '/Scrabble2/documentation' folder._**
 
 
 ### Launching the game
@@ -104,22 +103,22 @@ A windows desktop shortcut named 'Scrabble.lnk' is already provided in the game 
 _You can also recreate your own Windows shortcut by using the icon stored in '/materials/images/icon'_
 
 
-
-## On Linux:
 ------------
+## On Linux:
+
 
 
 ### Installing the game
 
-Type these command lines :
+Type these command lines :  
 	sudo apt-get update
 	sudo apt-get install python3	
 	pip3 install lxml
 	pip3 install pygame
-_go to the desired installation folder_
+_go to the desired installation folder_  
 	git clone https://github.com/chinchifou/Scrabble2.git
 
-Alternative methods if you want to use a python vresion prior to 3.4
+Alternative methods if you want to use a python vresion prior to 3.4  
 	sudo apt-get update
 	sudo apt-get install python3.0	
 	sudo apt-get install python3-lxml
@@ -139,6 +138,6 @@ _More information in the README.md in the '/Scrabble2/documentation' folder._
 ### Launching the game
 
 Launch 'main.py' located in the '/sources/' folder.
-To do so, from the main folder, type in a console :
+To do so, from the main folder, type in a console :  
 	cd /sources
 	python3 main.py

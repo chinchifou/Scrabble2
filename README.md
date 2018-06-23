@@ -22,7 +22,7 @@
 * lxml _(python module for XML parsing)_
 * pygame _(python module for games)_
 
-**See : '/documentation/README.md' for further information about installation.**
+**_See : '/documentation/README.md' for further information about installation._**
 
 
 # Enjoy !
