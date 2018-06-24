@@ -69,19 +69,25 @@ global PLAYERS
 PLAYERS = []
 
 #Folders' paths
-path_log_folder = path.abspath('../log/')
+path_log = path.abspath('../log/')
+if not path.exists(path_log):
+	makedirs(path_log)
+
 path_icon = path.abspath('../materials/images/icon/')
 path_background = path.abspath('../materials/images/background/')
-path_buttons = path.abspath('../materials/images/assets/buttons/primary/')
+
+path_buttons = path.abspath('../materials/images/assets/buttons/primary/') #changed later on
+path_buttons_french = path.abspath('../materials/images/assets/buttons/primary/french/')
+path_buttons_english = path.abspath('../materials/images/assets/buttons/primary/english/')
 path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/')
+
+path_letters = path.abspath('../materials/images/assets/letters/') #changed later on
 path_letters_french = path.abspath('../materials/images/assets/letters/french/')
 path_letters_english = path.abspath('../materials/images/assets/letters/english/')
-path_letters = path.abspath('../materials/images/assets/letters/')
+
 path_tiles = path.abspath('../materials/images/assets/tiles/')
 path_music = path.abspath('../materials/music/')
 
-if not path.exists(path_log_folder):
-	makedirs(path_log_folder)
 
 #----- Changing a runtime -----
 #class to store game variable
@@ -932,7 +938,7 @@ def calculatePoints(layer_letters_played) :
 
 #----- Init logger -----
 
-path_log_file = path.join(path_log_folder,'scrabble.log')
+path_log_file = path.join(path_log,'scrabble.log')
 logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
@@ -1074,10 +1080,13 @@ window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resoluti
 #User interface language
 if UI_LANGUAGE == 'english' :
 	language_id = 0
+	path_buttons = path_buttons_english
 elif UI_LANGUAGE == 'french' :
 	language_id = 1
+	path_buttons = path_buttons_french
 else :
 	language_id = 0
+	path_buttons = path_buttons_english
 
 #User interface content
 ui_content = config_reader.h_ui_params
