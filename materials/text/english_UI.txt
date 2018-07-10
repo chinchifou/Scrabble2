@@ -1,6 +1,0 @@
-player_turn : VALUE'sturn
-player_hand : VALUE's hand
-score : Scores :
-nothing_played : Nothing played by VALUE last turn
-player_played : VALUE played VALUE for VALUE points
-tiles_remaining : Remaining tiles in bag : VALUE

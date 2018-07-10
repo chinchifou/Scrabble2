@@ -32,7 +32,7 @@ def str_to_bool(s):
 #relative path
 path_conf_disp_file = path.abspath('../config/display_settings.ini')
 path_conf_rules_file = path.abspath('../config/game_settings.ini')
-path_conf_language_file = path.abspath('../config/ui_content.ini')
+path_conf_language_file = path.abspath('../materials/texts/ui_content.ini')
 
 #match everything of format >> multiple_letters = LeTTers
 match_word = re.compile(r'^([a-z_]*)\s*=\s*([A-Za-z]*)\s*$')

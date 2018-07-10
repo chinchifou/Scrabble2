@@ -86,7 +86,7 @@ path_letters_french = path.abspath('../materials/images/assets/letters/french/')
 path_letters_english = path.abspath('../materials/images/assets/letters/english/')
 
 path_tiles = path.abspath('../materials/images/assets/tiles/')
-path_music = path.abspath('../materials/music/')
+path_music = path.abspath('../materials/sounds/')
 
 
 #----- Changing a runtime -----

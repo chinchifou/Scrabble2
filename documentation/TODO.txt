@@ -2,6 +2,28 @@ __________  PRIMARY  __________
 
 check TODO in code
 
+Refactor calculatePoints()
+	I. Not allowed if not close to an existing word
+		if letter_on_board.size > 0
+			there are already played letters closeby
+
+	II. Not allowed in diagonal
+		Played letters must followed a line
+
+	III. First word must have more than one letter and be on the start tile
+		If letter_on_board.size == 0
+			letters_played.size should be > 1
+			and
+			for tile in letters played 
+				some of tile must be on start tile
+
+	IV. Store errors messages in a file
+		create a UI folder for UI and error messages
+
+	IV. Create and hanlde events for invalid moves
+
+	VI. Display errors messages (even when multiple messages)
+
 Possibility to redraw Letter
 
 use save game
