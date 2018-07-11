@@ -44,7 +44,7 @@ match_integer = re.compile(r'^([a-z_]*)\s*=\s*([0-9]*)\s*$')
 match_names = re.compile(r'^([a-z_]*)\s*=([^0-9])*$')
 
 #match everything of format >> multiple_letters = UI text <VALUE1> / other UI text <VALUE1> AND <VALUE2>
-match_ui_word = re.compile(r'([a-z_]*)\s*=\s*([éA-Za-z12<>\'/\s:._]*)\s*')
+match_ui_word = re.compile(r'([a-z_]*)\s*=\s*([éA-Za-z12<>\'/\s:.!_]*)\s*')
 
 
 
@@ -79,7 +79,7 @@ for line in open(path_conf_disp_file, "r", encoding="utf8") :
 		if param == 'max_fps' :
 			h_display_params[ param ] = int(int_found.group(2))
 
-#groupe rules
+#game rules
 for line in open(path_conf_rules_file, "r", encoding="utf8") :
 
 	word_found = match_word.search(line)
@@ -94,6 +94,10 @@ for line in open(path_conf_rules_file, "r", encoding="utf8") :
 			h_rules_params[ param ] = str(word_found.group(2))
 		if param == 'ui_language' :
 			h_rules_params[ param ] = str(word_found.group(2))
+		if param == 'display_type_of_tile_on_hoovering' :
+			h_rules_params[ param ] = str_to_bool(word_found.group(2))
+		if param == 'display_new_score_in_real_time' :
+			h_rules_params[ param ] = str_to_bool(word_found.group(2))
 
 	if names_found :
 		param = str(names_found.group(1))
@@ -144,13 +148,3 @@ for line in open(path_conf_language_file, "r", encoding="utf8") :
 				if value != '' :
 					values_array.append(value.strip())
 			h_ui_params [ param ] = values_array 
-
-
-#should be alright for accents ... PROOF :
-'''
-f = open('result.txt', 'w')
-for name in players :
-	f.write(name)
-	f.write('\n')
-f.close()
-'''

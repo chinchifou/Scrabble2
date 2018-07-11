@@ -934,6 +934,12 @@ def calculatePoints(layer_letters_played) :
 
 			return words_and_scores
 
+#increment predicted score in real time
+def incrementPredictedScore():
+	var.predicted_score = 0
+	for h_word_point in calculatePoints(layers.letters_just_played) :
+		var.predicted_score = var.predicted_score + h_word_point[1]
+
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
 #----- Init logger -----
@@ -975,6 +981,8 @@ display_next_player_hand = game_settings['display_next_player_hand']
 LETTERS_LANGUAGE = game_settings['letters_language']
 UI_LANGUAGE = game_settings['ui_language']
 players_names = config_reader.players
+display_type_of_tile_on_hoovering = game_settings['display_type_of_tile_on_hoovering']
+display_new_score_in_real_time = game_settings['display_new_score_in_real_time']
 
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
@@ -1369,17 +1377,10 @@ while game_is_running:
 									var.current_player.hand.draw(window)
 
 
-
-
-
-
-
 									#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
 
-									var.predicted_score = 0
-									for h_word_point in calculatePoints(layers.letters_just_played) :
-										var.predicted_score = var.predicted_score + h_word_point[1]									
-
+									if display_new_score_in_real_time :
+										incrementPredictedScore()									
 
 									#TODO SIMPLIFY (separate stuff)
 									#TODO CREATE A FUNCTION
@@ -1395,9 +1396,6 @@ while game_is_running:
 									var.current_background_no_text = window.copy()
 									ui_text.drawText()
 									var.current_background = window.copy()
-
-
-
 
 
 									pygame.display.update()
@@ -1428,15 +1426,10 @@ while game_is_running:
 									layers.letters_just_played.draw(window)
 
 
-
-
-
-
 									#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
 
-									var.predicted_score = 0
-									for h_word_point in calculatePoints(layers.letters_just_played) :
-										var.predicted_score = var.predicted_score + h_word_point[1]									
+									if display_new_score_in_real_time :
+										incrementPredictedScore()									
 
 									#remove previously displayed text
 									layers.background.draw(window)
@@ -1576,7 +1569,7 @@ while game_is_running:
 					pygame.display.update()
 
 
-			#------ PLAY A LETTER ------ 
+			#------ MOVE SELECTED LETTER ------ 
 			if len(layers.selected_letter) == 1 :
 				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 
@@ -1587,64 +1580,66 @@ while game_is_running:
 				pygame.display.update()
 
 			#------ INFO ABOUT HOVERED TILE ------
-			if var.current_action == 'SELECT_A_LETTER' :
-				cursor_on_empty_tile = True
-				cursor_on_a_special_tile = False
+			#TODO if diaplay help is defined in configuration
+			if display_type_of_tile_on_hoovering :
+				if var.current_action == 'SELECT_A_LETTER' :
+					cursor_on_empty_tile = True
+					cursor_on_a_special_tile = False
 
-				#Is cursor on a special tile ?
-				for tile in layers.tiles :
-					if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-						found_the_tile = True
-						if  ( tile.name != 'empty' ) :
-							cursor_on_a_special_tile = True
-							#pop up not already displayed for this tile
-							if tile.id != ui_text.id_tile_pop_up :
+					#Is cursor on a special tile ?
+					for tile in layers.tiles :
+						if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+							found_the_tile = True
+							if  ( tile.name != 'empty' ) :
+								cursor_on_a_special_tile = True
+								#pop up not already displayed for this tile
+								if tile.id != ui_text.id_tile_pop_up :
 
-								#Is this tile empty of previously played letter ?
-								for letter in layers.letters_on_board :
-									if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-										cursor_on_empty_tile = False
+									#Is this tile empty of previously played letter ?
+									for letter in layers.letters_on_board :
+										if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+											cursor_on_empty_tile = False
 
-								if cursor_on_empty_tile :
-									#remove previously displayed text
-									layers.background.draw(window)
-									layers.tiles.draw(window)
-									layers.hand_holder.draw(window)
-									layers.buttons.draw(window)
-									var.background_no_letter = window.copy()
-									layers.letters_on_board.draw(window)
-									layers.letters_just_played.draw(window)
-									var.current_player.hand.draw(window)
-									var.current_background_no_text = window.copy()
-									ui_text.drawText()
-									var.current_background = window.copy()
+									if cursor_on_empty_tile :
+										#remove previously displayed text
+										layers.background.draw(window)
+										layers.tiles.draw(window)
+										layers.hand_holder.draw(window)
+										layers.buttons.draw(window)
+										var.background_no_letter = window.copy()
+										layers.letters_on_board.draw(window)
+										layers.letters_just_played.draw(window)
+										var.current_player.hand.draw(window)
+										var.current_background_no_text = window.copy()
+										ui_text.drawText()
+										var.current_background = window.copy()
 
-									ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
-									pygame.display.update()
+										ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
+										pygame.display.update()
 
-									ui_text.id_tile_pop_up = tile.id
-									ui_text.pop_up_displayed = True
-									break
+										ui_text.id_tile_pop_up = tile.id
+										ui_text.pop_up_displayed = True
+										break
 
-				#If cursor on a normal tile
-				if ( not cursor_on_a_special_tile and ui_text.pop_up_displayed ):
-					#remove previously displayed text
-					layers.background.draw(window)
-					layers.tiles.draw(window)
-					layers.hand_holder.draw(window)
-					layers.buttons.draw(window)
-					var.background_no_letter = window.copy()
-					layers.letters_on_board.draw(window)
-					layers.letters_just_played.draw(window)
-					var.current_player.hand.draw(window)
-					var.current_background_no_text = window.copy()
-					ui_text.drawText()
-					var.current_background = window.copy()
+					#If cursor on a normal tile
+					if ( not cursor_on_a_special_tile and ui_text.pop_up_displayed ):
+						#remove previously displayed text
+						layers.background.draw(window)
+						layers.tiles.draw(window)
+						layers.hand_holder.draw(window)
+						layers.buttons.draw(window)
+						var.background_no_letter = window.copy()
+						layers.letters_on_board.draw(window)
+						layers.letters_just_played.draw(window)
+						var.current_player.hand.draw(window)
+						var.current_background_no_text = window.copy()
+						ui_text.drawText()
+						var.current_background = window.copy()
 
-					pygame.display.update()
+						pygame.display.update()
 
-					ui_text.id_tile_pop_up = 0
-					ui_text.pop_up_displayed = False
+						ui_text.id_tile_pop_up = 0
+						ui_text.pop_up_displayed = False
 
 logging.info("")
 logging.info("Game has ended")
