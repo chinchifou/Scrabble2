@@ -17,14 +17,10 @@ Refactor calculatePoints()
 			for tile in letters played 
 				some of tile must be on start tile
 
-	IV. Store errors messages in a file
-		create a UI folder for UI and error messages
-
 	IV. Create and hanlde events for invalid moves
 
-	VI. Display errors messages (even when multiple messages)
+	V. Display errors messages (even when multiple messages)
 
-Config file to display help message or not
 
 Possibility to redraw Letter
 
