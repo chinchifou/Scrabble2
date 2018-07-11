@@ -24,6 +24,8 @@ Refactor calculatePoints()
 
 	VI. Display errors messages (even when multiple messages)
 
+Config file to display help message or not
+
 Possibility to redraw Letter
 
 use save game
