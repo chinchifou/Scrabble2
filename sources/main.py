@@ -710,9 +710,14 @@ def calculatePoints(layer_letters_played) :
 		delta_x = max_x - min_x
 		delta_y = max_y - min_y
 
+		#TODO not in diagonal
+		if (delta_x > 0 and delta_y > 0) :
+			#print("Please do not play in diagonal")
+			return []
 
 		words_and_scores = []
 
+		#TODO do not add a scrabble if invalid move
 		if len(letters_played) == 7 : #is a SCRABBLE ?
 			words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
 
@@ -730,7 +735,12 @@ def calculatePoints(layer_letters_played) :
 			while( ( (end_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_x][end_y + 1] != '?') ) :
 				end_y = end_y + 1
 
-			#words_and_scores = []
+			#TODO not close to older letters
+			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
+				print("You must play close to another word")
+
+
+			#TODO one letter in first turn
 
 			if ( end_y > start_y ) : #prevent one letter word
 				logging.debug('HORIZONTAL WORD')
