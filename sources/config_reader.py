@@ -40,8 +40,8 @@ match_word = re.compile(r'^([a-z_]*)\s*=\s*([A-Za-z]*)\s*$')
 #match everything of format >> other_letters = 251
 match_integer = re.compile(r'^([a-z_]*)\s*=\s*([0-9]*)\s*$')
 
-#match everything of format >> multiple_letters = LeTTers OTHERletters andSoOn
-match_names = re.compile(r'^([a-z_]*)\s*=([^0-9])*$')
+#match everything of format >> multiple_letters = LeTTers OTHERletters also123 accepté
+match_names = re.compile(r'^([a-z_]*)\s*=([^.])*$')
 
 #match everything of format >> multiple_letters = UI text <VALUE1> / other UI text <VALUE1> AND <VALUE2>
 match_ui_word = re.compile(r'([a-z_]*)\s*=\s*([éA-Za-z12<>\'/\s:.!_]*)\s*')
