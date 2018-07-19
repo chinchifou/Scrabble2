@@ -268,19 +268,25 @@ class UserInterfaceTextPrinter():
 
 		self.player_score = UserInterfaceText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles) )
 
-		self.previous_turn_summary = UserInterfaceText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
+		#previous turn summary
+		if False :
+			self.previous_turn_summary = UserInterfaceText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
 
-		self.word_and_points = UserInterfaceText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles )  )		
+		self.word_and_points = UserInterfaceText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.player_score.bottom_tiles )  )		
 
 		self.nothing_played = UserInterfaceText( ui_content['nothing_played'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE) )
 
-		self.scrabble_obtained = UserInterfaceText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles) )
+		#Scrabble obtained
+		if False :
+			self.scrabble_obtained = UserInterfaceText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles) )
 		
-		self.remaining_letters = UserInterfaceText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+		#remaining letters
+		if False :
+			self.remaining_letters = UserInterfaceText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 
-		self.remaining_letter = UserInterfaceText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+			self.remaining_letter = UserInterfaceText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 		
-		self.no_remaining_letter = UserInterfaceText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+			self.no_remaining_letter = UserInterfaceText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 		
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
@@ -328,9 +334,9 @@ class UserInterfaceTextPrinter():
 			if ( player == var.current_player ) :
 				self.player_score.font.set_bold(1)
 				if var.predicted_score == 0 : #move does not give points
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.BLUE_SUPER_LIGHT )
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY )
 				else :
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, COLOR.BLUE_SUPER_LIGHT )
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, COLOR.GREY )
 				self.player_score.font.set_bold(0)
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			else :
@@ -339,50 +345,54 @@ class UserInterfaceTextPrinter():
 			pos_y_delta += 0.8
 
 		#previous turn summary
-		if len(var.last_words_and_scores) > 0 :
-
-			#header
-			text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
-			window.blit(text, (self.previous_turn_summary.pos_x, self.previous_turn_summary.pos_y))
-
-			pos_y_delta = 0
-			for association in var.last_words_and_scores :
-				if association[0] == "!! SCRABBLE !!" :
-					text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
-					window.blit(text, (self.scrabble_obtained.pos_x, self.scrabble_obtained.pos_y+(pos_y_delta*var.tile_size)))
-				else :		
-					text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
-					window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
-				pos_y_delta += 0.8
-
-		else :
-			#nothing played
-			text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
-			window.blit(text, (self.nothing_played.pos_x, self.nothing_played.pos_y) )
-
-		if len(var.bag_of_letters) == 0 :
-			text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY )
-				
+		if False :
 			if len(var.last_words_and_scores) > 0 :
-				window.blit(text, (self.no_remaining_letter.pos_x, self.no_remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-			else :
-				window.blit(text, (self.no_remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
-		elif len(var.bag_of_letters) == 1 :
-			text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY )
-				
-			if len(var.last_words_and_scores) > 0 :
-				window.blit(text, (self.remaining_letter.pos_x, self.remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-			else :
-				window.blit(text, (self.remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+				#header
+				text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
+				window.blit(text, (self.previous_turn_summary.pos_x, self.previous_turn_summary.pos_y))
 
-		else :
-			text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY )
+				pos_y_delta = 0
+				for association in var.last_words_and_scores :
+					if association[0] == "!! SCRABBLE !!" :
+						text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
+						window.blit(text, (self.scrabble_obtained.pos_x, self.scrabble_obtained.pos_y+(pos_y_delta*var.tile_size)))
+					else :		
+						text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
+						window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
+					pos_y_delta += 0.8
 
-			if len(var.last_words_and_scores) > 0 :
-				window.blit(text, (self.remaining_letters.pos_x, self.remaining_letters.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
 			else :
-				window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+				#nothing played
+				text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
+				window.blit(text, (self.nothing_played.pos_x, self.nothing_played.pos_y) )
+
+		#remaining_letters
+		if False :
+
+			if len(var.bag_of_letters) == 0 :
+				text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY )
+					
+				if len(var.last_words_and_scores) > 0 :
+					window.blit(text, (self.no_remaining_letter.pos_x, self.no_remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+				else :
+					window.blit(text, (self.no_remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+
+			elif len(var.bag_of_letters) == 1 :
+				text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY )
+					
+				if len(var.last_words_and_scores) > 0 :
+					window.blit(text, (self.remaining_letter.pos_x, self.remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+				else :
+					window.blit(text, (self.remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+
+			else :
+				text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY )
+
+				if len(var.last_words_and_scores) > 0 :
+					window.blit(text, (self.remaining_letters.pos_x, self.remaining_letters.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+				else :
+					window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
@@ -737,8 +747,8 @@ def calculatePoints(layer_letters_played) :
 
 			#TODO not close to older letters
 			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
-				print("You must play close to another word")
-
+				#print("You must play close to another word")
+				pass
 
 			#TODO one letter in first turn
 
