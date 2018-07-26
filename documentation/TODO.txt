@@ -1,6 +1,14 @@
 __________  PRIMARY  __________
 
+Special dev :
+
+Change time to clic for two way of semecting players
+
+See why loosing focus when in fullscreen and switching tab
+
+
 check TODO in code
+
 
 Refactor calculatePoints()
 	I. Not allowed if not close to an existing word
