@@ -729,9 +729,9 @@ def calculatePoints(layer_letters_played) :
 
 		#TODO do not add a scrabble if invalid move
 		if len(letters_played) == 7 : #is a SCRABBLE ?
-			words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
-
-			SOUNDS.victory.play()
+			pass
+			#words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+			#SOUNDS.victory.play()
 
 		if delta_x == 0 :
 
@@ -1464,11 +1464,6 @@ while game_is_running:
 									ui_text.drawText()
 									var.current_background = window.copy()
 
-
-
-
-
-
 									pygame.display.update()
 
 									var.current_action = "SELECT_A_LETTER"
@@ -1541,24 +1536,126 @@ while game_is_running:
 					pygame.display.update()
 
 
-				#------ RELEASE CLIC AWAY FROM BUTTON -------
-				for button in layers.buttons :
-					if button.is_pushed :
-						button.release() #release all pushed buttons
-						if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-							button.turnOnHighlighted()
-						else :
-							button.turnOffHighlighted()
+					#------ RELEASE CLIC AWAY FROM BUTTON -------
+					for button in layers.buttons :
+						if button.is_pushed :
+							button.release() #release all pushed buttons
+							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+								button.turnOnHighlighted()
+							else :
+								button.turnOffHighlighted()
 
-						layers.buttons.clear(window, var.current_background)
-						layers.buttons.draw(window)
-						
-						#TO DO - prevent artefact see line 1287 ?
-						layers.selected_letter.clear(window, var.current_background)
-						var.current_background = window.copy()
-						layers.selected_letter.draw(window)
-						
-						pygame.display.update()
+							layers.buttons.clear(window, var.current_background)
+							layers.buttons.draw(window)
+							
+							#TO DO - prevent artefact see line 1287 ?
+							layers.selected_letter.clear(window, var.current_background)
+							var.current_background = window.copy()
+							layers.selected_letter.draw(window)
+							
+							pygame.display.update()
+
+
+				#------ PLAY A SELECTED LETTER-------
+				if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
+
+					#not a simple fast clic
+					if ( timer > 100 )  : 
+
+						#------ CLIC ON THE HAND HOLDER ? -------
+						for hand_holder in layers.hand_holder :
+
+							if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+
+								index_in_hand = indexInHandHolder(cursor_pos_x)
+
+								#------ EMPTY SPOT ? -------
+								if var.current_player.hand_state[index_in_hand] == 0 :
+
+									selected_letter = layers.selected_letter.sprites()[0]
+									
+									delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
+
+									selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
+									var.current_player.hand_state[index_in_hand] = selected_letter.id
+
+									var.current_player.hand.add(selected_letter)
+									layers.selected_letter.remove(selected_letter)
+
+									layers.selected_letter.clear(window, var.current_background)
+									var.current_player.hand.draw(window)
+
+
+									#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
+
+									if display_new_score_in_real_time :
+										incrementPredictedScore()									
+
+									#TODO SIMPLIFY (separate stuff)
+									#TODO CREATE A FUNCTION
+									#remove previously displayed text
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons.draw(window)
+									var.background_no_letter = window.copy()
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									ui_text.drawText()
+									var.current_background = window.copy()
+
+
+									pygame.display.update()
+
+									var.current_action = "SELECT_A_LETTER"
+
+
+						#------ CLIC ON A TILE ON THE BOARD ? -------
+						for tile in layers.tiles :
+
+							if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+
+								tile_x_on_board = int( tile.pos_x - DELTA )
+								tile_y_on_board = int( tile.pos_y - DELTA )
+
+								#------ EMPTY TILE ? -------
+								if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+
+									selected_letter = layers.selected_letter.sprites()[0]
+
+									selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
+									var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+
+									layers.letters_just_played.add(selected_letter)								
+									layers.selected_letter.remove(selected_letter)
+
+									layers.selected_letter.clear(window, var.current_background)	
+									layers.letters_just_played.draw(window)
+
+
+									#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
+
+									if display_new_score_in_real_time :
+										incrementPredictedScore()									
+
+									#remove previously displayed text
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons.draw(window)
+									var.background_no_letter = window.copy()
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									ui_text.drawText()
+									var.current_background = window.copy()
+
+									pygame.display.update()
+
+									var.current_action = "SELECT_A_LETTER"
 
 
 
