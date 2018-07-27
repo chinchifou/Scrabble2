@@ -1189,9 +1189,9 @@ if game_is_running :
 		x_pos = 0 + DELTA
 		y_pos += 1
 
-	#create button END TURN
+	#create buttons
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
-	button_draw_tiles = Button("draw", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
+	button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
 
 #----- first image -----
@@ -1272,6 +1272,7 @@ while game_is_running:
 				logging.debug("ESCAPE key pressed")
 				game_is_running = False #exit the game
 
+			'''
 			elif ( key_pressed == pygame.K_s ) :
 				shuffle(var.current_player.hand_state)
 
@@ -1298,6 +1299,7 @@ while game_is_running:
 				layers.selected_letter.draw(window)
 				
 				pygame.display.update()
+			'''
 
 		#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
 		elif ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
@@ -1360,7 +1362,7 @@ while game_is_running:
 
 							var.current_action = "PLAY_A_LETTER"
 					
-					#------ CLIC ON BUTTONS -------
+					#------ CLIC ON BUTTONS (VISUAL) -------
 
 					for button in layers.buttons :
 						if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -1480,7 +1482,7 @@ while game_is_running:
 				if var.current_action == 'SELECT_A_LETTER' :
 
 				
-					#------ RELEASE CLIC ON A BUTTON -------
+					#------ RELEASE CLIC ON A BUTTON (VISUAL) -------
 					for button in layers.buttons :
 
 						if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -1540,7 +1542,37 @@ while game_is_running:
 					pygame.display.update()
 
 
-					#------ RELEASE CLIC AWAY FROM BUTTON -------
+					#------ RELEASE CLIC ON SHUFFLE BUTTON -------
+					if ( (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
+
+						shuffle(var.current_player.hand_state)
+
+						pos_x = (UI_LEFT_LIMIT)
+						pos_y = ui_text.current_player_turn.pos_y_tiles+1
+
+						for index in var.current_player.hand_state :
+
+							if index != 0:
+								var.current_player.hand.findByIndex(index).moveAtTile(pos_x, pos_y)
+							pos_x = pos_x + 1
+
+						layers.background.draw(window)
+						layers.tiles.draw(window)
+						layers.hand_holder.draw(window)
+						layers.buttons.draw(window)
+						var.background_no_letter = window.copy()
+						layers.letters_on_board.draw(window)
+						layers.letters_just_played.draw(window)
+						var.current_player.hand.draw(window)
+						var.current_background_no_text = window.copy()
+						ui_text.drawText()
+						var.current_background = window.copy()
+						layers.selected_letter.draw(window)
+						
+						pygame.display.update()
+
+
+					#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
 					for button in layers.buttons :
 						if button.is_pushed :
 							button.release() #release all pushed buttons
