@@ -725,6 +725,10 @@ def calculatePoints(layer_letters_played) :
 			#print("Please do not play in diagonal")
 			return []
 
+		#TODO there is a hole in the word
+		if (delta_x+1 != len(letters_played) and delta_y+1 != len(letters_played) ) :
+			return []
+
 		words_and_scores = []
 
 		#TODO do not add a scrabble if invalid move
