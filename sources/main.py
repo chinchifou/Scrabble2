@@ -1192,10 +1192,19 @@ ui_text = UserInterfaceTextPrinter(ui_content)
 
 #----- Create players -----
 
+#TODO
+#create custom set
+
+var.bag_of_letters = ['B','E','S','O','I', 'N', 'Z', 'T', 'E', 'S', 'T']
+
 enough_letters = len(players_names)*var.number_of_letters_per_hand < len(var.bag_of_letters)
 
 if enough_letters :
 
+
+	#TODO custom sort
+
+	'''
 	for player_name in players_names :
 		start_hand = GroupOfSprites()
 		hand_state = []
@@ -1210,12 +1219,36 @@ if enough_letters :
 				del(var.bag_of_letters[random_int])
 				pos_x = pos_x+1
 
+
 		PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
 
 	logPlayersInfo()
 
 	var.current_player = PLAYERS[0]
 	var.current_player.info()
+	'''
+
+	for player_name in players_names :
+		start_hand = GroupOfSprites()
+		hand_state = []
+		pos_x = (UI_LEFT_LIMIT)
+		pos_y = ui_text.current_player_turn.pos_y_tiles+1
+
+		for i in range(var.number_of_letters_per_hand) :
+			if len(var.bag_of_letters) > 0 :
+				letter = Letter(var.bag_of_letters[0], pos_x, pos_y)
+				start_hand.add(letter)
+				hand_state.append(letter.id)
+				del(var.bag_of_letters[0])
+				pos_x = pos_x+1
+
+		PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
+
+	logPlayersInfo()
+
+	var.current_player = PLAYERS[0]
+	var.current_player.info()
+
 
 else :
 	game_is_running = False
@@ -1692,7 +1725,8 @@ while game_is_running:
 								window.blit(var.background_no_letter, (0,0))
 								var.current_player.hand.clear(window, var.background_no_letter)
 
-								'''
+								#TODO to change if remove all letters from hand before
+
 								#redraw letters
 								index_hand = 0
 								while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
@@ -1710,7 +1744,7 @@ while game_is_running:
 
 								var.current_player = var.current_player.next()
 								var.current_player.info()
-								'''
+								
 								#display
 								layers.letters_just_played.clear(window, var.background_no_letter)
 								layers.letters_on_board.draw(window)
