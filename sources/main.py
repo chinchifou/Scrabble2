@@ -413,6 +413,22 @@ class UserInterfaceTextPrinter():
 					window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 
+	def drawTextPopUp(self):
+
+		pop_up_window = layers.pop_up_window.sprites()[0]
+
+		limit_left = tiles1( pop_up_window.rect.left )
+		limit_right = tiles1( pop_up_window.rect.right )
+		limit_top = tiles1( pop_up_window.rect.left )
+		limit_bottom = tiles1( pop_up_window.rect.bottom )
+
+		text_pop_up = UserInterfaceText( "This is a test", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1) )
+		print_text = text_pop_up.font.render(text_pop_up.text, 1, COLOR.GREY_LIGHT)
+
+		window.blit(print_text, (text_pop_up.pos_x, text_pop_up.pos_y))
+
+
+
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
 		if tile.name == 'double_letter' :
 			self.double_letter.drawAt(pixel_pos_x, pixel_pos_y)
@@ -1675,7 +1691,8 @@ while game_is_running:
 
 								pygame.display.update()
 
-								pygame.time.wait(900)
+								#pygame.time.wait(900)
+								#TODO to use in order to read score
 
 								ui_text.drawText(COLOR.GREY_LIGHT)
 								var.current_background = window.copy()
@@ -1683,6 +1700,8 @@ while game_is_running:
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
 								layers.buttons_pop_up_window.draw(window)
+
+								ui_text.drawTextPopUp()
 
 								var.current_background_pop_up = window.copy()
 
