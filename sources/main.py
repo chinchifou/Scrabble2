@@ -153,7 +153,7 @@ ERROR = ErrorPrinter()
 class ColorPannel():
 	def __init__(self):
 		self.BLACK = (0,0,0)
-		self.GREY = (143,144,138)
+		self.GREY_LIGHT = (143,144,138)
 		self.GREY_DEEP = (40,41,35)
 
 		self.BLUE_DEEP = (21, 109, 255)
@@ -314,16 +314,20 @@ class UserInterfaceTextPrinter():
 
 
 	#Draw UI text
-	def drawText(self):
+	def drawText(self, *args):
+
+		custom_color = COLOR.GREY_LIGHT
+		for arg in args:
+			custom_color = arg
 
 		#Current player hand
-		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY )
+		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY_LIGHT )
 		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))
 
 		#display next player hand
 		if display_next_player_hand :
 			#Next player hand header
-			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR.GREY )
+			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR.GREY_LIGHT )
 			window.blit(text, (self.next_player_hand_header.pos_x, self.next_player_hand_header.pos_y))
 
 			#Next player hand content
@@ -335,11 +339,11 @@ class UserInterfaceTextPrinter():
 				else :
 					str_hand += str ( letter_to_display.name ) + "  " 
 
-			text = self.next_player_hand.font.render( str_hand , 1, COLOR.GREY )
+			text = self.next_player_hand.font.render( str_hand , 1, COLOR.GREY_LIGHT )
 			window.blit(text, (self.next_player_hand.pos_x, self.next_player_hand.pos_y))
 
 		#Scores header
-		text = self.scores.font.render( self.scores.text, 1, COLOR.GREY )
+		text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
 		window.blit(text, (self.scores.pos_x, self.scores.pos_y))
 
 		#score of each player
@@ -348,13 +352,13 @@ class UserInterfaceTextPrinter():
 			if ( player == var.current_player ) :
 				self.player_score.font.set_bold(1)
 				if var.predicted_score == 0 : #move does not give points
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY )
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, custom_color )
 				else :
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, COLOR.GREY )
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, custom_color )
 				self.player_score.font.set_bold(0)
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			else :
-				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY )
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
 				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
 			pos_y_delta += 0.8
 
@@ -363,7 +367,7 @@ class UserInterfaceTextPrinter():
 			if len(var.last_words_and_scores) > 0 :
 
 				#header
-				text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
+				text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
 				window.blit(text, (self.previous_turn_summary.pos_x, self.previous_turn_summary.pos_y))
 
 				pos_y_delta = 0
@@ -372,20 +376,20 @@ class UserInterfaceTextPrinter():
 						text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
 						window.blit(text, (self.scrabble_obtained.pos_x, self.scrabble_obtained.pos_y+(pos_y_delta*var.tile_size)))
 					else :		
-						text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY )
+						text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY_LIGHT )
 						window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
 					pos_y_delta += 0.8
 
 			else :
 				#nothing played
-				text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY )
+				text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
 				window.blit(text, (self.nothing_played.pos_x, self.nothing_played.pos_y) )
 
 		#remaining_letters
 		if False :
 
 			if len(var.bag_of_letters) == 0 :
-				text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY )
+				text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY_LIGHT )
 					
 				if len(var.last_words_and_scores) > 0 :
 					window.blit(text, (self.no_remaining_letter.pos_x, self.no_remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
@@ -393,7 +397,7 @@ class UserInterfaceTextPrinter():
 					window.blit(text, (self.no_remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 			elif len(var.bag_of_letters) == 1 :
-				text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY )
+				text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY_LIGHT )
 					
 				if len(var.last_words_and_scores) > 0 :
 					window.blit(text, (self.remaining_letter.pos_x, self.remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
@@ -401,7 +405,7 @@ class UserInterfaceTextPrinter():
 					window.blit(text, (self.remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 			else :
-				text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY )
+				text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY_LIGHT )
 
 				if len(var.last_words_and_scores) > 0 :
 					window.blit(text, (self.remaining_letters.pos_x, self.remaining_letters.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
@@ -1666,12 +1670,15 @@ while game_is_running:
 								var.current_player.hand.draw(window)
 
 								var.current_background_no_text = window.copy()
-								ui_text.drawText()
 
-								
+								ui_text.drawText(COLOR.GREEN)
+
+								pygame.display.update()
+
+								pygame.time.wait(900)
+
+								ui_text.drawText(COLOR.GREY_LIGHT)
 								var.current_background = window.copy()
-
-								#pygame.display.update()
 
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
