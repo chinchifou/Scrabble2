@@ -422,7 +422,7 @@ class UserInterfaceTextPrinter():
 		limit_top = tiles1( pop_up_window.rect.left )
 		limit_bottom = tiles1( pop_up_window.rect.bottom )
 
-		text_pop_up = UserInterfaceText( "This is a test", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1) )
+		text_pop_up = UserInterfaceText( "Que souhaitez-vous améliorer ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1) )
 		print_text = text_pop_up.font.render(text_pop_up.text, 1, COLOR.GREY_LIGHT)
 
 		window.blit(print_text, (text_pop_up.pos_x, text_pop_up.pos_y))
@@ -597,8 +597,23 @@ class Button(ResizableSprite):
 	def release(self):
 		self.image = loadImage(path.join(self.path, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
-		self.is_pushed = False		
+		self.is_pushed = False	
 
+
+class Checkbox(Button):
+	def __init__(self, name, pos_x, pos_y):
+		Button.__init__(self, name, pos_x, pos_y)
+		self.is_filled = False
+
+	def fill(self):
+		self.name = 'filled_'+self.name
+		self.is_filled = True
+		self.turnOnHighlighted()
+
+	def empty(self):
+		self.name = self.name.replace("filled_", "")
+		self.is_filled = False
+		self.turnOnHighlighted()
 
 #----- Letter -----
 class Letter(ResizableSprite):
@@ -1249,6 +1264,9 @@ if game_is_running :
 	button_ok = Button("ok", 32/2.0 - 1, 18/2.0 -1 )
 	layers.buttons_pop_up_window.add(button_ok)
 
+	checkbox_bonus_tiles = Checkbox("checkbox", 32/2.0 - 1, 18/2.0 -3 )
+	layers.buttons_pop_up_window.add(checkbox_bonus_tiles)
+
 	#create dark_filter
 	mask_surface = pygame.Surface((var.window_width, var.window_height))
 	mask_surface.fill(COLOR.BLACK)
@@ -1374,9 +1392,10 @@ while game_is_running:
 								button.push()
 								need_refresh_buttons_on_screen = True
 
-
+					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 					elif ( event_type == pygame.MOUSEBUTTONUP ) :
 
+						#~~~~~~~~~~~ BUTTON OK ~~~~~~~~~~~
 						if ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
 
 							button_ok.release()
@@ -1396,6 +1415,19 @@ while game_is_running:
 							else :
 								pygame.event.post( pygame.event.Event(pygame.VIDEORESIZE, {'size' :[var.window_width,var.window_height]} ) )
 
+						#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
+						if ( (checkbox_bonus_tiles.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (checkbox_bonus_tiles.is_pushed) ):
+							if checkbox_bonus_tiles.is_filled :
+								checkbox_bonus_tiles.release()
+								checkbox_bonus_tiles.empty()
+								checkbox_bonus_tiles.turnOnHighlighted()
+							else :								
+								checkbox_bonus_tiles.release()
+								checkbox_bonus_tiles.fill()
+								checkbox_bonus_tiles.turnOnHighlighted()
+
+							need_refresh_buttons_on_screen = True
+							
 
 						#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------
 						
