@@ -1002,6 +1002,7 @@ logging.debug("")
 game_settings = config_reader.h_rules_params
 var.number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
 display_next_player_hand = game_settings['display_next_player_hand']
+enable_shuffle_letter = game_settings['enable_shuffle_letter']
 LETTERS_LANGUAGE = game_settings['letters_language']
 UI_LANGUAGE = game_settings['ui_language']
 players_names = config_reader.players
@@ -1032,6 +1033,7 @@ logging.debug("Language : %s", LETTERS_LANGUAGE)
 logging.debug("Players : %s", players_names)
 logging.debug("Number of letters per_hand %s: %s", forced, var.number_of_letters_per_hand)
 logging.debug("Display next player hand : %s", display_next_player_hand)
+logging.debug("Enable shuffle letters : %s", enable_shuffle_letter)
 logging.debug("")
 
 
@@ -1191,7 +1193,9 @@ if game_is_running :
 
 	#create buttons
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
-	button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
+	
+	if enable_shuffle_letter : 
+		button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
 
 #----- first image -----
@@ -1541,35 +1545,35 @@ while game_is_running:
 					var.current_background = window.copy()
 					pygame.display.update()
 
+					if enable_shuffle_letter :
+						#------ RELEASE CLIC ON SHUFFLE BUTTON -------
+						if ( (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
 
-					#------ RELEASE CLIC ON SHUFFLE BUTTON -------
-					if ( (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
+							shuffle(var.current_player.hand_state)
 
-						shuffle(var.current_player.hand_state)
+							pos_x = (UI_LEFT_LIMIT)
+							pos_y = ui_text.current_player_turn.pos_y_tiles+1
 
-						pos_x = (UI_LEFT_LIMIT)
-						pos_y = ui_text.current_player_turn.pos_y_tiles+1
+							for index in var.current_player.hand_state :
 
-						for index in var.current_player.hand_state :
+								if index != 0:
+									var.current_player.hand.findByIndex(index).moveAtTile(pos_x, pos_y)
+								pos_x = pos_x + 1
 
-							if index != 0:
-								var.current_player.hand.findByIndex(index).moveAtTile(pos_x, pos_y)
-							pos_x = pos_x + 1
-
-						layers.background.draw(window)
-						layers.tiles.draw(window)
-						layers.hand_holder.draw(window)
-						layers.buttons.draw(window)
-						var.background_no_letter = window.copy()
-						layers.letters_on_board.draw(window)
-						layers.letters_just_played.draw(window)
-						var.current_player.hand.draw(window)
-						var.current_background_no_text = window.copy()
-						ui_text.drawText()
-						var.current_background = window.copy()
-						layers.selected_letter.draw(window)
-						
-						pygame.display.update()
+							layers.background.draw(window)
+							layers.tiles.draw(window)
+							layers.hand_holder.draw(window)
+							layers.buttons.draw(window)
+							var.background_no_letter = window.copy()
+							layers.letters_on_board.draw(window)
+							layers.letters_just_played.draw(window)
+							var.current_player.hand.draw(window)
+							var.current_background_no_text = window.copy()
+							ui_text.drawText()
+							var.current_background = window.copy()
+							layers.selected_letter.draw(window)
+							
+							pygame.display.update()
 
 
 					#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------

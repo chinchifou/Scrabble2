@@ -50,7 +50,7 @@ match_ui_word = re.compile(r'([a-z_]*)\s*=\s*([éA-Za-z12<>\'/\s:.!_]*)\s*')
 
 #~~~~~~~~ Retrieve data ~~~~~~~~
 
-#display settings
+# --- display settings ---
 for line in open(path_conf_disp_file, "r", encoding="utf8") :
 
 	word_found = match_word.search(line)
@@ -79,7 +79,8 @@ for line in open(path_conf_disp_file, "r", encoding="utf8") :
 		if param == 'max_fps' :
 			h_display_params[ param ] = int(int_found.group(2))
 
-#game rules
+
+# --- game_settings ---
 for line in open(path_conf_rules_file, "r", encoding="utf8") :
 
 	word_found = match_word.search(line)
@@ -88,12 +89,17 @@ for line in open(path_conf_rules_file, "r", encoding="utf8") :
 
 	if word_found :
 		param = str(word_found.group(1))
-		if param == 'display_next_player_hand' :
-			h_rules_params[ param ] = str_to_bool(word_found.group(2))
+		#Game language
 		if param == 'letters_language' :
 			h_rules_params[ param ] = str(word_found.group(2))
 		if param == 'ui_language' :
 			h_rules_params[ param ] = str(word_found.group(2))
+		#Advanced options
+		if param == 'display_next_player_hand' :
+			h_rules_params[ param ] = str_to_bool(word_found.group(2))
+		if param == 'enable_shuffle_letter' :
+			h_rules_params[ param ] = str_to_bool(word_found.group(2))
+		#Show help
 		if param == 'display_type_of_tile_on_hoovering' :
 			h_rules_params[ param ] = str_to_bool(word_found.group(2))
 		if param == 'display_new_score_in_real_time' :
@@ -113,6 +119,9 @@ for line in open(path_conf_rules_file, "r", encoding="utf8") :
 		param = str(int_found.group(1))
 		if param == 'number_of_letters_per_hand' :
 			h_rules_params[ param ] = int(int_found.group(2))
+
+
+# --- UI content ---
 
 ui_possible_values = (
 'current_player_turn',
