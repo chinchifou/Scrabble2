@@ -63,7 +63,7 @@ UI_LEFT_LIMIT = DELTA + TILES_PER_LINE + DELTA + 1.0
 UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
-# UI Sprites wich need to load image with trasparency
+# UI Sprites wich need to load image with transparency
 UI_TRANSPARENT_COMPONENTS = ["letter", "button"]
 # UI Sprites wich need to load an image without transparency 
 UI_COMPONENTS = ["board", "hand_holder", "tile"]
@@ -118,6 +118,7 @@ class GameVariable():
 
 		self.background_no_letter = []
 		self.current_background = []
+		self.current_background_pop_up = []
 		self.current_background_no_text = []
 
 		self.points_for_scrabble = 50
@@ -190,16 +191,20 @@ LINE_HEIGHT = LineHeights()
 #class to create rendering layers used for display
 class Layer():
 	def __init__(self):
-		self.background = GroupOfSprites()
-		self.tiles = GroupOfSprites()
+		self.background = GroupOfSprites()		
 		self.hand_holder = GroupOfSprites()
+
+		self.tiles = GroupOfSprites()
 		self.letters_on_board = GroupOfSprites()
 		self.letters_just_played = GroupOfSprites()
 		self.selected_letter = GroupOfSprites()
+
 		self.buttons = GroupOfSprites()
-		self.side_menu = GroupOfSprites()
+		self.buttons_pop_up_window = GroupOfSprites()
+
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
+
 		self.all = GroupOfSprites()
 
 layers = Layer()
@@ -466,8 +471,13 @@ class ResizableSprite(pygame.sprite.Sprite):
 		elif self.type in UI_COMPONENTS :
 			self.image = loadImage(path.join(self.path, self.name+'.png'))
 
+
+		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
+			#auto detect width and height
+			self.width, self.height = tiles (self.image.get_width(), self.image.get_height())
+
 		#resize image
-		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height) )
+		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height ) )
 
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
@@ -506,7 +516,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 class Board(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'board'
-		self.width, self.height = 32, 18
 		self.path = path_background
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
@@ -516,6 +525,7 @@ class Board(ResizableSprite):
 class Hand_holder(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'hand_holder'
+		#create custom width and height 
 		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
 		self.path = path_background
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
@@ -528,8 +538,6 @@ class UI_Surface(ResizableSprite):
 		self.image = surface
 		self.rect = rectangle
 
-		self.width, self.height = tiles(self.rect.width, self.rect.height)
-
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
@@ -537,7 +545,6 @@ class UI_Surface(ResizableSprite):
 class Tile(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'tile'
-		self.width, self.height = 1, 1
 		self.path = path_tiles
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
@@ -546,7 +553,7 @@ class Tile(ResizableSprite):
 class Button(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'button'
-		self.width, self.height = 3, 1
+		#self.width, self.height = 3, 1
 		self.path = path_buttons
 		self.is_highlighted = False
 		self.is_pushed = False
@@ -577,7 +584,6 @@ class Button(ResizableSprite):
 class Letter(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'letter'
-		self.width, self.height = 1, 1
 		self.path = path_letters
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)		
@@ -600,7 +606,7 @@ class Letter(ResizableSprite):
 Board.containers = layers.all, layers.background
 Hand_holder.containers = layers.all, layers.hand_holder
 Tile.containers = layers.all, layers.tiles
-Button.containers = layers.all, layers.buttons
+Button.containers = layers.all
 Letter.containers = layers.all
 UI_Surface.containers = layers.all
 
@@ -1214,9 +1220,14 @@ if game_is_running :
 
 	#create buttons
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
-	
+	layers.buttons.add(button_end_turn)
+
 	if enable_shuffle_letter : 
 		button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
+		layers.buttons.add(button_shuffle)
+
+	button_ok = Button("ok", 32/2.0 - 1, 18/2.0 -1 )
+	layers.buttons_pop_up_window.add(button_ok)
 
 	#create dark_filter
 	mask_surface = pygame.Surface((var.window_width, var.window_height))
@@ -1275,20 +1286,25 @@ while game_is_running:
 			logging.info("-------------------")
 			logging.info("")
 
+		#~~~~~~ KEY PRESSED - ESCAPE GAME ~~~~~~			
+		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_ESCAPE ) :
+			logging.info("ESCAPE key pressed")
+			game_is_running = False #exit the game
+
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		#TODO create a specific function ?
 		elif ( event_type == pygame.VIDEORESIZE ) : #properly refresh the game window if a resize is detected
 			
 			#new width and height
-			width = event.dict['size'][0]
-			height = event.dict['size'][1]
+			var.window_width = event.dict['size'][0]
+			var.window_height = event.dict['size'][1]
 
-			#create a fullscreen fully black to prevent later artefacts
+			#create a fullscreen image fully black to prevent later artefacts
 			window = resizeWindow(var.monitor_resolution.current_w, var.monitor_resolution.current_h, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
-			pygame.draw.rect(window, (0,0,0), ( (0,0), (var.monitor_resolution.current_w, var.monitor_resolution.current_h) ) )
+			pygame.draw.rect(window, COLOR.BLACK, ( (0,0), (var.monitor_resolution.current_w, var.monitor_resolution.current_h) ) )
 			pygame.display.update()
 
-			window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
+			window = resizeWindow(var.window_width, var.window_height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
 			layers.background.draw(window)
 			layers.tiles.draw(window)
@@ -1306,42 +1322,116 @@ while game_is_running:
 			if var.current_action == "POP_UP_DISPLAYED":
 				layers.dark_filter.draw(window)
 				layers.pop_up_window.draw(window)
+				layers.buttons_pop_up_window.draw(window)
 
 			pygame.display.update()
 			
-		#~~~~~~ KEY PRESSED - ESCAPE GAME ~~~~~~			
-		elif ( event_type == pygame.KEYDOWN ) :
-			logging.debug("Key pressed")
-			key_pressed = event.key
-			
-			if ( key_pressed == pygame.K_ESCAPE ) :
-				logging.debug("ESCAPE key pressed")
-				game_is_running = False #exit the game
 
-
+		# NORMAL EVENTS
 		else :
 
-			if var.current_action == "PROMPT_POP_UP" :
+			# //////// POP UP DISPLAYED ////////
 
-				#TODO to MOVE on "click on end button"
+			if (var.current_action == "POP_UP_DISPLAYED") :
 
-				layers.dark_filter.draw(window)
-				layers.pop_up_window.draw(window)
+				need_refresh_buttons_on_screen = False
 
-				pygame.display.update()
+				#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
+				if ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
 
-				var.current_action = "POP_UP_DISPLAYED"
+					timer = clic_clock.tick()
+
+					#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
+					if ( event_type == pygame.MOUSEBUTTONDOWN ) :
+
+						cursor_pos_x, cursor_pos_y = event.pos[0], event.pos[1]
+
+						#------ CLIC ON BUTTONS (VISUAL) -------
+						for button in layers.buttons_pop_up_window :
+							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+								#change button state
+								button.is_highlighted = False
+								button.push()
+								need_refresh_buttons_on_screen = True
 
 
-			elif (var.current_action == "POP_UP_DISPLAYED") :
-				pass
+					elif ( event_type == pygame.MOUSEBUTTONUP ) :
 
+						if ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
+
+							button_ok.release()
+
+							var.current_action = "SELECT_A_LETTER"
+
+							#------ CLOSE WINDOW -------
+
+							# Check if resolution changed during pop_up
+							same_width = var.current_background.get_width() == var.current_background_pop_up.get_width()
+							same_height = var.current_background.get_height() == var.current_background_pop_up.get_height()
+							#Same resolution
+							if same_width and same_height :
+								window.blit(var.current_background, (0,0)) #TO DEBUG
+								pygame.display.update()
+								break
+							else :
+								pygame.event.post( pygame.event.Event(pygame.VIDEORESIZE, {'size' :[var.window_width,var.window_height]} ) )
+
+
+						#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------
+						
+						for button in layers.buttons_pop_up_window :
+
+							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+								button.turnOnHighlighted()
+								need_refresh_buttons_on_screen = True
+
+							if button.is_pushed :
+								button.release() #release all pushed buttons
+								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+									button.turnOnHighlighted()
+								else :
+									button.turnOffHighlighted()
+								need_refresh_buttons_on_screen = True
+
+				if need_refresh_buttons_on_screen :
+					layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
+					layers.buttons_pop_up_window.draw(window)
+					var.current_background_pop_up = window.copy() 
+					pygame.display.update()
+
+
+
+				#~~~~~~ MOUSE MOTION ~~~~~~	
+				elif(event_type == pygame.MOUSEMOTION ):
+
+					mouse_pos = pygame.mouse.get_pos()
+					cursor_pos_x = mouse_pos[0]
+					cursor_pos_y = mouse_pos[1]
+
+					#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
+					buttons_changed = False
+					for button in layers.buttons_pop_up_window :
+						if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+							button.turnOnHighlighted()
+							buttons_changed = True
+						elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+							button.turnOffHighlighted()
+							buttons_changed = True
+
+					if buttons_changed :
+						layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
+						layers.buttons_pop_up_window.draw(window)
+
+						pygame.display.update()
+
+
+			# //////// MAIN GAME SCREEN ////////
 
 			else : 
 				#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
-				if ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) : #TODO TO DEBUG
+				if ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
 
-					timer = clic_clock.tick() #TODO to use ?
+					timer = clic_clock.tick()
 
 					#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
 					if ( event_type == pygame.MOUSEBUTTONDOWN ) :
@@ -1399,6 +1489,7 @@ while game_is_running:
 
 									var.current_action = "PLAY_A_LETTER"
 							
+
 							#------ CLIC ON BUTTONS (VISUAL) -------
 							for button in layers.buttons :
 								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -1408,6 +1499,7 @@ while game_is_running:
 									layers.buttons.clear(window, var.current_background)
 									layers.buttons.draw(window) 
 							pygame.display.update()
+
 
 						#------ PLAY A LETTER -------
 						elif var.current_action == 'PLAY_A_LETTER' :
@@ -1530,6 +1622,8 @@ while game_is_running:
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
+								button_end_turn.release()
+
 								#scores
 								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
@@ -1546,6 +1640,7 @@ while game_is_running:
 								window.blit(var.background_no_letter, (0,0))
 								var.current_player.hand.clear(window, var.background_no_letter)
 
+								'''
 								#redraw letters
 								index_hand = 0
 								while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
@@ -1563,7 +1658,7 @@ while game_is_running:
 
 								var.current_player = var.current_player.next()
 								var.current_player.info()
-
+								'''
 								#display
 								layers.letters_just_played.clear(window, var.background_no_letter)
 								layers.letters_on_board.draw(window)
@@ -1573,16 +1668,28 @@ while game_is_running:
 								var.current_background_no_text = window.copy()
 								ui_text.drawText()
 
-								#TODO toremove in accord with RELEASE CLIC AWAY FROM BUTTON 
+								
 								var.current_background = window.copy()
 
-								pygame.display.update()
+								#pygame.display.update()
 
-								var.current_action = "PROMPT_POP_UP"
+								layers.dark_filter.draw(window)
+								layers.pop_up_window.draw(window)
+								layers.buttons_pop_up_window.draw(window)
+
+								var.current_background_pop_up = window.copy()
+
+								pygame.display.flip()
+
+								var.current_action = "POP_UP_DISPLAYED"
+
+								break 
+
 
 							if enable_shuffle_letter :
 								#------ RELEASE CLIC ON SHUFFLE BUTTON -------
 								if ( (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
+									button_shuffle.release()
 
 									shuffle(var.current_player.hand_state)
 
@@ -1742,10 +1849,11 @@ while game_is_running:
 			cursor_pos_y = mouse_pos[1]
 
 			#------ SELECT A LETTER ------ 
-			#change appearance of button
 			if var.current_action == 'SELECT_A_LETTER' :
 
+				#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
 				buttons_changed = False
+				#TODO restrict area to boost performance
 				for button in layers.buttons :
 					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 						button.turnOnHighlighted()
@@ -1766,7 +1874,7 @@ while game_is_running:
 				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 
 				layers.selected_letter.clear(window, var.current_background)
-				var.current_background = window.copy()
+				#var.current_background = window.copy()
 				layers.selected_letter.draw(window)
 
 				pygame.display.update()
@@ -1832,6 +1940,9 @@ while game_is_running:
 
 						ui_text.id_tile_pop_up = 0
 						ui_text.pop_up_displayed = False
+
+	#display fps
+	#logging.debug('fps : %s', str(fps_clock.get_fps() ) )
 
 logging.info("")
 logging.info("Game has ended")
