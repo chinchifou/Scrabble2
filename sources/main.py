@@ -68,9 +68,11 @@ UI_TRANSPARENT_COMPONENTS = ["letter", "button"]
 # UI Sprites wich need to load an image without transparency 
 UI_COMPONENTS = ["board", "hand_holder", "tile"]
 
-global PLAYERS
+global PLAYERS, TURN
 #all players
 PLAYERS = []
+# Turn number
+TURN = 1
 
 #Folders' paths
 path_log = path.abspath('../log/')
@@ -1190,43 +1192,40 @@ ui_content = config_reader.h_ui_params
 #Initialize userface texts
 ui_text = UserInterfaceTextPrinter(ui_content)
 
+
+#~~~~~~ PLAYERS LETTERS ~~~~~~
+
+tmp_first_hand = ['B','E','S','O','I', 'N']
+tmp_second_hand = ['S','Y','S','T','E','M','E']
+tmp_third_hand = ['U','T','I','L','I','S','A']
+
+
+start_hand = GroupOfSprites()
+hand_state = []
+pos_x = (UI_LEFT_LIMIT)
+pos_y = ui_text.current_player_turn.pos_y_tiles+1
+
+
+for tmp_letter in tmp_first_hand :
+
+	letter = Letter(tmp_letter, pos_x, pos_y)
+	start_hand.add(letter)
+	hand_state.append(letter.id)
+	pos_x = pos_x+1
+
+
+#~~~~~~ CREATE PLAYER ~~~~~~
+
+PLAYERS.append(Player(players_names[0], 0, start_hand, hand_state))
+
+var.current_player = PLAYERS[0]
+
+'''
+
 #----- Create players -----
-
-#TODO
-#create custom set
-
-var.bag_of_letters = ['B','E','S','O','I', 'N', 'Z', 'T', 'E', 'S', 'T']
-
 enough_letters = len(players_names)*var.number_of_letters_per_hand < len(var.bag_of_letters)
 
 if enough_letters :
-
-
-	#TODO custom sort
-
-	'''
-	for player_name in players_names :
-		start_hand = GroupOfSprites()
-		hand_state = []
-		pos_x = (UI_LEFT_LIMIT)
-		pos_y = ui_text.current_player_turn.pos_y_tiles+1
-		for i in range(var.number_of_letters_per_hand) :
-			if len(var.bag_of_letters) > 0 :
-				random_int = randint(0,len(var.bag_of_letters)-1)
-				letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
-				start_hand.add(letter)
-				hand_state.append(letter.id)
-				del(var.bag_of_letters[random_int])
-				pos_x = pos_x+1
-
-
-		PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
-
-	logPlayersInfo()
-
-	var.current_player = PLAYERS[0]
-	var.current_player.info()
-	'''
 
 	for player_name in players_names :
 		start_hand = GroupOfSprites()
@@ -1253,6 +1252,7 @@ if enough_letters :
 else :
 	game_is_running = False
 	ERROR.not_enough_letters()
+'''
 
 #----- Create board game -----
 
@@ -1335,7 +1335,21 @@ if game_is_running :
 	ui_text.drawText()
 	var.current_background = window.copy()
 
-	pygame.display.update()
+	var.current_background = window.copy()
+
+	layers.dark_filter.draw(window)
+	layers.pop_up_window.draw(window)
+	layers.buttons_pop_up_window.draw(window)
+
+	ui_text.drawTextPopUp()
+
+	var.current_background_pop_up = window.copy()
+
+	pygame.display.flip()
+
+	var.current_action = "POP_UP_DISPLAYED"
+
+	#pygame.display.update()
 
 
 #~~~~~~ MAIN  ~~~~~~
@@ -1725,27 +1739,6 @@ while game_is_running:
 								window.blit(var.background_no_letter, (0,0))
 								var.current_player.hand.clear(window, var.background_no_letter)
 
-								#TODO to change if remove all letters from hand before
-
-								#redraw letters
-								index_hand = 0
-								while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
-									if var.current_player.hand_state[index_hand] == 0 :
-										random_int = randint(0,len(var.bag_of_letters)-1)
-										drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
-										del(var.bag_of_letters[random_int])	
-
-										var.current_player.hand_state[index_hand] = drawn_letter.id
-										delta_x, delta_y = tiles1(hand_holder.rect.x), ui_text.current_player_turn.pos_y_tiles+1
-										drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
-										var.current_player.hand.add(drawn_letter)
-
-									index_hand += 1
-
-								var.current_player = var.current_player.next()
-								var.current_player.info()
-								
-								#display
 								layers.letters_just_played.clear(window, var.background_no_letter)
 								layers.letters_on_board.draw(window)
 
@@ -1755,12 +1748,92 @@ while game_is_running:
 
 								ui_text.drawText(COLOR.GREEN)
 
+								var.current_background = window.copy()
+
 								pygame.display.update()
 
-								#pygame.time.wait(900)
-								#TODO to use in order to read score
+
+								#TEMPO to see score
+								#TODO activate in final version
+								pygame.time.wait(900)
+
+								if TURN == 1 :
+
+									start_hand = GroupOfSprites()
+									hand_state = []
+									pos_x = (UI_LEFT_LIMIT)
+									pos_y = ui_text.current_player_turn.pos_y_tiles+1
+
+
+									for tmp_letter in tmp_second_hand :
+
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										start_hand.add(letter)
+										hand_state.append(letter.id)
+										pos_x = pos_x+1
+
+									PLAYERS[0].hand = start_hand
+									PLAYERS[0].hand_state = hand_state
+
+									TURN = TURN + 1
+
+
+								elif TURN == 2 :
+
+									start_hand = GroupOfSprites()
+									hand_state = []
+									pos_x = (UI_LEFT_LIMIT)
+									pos_y = ui_text.current_player_turn.pos_y_tiles+1
+
+
+									for tmp_letter in tmp_third_hand :
+
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										start_hand.add(letter)
+										hand_state.append(letter.id)
+										pos_x = pos_x+1
+
+									PLAYERS[0].hand = start_hand
+									PLAYERS[0].hand_state = hand_state
+									
+									TURN = TURN + 1
+
+								elif TURN == 3 :
+
+									start_hand = GroupOfSprites()
+
+									hand_state = []
+									pos_x = (UI_LEFT_LIMIT)
+									pos_y = ui_text.current_player_turn.pos_y_tiles+1
+
+
+									for tmp_letter in tmp_first_hand :
+
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										start_hand.add(letter)
+										hand_state.append(letter.id)
+										pos_x = pos_x+1
+
+									PLAYERS[0].hand = start_hand
+									PLAYERS[0].hand_state = hand_state
+
+									TURN = 1
+
+
+								#update display
+
+								#layers.letters_just_played.clear(window, var.background_no_letter)
+								#layers.letters_on_board.draw(window)
+
+								window.blit(var.background_no_letter, (0,0))
+
+
+								var.current_player.hand.draw(window)
+
+								var.current_background_no_text = window.copy()
 
 								ui_text.drawText(COLOR.GREY_LIGHT)
+
 								var.current_background = window.copy()
 
 								layers.dark_filter.draw(window)
