@@ -464,12 +464,12 @@ class UITextPrinter():
 
 		all_texts = [
 		UIText( "Bien !", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Aider moi à améliorer l'ergonomie en répondants à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
+		UIText( "Aidez moi à améliorer l'ergonomie en répondant à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
 		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
 		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.25) ),
 		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.75) ),
 		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8.25) ),
-		UIText( "Cocher ce que vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+10) ),
+		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+10) ),
 		UIText( "Réussir à ajouter un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.25) ),
 		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.75) )
 		]
@@ -504,14 +504,14 @@ class UITextPrinter():
 
 		all_texts = [
 		UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1) ),
-		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.25) ),
-		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.75) ),
-		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+7.25) ),
-		UIText( "Cocher ce que vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
-		UIText( "Réussir à ajouter un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.25) ),
-		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.75) ),
-		UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+13.25) )
+		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
+		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+3.25) ),
+		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.75) ),
+		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.25) ),
+		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
+		UIText( "Réussir à ajouter un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.25) ),
+		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.75) ),
+		UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.25) )
 		]
 
 		for text_it in all_texts :
@@ -528,7 +528,7 @@ class UITextPrinter():
 		UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
 		UIText( "Voici une dernière version dans laquelle j'ai rajouté de nouvelles fonctionnalités.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
 		UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
-		UIText( "Fonctionalités :", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) ),
+		UIText( "Fonctionalités :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
 		UIText( "Pouvoir mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
 		UIText( "Afficher l'effet des cases bonus au survol.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8) ),
 		UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
@@ -1473,22 +1473,22 @@ if game_is_running :
 	checkbox_moyen = Checkbox("checkbox", 3, 8.5 )
 	checkbox_difficile = Checkbox("checkbox", 3, 10 )
 
-	checkbox_facile2 = Checkbox("checkbox", 3, 6 )
-	checkbox_moyen2 = Checkbox("checkbox", 3, 7.5 )
-	checkbox_difficile2 = Checkbox("checkbox", 3, 9 )
+	checkbox_facile2 = Checkbox("checkbox", 3, 5 )
+	checkbox_moyen2 = Checkbox("checkbox", 3, 6.5 )
+	checkbox_difficile2 = Checkbox("checkbox", 3, 8 )
 
 	checkbox_function_shuffle = Checkbox("checkbox", 3, 13 )
 	checkbox_function_display_bonus = Checkbox("checkbox", 3, 14.5 )
 	checkbox_function_score = Checkbox("checkbox", 3, 16 )
 
-	checkbox_function_shuffle2 = Checkbox("checkbox", 3, 12 )
-	checkbox_function_display_bonus2 = Checkbox("checkbox", 3, 13.50 )
-	checkbox_function_score2 = Checkbox("checkbox", 3, 15 )
+	checkbox_function_shuffle2 = Checkbox("checkbox", 3, 11 )
+	checkbox_function_display_bonus2 = Checkbox("checkbox", 3, 12.50 )
+	checkbox_function_score2 = Checkbox("checkbox", 3, 14 )
 
-	checkbox_find_word = Checkbox("checkbox", 3, 8.5 )
-	checkbox_bonus_cases = Checkbox("checkbox", 3, 10 )
-	checkbox_calculate_score = Checkbox("checkbox", 3, 11.5 )
-	checkbox_suggest_word = Checkbox("checkbox", 3, 13 )
+	checkbox_find_word = Checkbox("checkbox", 3, 8.25 )
+	checkbox_bonus_cases = Checkbox("checkbox", 3, 9.75 )
+	checkbox_calculate_score = Checkbox("checkbox", 3, 11.25 )
+	checkbox_suggest_word = Checkbox("checkbox", 3, 12.75 )
 
 
 	#create dark_filter
