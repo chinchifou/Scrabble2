@@ -72,7 +72,7 @@ global PLAYERS, STEP
 #all players
 PLAYERS = []
 # Turn number
-STEP = 1
+STEP = 0
 
 #Folders' paths
 path_log = path.abspath('../log/')
@@ -1426,38 +1426,47 @@ if game_is_running :
 
 	# //////// Add letters to Board ///////////
 
-	layers.letters_on_board.add( Letter('M',DELTA+1,DELTA+4) )
-	layers.letters_on_board.add( Letter('E',DELTA+1,DELTA+5) )
-	layers.letters_on_board.add( Letter('T',DELTA+1,DELTA+6) )
-	layers.letters_on_board.add( Letter('H',DELTA+1,DELTA+7) )
-	layers.letters_on_board.add( Letter('O',DELTA+1,DELTA+8) )
-	layers.letters_on_board.add( Letter('D',DELTA+1,DELTA+9) )
-	layers.letters_on_board.add( Letter('E',DELTA+1,DELTA+10) )
-	layers.letters_on_board.add( Letter('S',DELTA+1,DELTA+11) )
+	layers.letters_on_board.add( Letter('M',DELTA+2,DELTA+4) )
+	layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+5) )
+	layers.letters_on_board.add( Letter('T',DELTA+2,DELTA+6) )
+	layers.letters_on_board.add( Letter('H',DELTA+2,DELTA+7) )
+	layers.letters_on_board.add( Letter('O',DELTA+2,DELTA+8) )
+	layers.letters_on_board.add( Letter('D',DELTA+2,DELTA+9) )
+	layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+10) )
+	layers.letters_on_board.add( Letter('S',DELTA+2,DELTA+11) )
 
-	layers.letters_on_board.add( Letter('R',DELTA+2,DELTA+10) )
-	layers.letters_on_board.add( Letter('G',DELTA+3,DELTA+10) )
-	layers.letters_on_board.add( Letter('O',DELTA+4,DELTA+10) )
-	layers.letters_on_board.add( Letter('N',DELTA+5,DELTA+10) )
-	layers.letters_on_board.add( Letter('O',DELTA+6,DELTA+10) )
-	layers.letters_on_board.add( Letter('M',DELTA+7,DELTA+10) )
-	layers.letters_on_board.add( Letter('I',DELTA+8,DELTA+10) )
-	layers.letters_on_board.add( Letter('E',DELTA+9,DELTA+10) )
+	layers.letters_on_board.add( Letter('U',DELTA+1,DELTA+6) )
+	layers.letters_on_board.add( Letter('I',DELTA+3,DELTA+6) )
+	layers.letters_on_board.add( Letter('L',DELTA+4,DELTA+6) )
+	layers.letters_on_board.add( Letter('I',DELTA+5,DELTA+6) )
+	layers.letters_on_board.add( Letter('S',DELTA+6,DELTA+6) )
+	layers.letters_on_board.add( Letter('A',DELTA+7,DELTA+6) )
+	layers.letters_on_board.add( Letter('T',DELTA+8,DELTA+6) )
+	layers.letters_on_board.add( Letter('E',DELTA+9,DELTA+6) )
+	layers.letters_on_board.add( Letter('U',DELTA+10,DELTA+6) )
+	layers.letters_on_board.add( Letter('R',DELTA+11,DELTA+6) )
+
+	layers.letters_on_board.add( Letter('R',DELTA+3,DELTA+10) )
+	layers.letters_on_board.add( Letter('G',DELTA+4,DELTA+10) )
+	layers.letters_on_board.add( Letter('O',DELTA+5,DELTA+10) )
+	layers.letters_on_board.add( Letter('N',DELTA+6,DELTA+10) )
+	layers.letters_on_board.add( Letter('O',DELTA+7,DELTA+10) )
+	layers.letters_on_board.add( Letter('M',DELTA+8,DELTA+10) )
+	layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
+	layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )
 
 
 
-	# ////// create buttons  ////////
+
+	# ------- CREATES BUTTONS --------
+	button_ok = Button("ok", 32/2.0 - 1, 14 )
+
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
-	layers.buttons.add(button_end_turn)
 
 	button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
-		
-	if enable_shuffle_letter :
-		layers.buttons.add(button_shuffle)
 
-	# ------- BUTON OK --------
-	button_ok = Button("ok", 32/2.0 - 1, 14 )
-	layers.buttons_pop_up_window.add(button_ok)	
+	button_play = Button("play", 32/2.0 + 6, 8.5)
+
 
 	# ------- CHECKBOXES --------
 	checkbox_facile = Checkbox("checkbox", 3, 7 )
@@ -1504,31 +1513,20 @@ if game_is_running :
 
 if game_is_running :
 
+	layers.buttons.add(button_play)
+
 	layers.background.draw(window)
 	layers.tiles.draw(window)
-	layers.hand_holder.draw(window)
 	layers.buttons.draw(window)
 
 	var.background_no_letter = window.copy()
 
 	layers.letters_on_board.draw(window)
-	var.current_player.hand.draw(window)
 	var.current_background_no_text = window.copy()
-
-	ui_text.drawText()
 	var.current_background = window.copy()
-
-	layers.dark_filter.draw(window)
-	layers.pop_up_window.draw(window)
-	layers.buttons_pop_up_window.draw(window)
-
-	ui_text.drawTextPopUp1()
-
-	var.current_background_pop_up = window.copy()
 
 	pygame.display.flip()
 
-	var.current_action = "POP_UP_DISPLAYED"
 
 	#pygame.display.update()
 
@@ -1799,8 +1797,38 @@ while game_is_running:
 								for letter in var.current_player.hand :
 									letter.kill()
 
+								layers.letters_on_board.add( Letter('M',DELTA+2,DELTA+4) )
+								layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+5) )
+								layers.letters_on_board.add( Letter('T',DELTA+2,DELTA+6) )
+								layers.letters_on_board.add( Letter('H',DELTA+2,DELTA+7) )
+								layers.letters_on_board.add( Letter('O',DELTA+2,DELTA+8) )
+								layers.letters_on_board.add( Letter('D',DELTA+2,DELTA+9) )
+								layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+10) )
+								layers.letters_on_board.add( Letter('S',DELTA+2,DELTA+11) )
+
+								layers.letters_on_board.add( Letter('U',DELTA+1,DELTA+6) )
+								layers.letters_on_board.add( Letter('I',DELTA+3,DELTA+6) )
+								layers.letters_on_board.add( Letter('L',DELTA+4,DELTA+6) )
+								layers.letters_on_board.add( Letter('I',DELTA+5,DELTA+6) )
+								layers.letters_on_board.add( Letter('S',DELTA+6,DELTA+6) )
+								layers.letters_on_board.add( Letter('A',DELTA+7,DELTA+6) )
+								layers.letters_on_board.add( Letter('T',DELTA+8,DELTA+6) )
+								layers.letters_on_board.add( Letter('E',DELTA+9,DELTA+6) )
+								layers.letters_on_board.add( Letter('U',DELTA+10,DELTA+6) )
+								layers.letters_on_board.add( Letter('R',DELTA+11,DELTA+6) )
+
+								layers.letters_on_board.add( Letter('R',DELTA+3,DELTA+10) )
+								layers.letters_on_board.add( Letter('G',DELTA+4,DELTA+10) )
+								layers.letters_on_board.add( Letter('O',DELTA+5,DELTA+10) )
+								layers.letters_on_board.add( Letter('N',DELTA+6,DELTA+10) )
+								layers.letters_on_board.add( Letter('O',DELTA+7,DELTA+10) )
+								layers.letters_on_board.add( Letter('M',DELTA+8,DELTA+10) )
+								layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
+								layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )
+
 								layers.buttons.empty()
-								layers.buttons.add(button_end_turn)
+								layers.buttons_pop_up_window.empty()
+								layers.buttons.add(button_play)
 
 								# Reset player
 								var.current_player.score = 0
@@ -1820,27 +1848,20 @@ while game_is_running:
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
-								layers.hand_holder.draw(window)
 								layers.buttons.draw(window)
 
 								var.background_no_letter = window.copy()
 
-								var.current_player.hand.draw(window)
+								layers.letters_on_board.draw(window)
 								var.current_background_no_text = window.copy()
 
-								ui_text.drawText()
 								var.current_background = window.copy()
 
-								layers.dark_filter.draw(window)
-								layers.pop_up_window.draw(window)
+								pygame.display.flip()
 
-								layers.buttons_pop_up_window.empty()
-								layers.buttons_pop_up_window.add(button_ok)
+								var.current_action = "SELECT_A_LETTER"							
 
-								layers.buttons_pop_up_window.draw(window)
-								ui_text.drawTextPopUp1()
-
-								STEP = 1
+								STEP = 0
 
 
 							#STEP 2 / STEP 5
@@ -2122,6 +2143,47 @@ while game_is_running:
 									layers.buttons.clear(window, var.current_background)
 									layers.buttons.draw(window)
 
+							#------ RELEASE CLIC ON PLAY BUTTON -------
+							if ( (button_play.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
+
+								button_play.release()
+
+								if STEP == 0 :
+
+									layers.letters_on_board.empty()
+									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+									layers.buttons_pop_up_window.add(button_ok)
+									layers.buttons.empty()
+									layers.buttons.add(button_end_turn)	
+
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons.draw(window)
+
+									var.background_no_letter = window.copy()
+
+									layers.letters_on_board.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+
+									ui_text.drawText()
+									var.current_background = window.copy()
+
+									layers.dark_filter.draw(window)
+									layers.pop_up_window.draw(window)
+									layers.buttons_pop_up_window.draw(window)
+
+									ui_text.drawTextPopUp1()
+
+									var.current_background_pop_up = window.copy()
+
+									pygame.display.flip()
+
+									STEP = STEP + 1
+
+									var.current_action = "POP_UP_DISPLAYED"
+
 
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
@@ -2160,12 +2222,13 @@ while game_is_running:
 
 								#TEMPO to see score
 								#TODO activate in final version
-								pygame.time.wait(900)
+								#pygame.time.wait(900)
 
 
 								if STEP == 3 :
 
 									layers.letters_on_board.empty()
+									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
 									for letter in var.current_player.hand :
 										letter.kill()
@@ -2206,6 +2269,9 @@ while game_is_running:
 
 
 								elif STEP == 6 :
+
+									layers.letters_on_board.empty()
+									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
 									for letter in var.current_player.hand :
 										letter.kill()
