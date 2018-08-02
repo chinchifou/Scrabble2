@@ -666,6 +666,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 class Board(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'board'
+		self.width, self.height = 32, 18
 		self.path = path_background
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
@@ -1649,6 +1650,7 @@ while game_is_running:
 
 							elif STEP == 4 :
 
+
 								if checkbox_function_shuffle.is_filled :
 									enable_shuffle_letter = True
 									layers.buttons.add(button_shuffle)
@@ -1749,6 +1751,7 @@ while game_is_running:
 
 								if checkbox_find_word.is_filled :
 									enable_shuffle_letter = True
+									layers.buttons.add(button_shuffle)
 								if checkbox_bonus_cases.is_filled :
 									display_type_of_tile_on_hoovering = True
 								if checkbox_calculate_score.is_filled :
