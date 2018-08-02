@@ -1410,7 +1410,7 @@ if game_is_running :
 			if rules.BOARD_LAYOUT[row][column] == 0 :
 				Tile('start', x_pos, y_pos)
 			elif rules.BOARD_LAYOUT[row][column] == 1 :
-				Tile('empty', x_pos, y_pos)
+				Tile('normal', x_pos, y_pos)
 			elif rules.BOARD_LAYOUT[row][column] == 2 :
 				Tile('double_letter', x_pos, y_pos)
 			elif rules.BOARD_LAYOUT[row][column] == 3 :
@@ -2471,44 +2471,39 @@ while game_is_running:
 			#------ INFO ABOUT HOVERED TILE ------
 			#TODO if diaplay help is defined in configuration
 			if display_type_of_tile_on_hoovering :
-				if var.current_action == 'SELECT_A_LETTER' :
-					cursor_on_empty_tile = True
+				if var.current_action == 'SELECT_A_LETTER' or var.current_action == 'PLAY_A_LETTER':
 					cursor_on_a_special_tile = False
 
 					#Is cursor on a special tile ?
 					for tile in layers.tiles :
 						if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-							found_the_tile = True
-							if  ( tile.name != 'empty' ) :
+							if  ( tile.name != 'normal' ) :
 								cursor_on_a_special_tile = True
 								#pop up not already displayed for this tile
 								if tile.id != ui_text.id_tile_pop_up :
 
-									#Is this tile empty of previously played letter ?
-									for letter in layers.letters_on_board :
-										if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-											cursor_on_empty_tile = False
+									#remove previously displayed text
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons.draw(window)
+									var.background_no_letter = window.copy()
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									ui_text.drawText()
+									
+									ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
 
-									if cursor_on_empty_tile :
-										#remove previously displayed text
-										layers.background.draw(window)
-										layers.tiles.draw(window)
-										layers.hand_holder.draw(window)
-										layers.buttons.draw(window)
-										var.background_no_letter = window.copy()
-										layers.letters_on_board.draw(window)
-										layers.letters_just_played.draw(window)
-										var.current_player.hand.draw(window)
-										var.current_background_no_text = window.copy()
-										ui_text.drawText()
-										var.current_background = window.copy()
+									var.current_background = window.copy()
 
-										ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
-										pygame.display.update()
+									pygame.display.update()
 
-										ui_text.id_tile_pop_up = tile.id
-										ui_text.pop_up_displayed = True
-										break
+									ui_text.id_tile_pop_up = tile.id
+									ui_text.pop_up_displayed = True
+									break
+
 
 					#If cursor on a normal tile
 					if ( not cursor_on_a_special_tile and ui_text.pop_up_displayed ):
