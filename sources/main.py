@@ -1423,6 +1423,19 @@ if game_is_running :
 		x_pos = 0 + DELTA
 		y_pos += 1
 
+
+	# //////// Add letters to Board ///////////
+
+	layers.letters_on_board.add( Letter('M',DELTA+1,DELTA+4) )
+	layers.letters_on_board.add( Letter('E',DELTA+1,DELTA+5) )
+	layers.letters_on_board.add( Letter('T',DELTA+1,DELTA+6) )
+	layers.letters_on_board.add( Letter('H',DELTA+1,DELTA+7) )
+	layers.letters_on_board.add( Letter('O',DELTA+1,DELTA+8) )
+	layers.letters_on_board.add( Letter('D',DELTA+1,DELTA+9) )
+	layers.letters_on_board.add( Letter('E',DELTA+1,DELTA+10) )
+	layers.letters_on_board.add( Letter('S',DELTA+1,DELTA+11) )
+
+
 	# ////// create buttons  ////////
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
 	layers.buttons.add(button_end_turn)
@@ -1488,6 +1501,7 @@ if game_is_running :
 
 	var.background_no_letter = window.copy()
 
+	layers.letters_on_board.draw(window)
 	var.current_player.hand.draw(window)
 	var.current_background_no_text = window.copy()
 
@@ -1614,12 +1628,7 @@ while game_is_running:
 
 							if STEP == 1 :
 
-								window.blit(var.background_no_letter, (0,0))
-								
-								var.current_player.hand.draw(window)
-								var.current_background_no_text = window.copy()
-								ui_text.drawText(COLOR.GREY_LIGHT)
-								var.current_background = window.copy()
+								window.blit(var.current_background, (0,0))
 
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
@@ -2145,6 +2154,8 @@ while game_is_running:
 
 
 								if STEP == 3 :
+
+									layers.letters_on_board.empty()
 
 									for letter in var.current_player.hand :
 										letter.kill()
