@@ -1527,7 +1527,6 @@ if game_is_running :
 
 	pygame.display.flip()
 
-
 	#pygame.display.update()
 
 
@@ -1865,7 +1864,7 @@ while game_is_running:
 
 
 							#STEP 2 / STEP 5
-							else :
+							elif STEP == 2 or STEP == 5 :
 
 								STEP = STEP + 1
 
