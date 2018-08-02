@@ -1672,6 +1672,22 @@ while game_is_running:
 
 							elif STEP == 7 :
 
+								# Keep track of choice
+								tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
+
+								if checkbox_function_shuffle2.is_filled :
+									tmp_enable_shuffle = True
+								if checkbox_function_display_bonus2.is_filled :
+									tmp_display_pop_up = True
+								if checkbox_function_score2.is_filled :
+									tmp_display_score = True
+
+								# Reset
+								for button in layers.buttons_pop_up_window :
+									if button.type == "checkbox":
+										button.empty()
+								layers.buttons_pop_up_window.empty()
+
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
@@ -1689,23 +1705,17 @@ while game_is_running:
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
 
-								# Reset
-								for button in layers.buttons_pop_up_window :
-									if button.type == "checkbox":
-										button.empty()
-								layers.buttons_pop_up_window.empty()
-
 								layers.buttons_pop_up_window.add(button_ok)
 								layers.buttons_pop_up_window.add(checkbox_find_word)
 								layers.buttons_pop_up_window.add(checkbox_bonus_cases)
 								layers.buttons_pop_up_window.add(checkbox_calculate_score)
 								layers.buttons_pop_up_window.add(checkbox_suggest_word)
 
-								if checkbox_function_shuffle2.is_filled :
+								if tmp_enable_shuffle :
 									checkbox_find_word.fill()
-								if checkbox_function_display_bonus2.is_filled :
+								if tmp_display_pop_up :
 									checkbox_bonus_cases.fill()
-								if checkbox_function_score2.is_filled :
+								if tmp_display_score :
 									checkbox_calculate_score.fill()
 
 								layers.buttons_pop_up_window.draw(window)
