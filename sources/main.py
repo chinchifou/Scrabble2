@@ -1435,6 +1435,16 @@ if game_is_running :
 	layers.letters_on_board.add( Letter('E',DELTA+1,DELTA+10) )
 	layers.letters_on_board.add( Letter('S',DELTA+1,DELTA+11) )
 
+	layers.letters_on_board.add( Letter('R',DELTA+2,DELTA+10) )
+	layers.letters_on_board.add( Letter('G',DELTA+3,DELTA+10) )
+	layers.letters_on_board.add( Letter('O',DELTA+4,DELTA+10) )
+	layers.letters_on_board.add( Letter('N',DELTA+5,DELTA+10) )
+	layers.letters_on_board.add( Letter('O',DELTA+6,DELTA+10) )
+	layers.letters_on_board.add( Letter('M',DELTA+7,DELTA+10) )
+	layers.letters_on_board.add( Letter('I',DELTA+8,DELTA+10) )
+	layers.letters_on_board.add( Letter('E',DELTA+9,DELTA+10) )
+
+
 
 	# ////// create buttons  ////////
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
@@ -2150,7 +2160,7 @@ while game_is_running:
 
 								#TEMPO to see score
 								#TODO activate in final version
-								#pygame.time.wait(900)
+								pygame.time.wait(900)
 
 
 								if STEP == 3 :
