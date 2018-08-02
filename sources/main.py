@@ -1757,6 +1757,8 @@ while game_is_running:
 								var.current_background = window.copy()
 								layers.selected_letter.draw(window)
 
+								pygame.display.update()
+
 
 							elif STEP == 10 :
 
@@ -2191,7 +2193,7 @@ while game_is_running:
 									pos_y = ui_text.current_player_turn.pos_y_tiles+1
 
 									hand_state = []
-									for tmp_letter in tmp_first_hand :
+									for tmp_letter in tmp_third_hand :
 
 										letter = Letter(tmp_letter, pos_x, pos_y)
 										var.current_player.hand.add(letter)
