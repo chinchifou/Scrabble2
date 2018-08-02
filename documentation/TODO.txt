@@ -2,6 +2,8 @@ __________  PRIMARY  __________
 
 Special dev :
 
+help pop up on overlay
+
 transparency for button
 
 
