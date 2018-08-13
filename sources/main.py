@@ -464,8 +464,8 @@ class UITextPrinter():
 
 		#TODO - virer la deuxieme phrase (ou la mettre a la fin)
 		all_texts = [
-		UIText( "Bien !", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
+		UIText( "Bien ! Aidez moi maintenant à améliorer l'ergonomie ", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
+		UIText( "de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
 		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
 		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.25) ),
 		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.75) ),
@@ -487,10 +487,11 @@ class UITextPrinter():
 
 		all_texts = [
 		UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Voici une nouvelle version dans laquelle j'ai rajouté de nouvelles fonctionnalités.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
-		UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
-		UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+6) ),
-		UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+8) )
+		UIText( "Voici une nouvelle version dans laquelle", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
+		UIText( "j'ai rajouté de nouvelles fonctionnalités.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
+		UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+6) ),
+		UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8) ),
+		UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+10) )
 		]
 
 		for text_it in all_texts :
@@ -695,12 +696,12 @@ class UI_Surface(ResizableSprite):
 
 #----- UI Image -----
 class UI_Image(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y):
+	def __init__(self, name, pos_x, pos_y, width, height):
 		self.type = 'ui_image'
 
 		self.name = 'ergonome'
 
-		self.width, self.height = 6, 6
+		self.width, self.height = width, height
 		self.path = path_background
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
@@ -1542,7 +1543,7 @@ if game_is_running :
 
 
 	#create avatar
-	ui_avatar = UI_Image('ergonome', 22, 3) #Screen 32*18
+	ui_avatar = UI_Image('ergonome', 22, 2.84, 6, 6) #Screen 32*18
 	layers.pop_up_window.add(ui_avatar)
 
 
