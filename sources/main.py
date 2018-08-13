@@ -685,11 +685,10 @@ class Hand_holder(ResizableSprite):
 
 #----- UI Surface -----
 class UI_Surface(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y, surface, rectangle):
+	def __init__(self, name, pos_x, pos_y, surface):
 		self.type = 'ui_surface'
 
 		self.image = surface
-		self.rect = rectangle
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
@@ -1530,21 +1529,24 @@ if game_is_running :
 	mask_surface.fill(COLOR.BLACK)
 	mask_surface.set_alpha(180)
 	mask_surface = mask_surface.convert_alpha()
-	mask_rectangle = pygame.Rect( (0,0), (var.window_width, var.window_height) )
-	dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface, mask_rectangle)
+	dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface)
 	layers.dark_filter.add(dark_filter)
 
 	#create window_pop_up
 	pop_up_window_surface = pygame.Surface((28*var.tile_size, 14*var.tile_size))
 	pop_up_window_surface.fill(COLOR.GREY_DEEP)				
-	pop_up_window_rectangle = pygame.Rect( (0,0), (28*var.tile_size, 14*var.tile_size) ) #no need to initialize ??
-	pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface, pop_up_window_rectangle)
+	pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
 	layers.pop_up_window.add(pop_up_window)
 
 
 	#create avatar
 	ui_avatar = UI_Image('ergonome', 22, 2.84, 6, 6) #Screen 32*18
 	layers.pop_up_window.add(ui_avatar)
+
+	#create progress bar
+	#edges of the box
+
+	#TODO
 
 
 
