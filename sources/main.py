@@ -64,7 +64,7 @@ UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
 # UI Sprites wich need to load image with transparency
-UI_TRANSPARENT_COMPONENTS = ["letter", "button"]
+UI_TRANSPARENT_COMPONENTS = ["letter", "button","ui_image"]
 # UI Sprites wich need to load an image without transparency 
 UI_COMPONENTS = ["board", "hand_holder", "tile"]
 
@@ -693,6 +693,29 @@ class UI_Surface(ResizableSprite):
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
+#----- UI Image -----
+class UI_Image(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y):
+		self.type = 'ui_image'
+
+		self.name = 'ergonome'
+
+		self.width, self.height = 6, 6
+		self.path = path_background
+
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
+
+#----- Board -----
+class Board(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y):
+		self.type = 'board'
+		self.width, self.height = 32, 18
+		self.path = path_background
+		
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
+
 #----- Tiles -----
 class Tile(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
@@ -778,6 +801,7 @@ Tile.containers = layers.all, layers.tiles
 Button.containers = layers.all
 Letter.containers = layers.all
 UI_Surface.containers = layers.all
+UI_Image.containers = layers.all
 
 #----- Other classes -----
 
@@ -1515,6 +1539,11 @@ if game_is_running :
 	pop_up_window_rectangle = pygame.Rect( (0,0), (28*var.tile_size, 14*var.tile_size) ) #no need to initialize ??
 	pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface, pop_up_window_rectangle)
 	layers.pop_up_window.add(pop_up_window)
+
+
+	#create avatar
+	ui_avatar = UI_Image('ergonome', 22, 3) #Screen 32*18
+	layers.pop_up_window.add(ui_avatar)
 
 
 
