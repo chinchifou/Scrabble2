@@ -449,7 +449,7 @@ class UITextPrinter():
 		UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
 		UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
 		UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4) ),
-		UIText( "Les cases Bonus rapportent plus de points.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ) ]
+		UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ) ]
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
@@ -462,9 +462,10 @@ class UITextPrinter():
 		limit_left = tiles1( pop_up_window.rect.left )
 		limit_top = tiles1( pop_up_window.rect.left )
 
+		#TODO - virer la deuxieme phrase (ou la mettre a la fin)
 		all_texts = [
 		UIText( "Bien !", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Aidez moi à améliorer l'ergonomie en répondant à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
+		UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
 		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
 		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.25) ),
 		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.75) ),
@@ -1331,12 +1332,12 @@ ui_text = UITextPrinter(ui_content)
 #~~~~~~ PLAYERS LETTERS ~~~~~~
 
 #tmp_first_hand = ['B','E','S','O','I', 'N']
-tmp_first_hand = ['B','I','N','S','E', 'O']
 #tmp_second_hand = ['S','Y','S','T','E','M','E']
-tmp_second_hand = ['S','E','T','E','S','M','Y']
 #tmp_third_hand = ['U','T','I','L','I','S','A']
-tmp_third_hand = ['U','A','S','L','I','T','I']
 
+tmp_first_hand = ['B','I','N','S','E', 'O']
+tmp_second_hand = ['S','E','T','E','S','M','Y']
+tmp_third_hand = ['U','A','S','L','I','T','I']
 
 start_hand = GroupOfSprites()
 hand_state = []
@@ -1350,6 +1351,8 @@ for tmp_letter in tmp_first_hand :
 	start_hand.add(letter)
 	hand_state.append(letter.id)
 	pos_x = pos_x+1
+
+hand_state.append(0)
 
 
 #~~~~~~ CREATE PLAYER ~~~~~~
@@ -1456,6 +1459,11 @@ if game_is_running :
 	layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
 	layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )
 
+	layers.letters_on_board.add( Letter('B',DELTA+10,DELTA+9) )
+	layers.letters_on_board.add( Letter('S',DELTA+10,DELTA+11) )
+	layers.letters_on_board.add( Letter('O',DELTA+10,DELTA+12) )
+	layers.letters_on_board.add( Letter('I',DELTA+10,DELTA+13) )
+	layers.letters_on_board.add( Letter('N',DELTA+10,DELTA+14) )
 
 
 
@@ -1593,7 +1601,8 @@ while game_is_running:
 				elif STEP == 2 :
 					ui_text.drawTextPopUp2()
 				elif STEP == 3 :
-					ui_text.drawTextPopUp2()					
+					ui_text.drawTextPopUp2()
+				#TODO to complete					
 
 
 			pygame.display.update()
@@ -2224,7 +2233,7 @@ while game_is_running:
 
 								#TEMPO to see score
 								#TODO activate in final version
-								#pygame.time.wait(900)
+								pygame.time.wait(1200)
 
 
 								if STEP == 3 :

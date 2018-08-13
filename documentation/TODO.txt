@@ -2,9 +2,7 @@ __________  PRIMARY  __________
 
 Special dev :
 
-help pop up on overlay
-
-transparency for button
+add avatar
 
 
 check TODO in code
