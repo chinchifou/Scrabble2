@@ -207,6 +207,7 @@ class Layer():
 
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
+		self.progress_bar = GroupOfSprites()
 
 
 		self.all = GroupOfSprites()
@@ -695,13 +696,14 @@ class UI_Surface(ResizableSprite):
 
 #----- UI Image -----
 class UI_Image(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y, width, height):
+	def __init__(self, name, path, pos_x, pos_y, width, height):
+
 		self.type = 'ui_image'
 
-		self.name = 'ergonome'
+		self.name = name
+		self.path = path
 
 		self.width, self.height = width, height
-		self.path = path_background
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
@@ -1540,14 +1542,16 @@ if game_is_running :
 
 
 	#create avatar
-	ui_avatar = UI_Image('ergonome', 22, 2.84, 6, 6) #Screen 32*18
+	ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
 	layers.pop_up_window.add(ui_avatar)
 
 	#create progress bar
-	#edges of the box
+	progress_bar_bck = UI_Image('progress_bar_background', path_background, 21.5, 14, 7, 1)
+	layers.progress_bar.add(progress_bar_bck)
 
-	#TODO
-
+	#fill progress bar
+	progress_bar_filling = UI_Image('progress_bar_tile', path_background, 21.5, 14, 2, 1)
+	layers.progress_bar.add(progress_bar_filling)
 
 
 #----- first image -----
@@ -1627,6 +1631,7 @@ while game_is_running:
 				layers.dark_filter.draw(window)
 				layers.pop_up_window.draw(window)
 				layers.buttons_pop_up_window.draw(window)
+				layers.progress_bar.draw(window)
 
 				if STEP == 1 :
 					ui_text.drawTextPopUp1()
@@ -1682,6 +1687,7 @@ while game_is_running:
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
 								layers.buttons_pop_up_window.draw(window)
+								layers.progress_bar.draw(window)
 								ui_text.drawTextPopUp2()
 
 								pygame.display.update()
@@ -1722,6 +1728,7 @@ while game_is_running:
 								layers.buttons_pop_up_window.empty()
 								layers.buttons_pop_up_window.add(button_ok)
 								layers.buttons_pop_up_window.draw(window)
+								layers.progress_bar.draw(window)
 
 								ui_text.drawTextPopUp4()
 								#TODO based on selected checkboxes
@@ -1778,6 +1785,7 @@ while game_is_running:
 									checkbox_calculate_score.fill()
 
 								layers.buttons_pop_up_window.draw(window)
+								layers.progress_bar.draw(window)
 
 								ui_text.drawTextPopUp6()
 
@@ -1813,6 +1821,7 @@ while game_is_running:
 								layers.letters_just_played.draw(window)
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
+								layers.progress_bar.draw(window)
 								ui_text.drawText()
 								var.current_background = window.copy()
 								layers.selected_letter.draw(window)
@@ -1964,6 +1973,7 @@ while game_is_running:
 				if need_refresh_buttons_on_screen :
 					layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
 					layers.buttons_pop_up_window.draw(window)
+					layers.progress_bar.draw(window)
 					var.current_background_pop_up = window.copy() 
 					pygame.display.update()
 
@@ -2216,6 +2226,7 @@ while game_is_running:
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
+									layers.progress_bar.draw(window)
 
 									ui_text.drawTextPopUp1()
 
@@ -2306,6 +2317,7 @@ while game_is_running:
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
+									layers.progress_bar.draw(window)
 									ui_text.drawTextPopUp3()
 
 									STEP = STEP + 1
@@ -2358,6 +2370,7 @@ while game_is_running:
 									layers.buttons_pop_up_window.add(checkbox_function_score2)
 
 									layers.buttons_pop_up_window.draw(window)
+									layers.progress_bar.draw(window)
 									ui_text.drawTextPopUp5()
 
 									STEP = STEP + 1
@@ -2394,6 +2407,7 @@ while game_is_running:
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
+									layers.progress_bar.draw(window)
 									ui_text.drawTextPopUp7()
 
 									STEP = STEP + 1
