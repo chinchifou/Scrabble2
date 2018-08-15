@@ -1547,7 +1547,7 @@ if game_is_running :
 	layers.pop_up_window.add(ui_avatar)
 
 	#create progress bar
-	progress_bar_bck = UI_Image('progress_bar_background', path_background, 21.5, 14, 7, 1)
+	progress_bar_bck = UI_Image('progress_bar_background', path_background, 21.4, 13.9, 7.2, 1.2)
 	layers.progress_bar.add(progress_bar_bck)
 
 	#fill progress bar
@@ -1801,6 +1801,10 @@ while game_is_running:
 								STEP = STEP + 1
 								var.current_action = "SELECT_A_LETTER"
 
+								#fill progress bar
+								progress_bar_filling.width = 6
+								progress_bar_filling.resize()
+
 								if checkbox_find_word.is_filled :
 									enable_shuffle_letter = True
 									layers.buttons.add(button_shuffle)
@@ -1833,6 +1837,10 @@ while game_is_running:
 
 
 							elif STEP == 10 :
+
+								#fill progress bar
+								progress_bar_filling.width = 1
+								progress_bar_filling.resize()
 
 								# Reset conf
 								enable_shuffle_letter = False
@@ -1922,8 +1930,12 @@ while game_is_running:
 							#STEP 2 / STEP 5
 							elif STEP == 2 or STEP == 5 :
 
-								STEP = STEP + 1
-								var.current_action = "SELECT_A_LETTER"
+								#fill progress bar
+								if STEP == 2 :
+									progress_bar_filling.width = 2
+								elif STEP == 5 :
+									progress_bar_filling.width = 4
+								progress_bar_filling.resize()
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
@@ -1942,6 +1954,8 @@ while game_is_running:
 
 								pygame.display.flip()
 
+								STEP = STEP + 1
+								var.current_action = "SELECT_A_LETTER"
 								break
 
 								"""
@@ -2307,6 +2321,10 @@ while game_is_running:
 
 								if STEP == 3 :
 
+									#fill progress bar
+									progress_bar_filling.width = 3
+									progress_bar_filling.resize()
+
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
@@ -2351,6 +2369,10 @@ while game_is_running:
 
 
 								elif STEP == 6 :
+
+									#fill progress bar
+									progress_bar_filling.width = 5
+									progress_bar_filling.resize()
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2406,6 +2428,9 @@ while game_is_running:
 								#LAST STEP
 								elif STEP == 9 :
 
+									#fill progress bar
+									progress_bar_filling.width = 7
+									progress_bar_filling.resize()
 
 									for letter in var.current_player.hand :
 										letter.kill()
