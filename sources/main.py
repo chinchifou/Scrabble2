@@ -1485,12 +1485,13 @@ if game_is_running :
 	layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
 	layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )
 
+	"""
 	layers.letters_on_board.add( Letter('B',DELTA+10,DELTA+9) )
 	layers.letters_on_board.add( Letter('S',DELTA+10,DELTA+11) )
 	layers.letters_on_board.add( Letter('O',DELTA+10,DELTA+12) )
 	layers.letters_on_board.add( Letter('I',DELTA+10,DELTA+13) )
 	layers.letters_on_board.add( Letter('N',DELTA+10,DELTA+14) )
-
+	"""
 
 
 	# ------- CREATES BUTTONS --------
@@ -1550,7 +1551,7 @@ if game_is_running :
 	layers.progress_bar.add(progress_bar_bck)
 
 	#fill progress bar
-	progress_bar_filling = UI_Image('progress_bar_tile', path_background, 21.5, 14, 2, 1)
+	progress_bar_filling = UI_Image('progress_bar_tile', path_background, 21.5, 14, 1, 1)
 	layers.progress_bar.add(progress_bar_filling)
 
 
@@ -1622,6 +1623,7 @@ while game_is_running:
 			layers.letters_on_board.draw(window)
 			layers.letters_just_played.draw(window)
 			var.current_player.hand.draw(window)
+			layers.progress_bar.draw(window)
 			var.current_background_no_text = window.copy()
 			ui_text.drawText()
 			var.current_background = window.copy()
@@ -1763,6 +1765,7 @@ while game_is_running:
 								layers.letters_on_board.draw(window)
 								layers.letters_just_played.draw(window)
 								var.current_player.hand.draw(window)
+								layers.progress_bar.draw(window)
 								var.current_background_no_text = window.copy()
 								ui_text.drawText()
 								var.current_background = window.copy()
@@ -1920,9 +1923,28 @@ while game_is_running:
 							elif STEP == 2 or STEP == 5 :
 
 								STEP = STEP + 1
-
 								var.current_action = "SELECT_A_LETTER"
 
+								layers.background.draw(window)
+								layers.tiles.draw(window)
+								layers.hand_holder.draw(window)
+								layers.buttons.draw(window)
+
+								var.background_no_letter = window.copy()
+
+								layers.letters_on_board.draw(window)
+								var.current_player.hand.draw(window)
+								var.current_background_no_text = window.copy()
+								layers.progress_bar.draw(window)
+
+								ui_text.drawText()
+								var.current_background = window.copy()
+
+								pygame.display.flip()
+
+								break
+
+								"""
 								#------ CLOSE WINDOW -------
 
 								#TO DEBUG
@@ -1936,6 +1958,7 @@ while game_is_running:
 									break
 								else :
 									pygame.event.post( pygame.event.Event(pygame.VIDEORESIZE, {'size' :[var.window_width,var.window_height]} ) )
+								"""
 
 
 						#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
@@ -2125,6 +2148,7 @@ while game_is_running:
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
+											layers.progress_bar.draw(window)
 											var.current_background_no_text = window.copy()
 											ui_text.drawText()
 											var.current_background = window.copy()
@@ -2172,6 +2196,7 @@ while game_is_running:
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
+											layers.progress_bar.draw(window)
 											var.current_background_no_text = window.copy()
 											ui_text.drawText()
 											var.current_background = window.copy()
@@ -2264,6 +2289,7 @@ while game_is_running:
 								layers.letters_on_board.draw(window)
 
 								var.current_player.hand.draw(window)
+								layers.progress_bar.draw(window)
 
 								var.current_background_no_text = window.copy()
 
@@ -2303,6 +2329,7 @@ while game_is_running:
 									window.blit(var.background_no_letter, (0,0))
 									
 									var.current_player.hand.draw(window)
+
 									var.current_background_no_text = window.copy()
 									ui_text.drawText(COLOR.GREY_LIGHT)
 									var.current_background = window.copy()
@@ -2347,6 +2374,7 @@ while game_is_running:
 
 									window.blit(var.background_no_letter, (0,0))
 									var.current_player.hand.draw(window)
+
 									var.current_background_no_text = window.copy()
 									ui_text.drawText(COLOR.GREY_LIGHT)
 									var.current_background = window.copy()
@@ -2455,6 +2483,7 @@ while game_is_running:
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
 									var.current_player.hand.draw(window)
+									layers.progress_bar.draw(window)
 									var.current_background_no_text = window.copy()
 									ui_text.drawText()
 									var.current_background = window.copy()
@@ -2529,6 +2558,7 @@ while game_is_running:
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
+											layers.progress_bar.draw(window)
 											var.current_background_no_text = window.copy()
 											ui_text.drawText()
 											var.current_background = window.copy()
@@ -2576,6 +2606,7 @@ while game_is_running:
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
+											layers.progress_bar.draw(window)
 											var.current_background_no_text = window.copy()
 											ui_text.drawText()
 											var.current_background = window.copy()
@@ -2647,6 +2678,7 @@ while game_is_running:
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
 									var.current_player.hand.draw(window)
+									layers.progress_bar.draw(window)
 									var.current_background_no_text = window.copy()
 									ui_text.drawText()
 									
@@ -2672,6 +2704,7 @@ while game_is_running:
 						layers.letters_on_board.draw(window)
 						layers.letters_just_played.draw(window)
 						var.current_player.hand.draw(window)
+						layers.progress_bar.draw(window)
 						var.current_background_no_text = window.copy()
 						ui_text.drawText()
 						var.current_background = window.copy()
