@@ -186,6 +186,8 @@ class LineHeights():
 		self.NORMAL = 0.6		
 		#size for small pop up
 		self.POP_UP = 0.5
+		#size for the progress bar text
+		self.PROGRESS_BAR = 0.46
 
 LINE_HEIGHT = LineHeights()
 
@@ -418,13 +420,21 @@ class UITextPrinter():
 					window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 
+	def drawTextProgressBar(self, value):
+
+		all_texts = [
+		UIText( "Etape : "+str(value)+" / 7", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+		]
+
+		for text_it in all_texts :
+			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+
+
 	def drawTextPopUp1(self):
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
-		limit_right = tiles1( pop_up_window.rect.right )
-		limit_top = tiles1( pop_up_window.rect.left )
-		limit_bottom = tiles1( pop_up_window.rect.bottom )
+		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
 		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
@@ -443,7 +453,7 @@ class UITextPrinter():
 
 		limit_left = tiles1( pop_up_window.rect.left )
 		limit_right = tiles1( pop_up_window.rect.right )
-		limit_top = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
 		limit_bottom = tiles1( pop_up_window.rect.bottom )
 
 		all_texts = [
@@ -461,7 +471,7 @@ class UITextPrinter():
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
 
 		#TODO - virer la deuxieme phrase (ou la mettre a la fin)
 		all_texts = [
@@ -484,7 +494,7 @@ class UITextPrinter():
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
 		UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
@@ -503,7 +513,7 @@ class UITextPrinter():
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
 		UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1) ),
@@ -525,7 +535,7 @@ class UITextPrinter():
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
 		UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
@@ -547,7 +557,7 @@ class UITextPrinter():
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
 		UIText( "Félicitations et merci de votre participation !", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
@@ -1498,7 +1508,7 @@ if game_is_running :
 
 
 	# ------- CREATES BUTTONS --------
-	button_ok = Button("ok", 32/2.0 - 1, 14 )
+	button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 
 	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
 
@@ -1553,12 +1563,22 @@ if game_is_running :
 	ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
 	layers.pop_up_window.add(ui_avatar)
 
+	"""
 	#create progress bar
 	progress_bar_bck = UI_Image('progress_bar_background', path_background, 21.4, 13.9, 7.2, 1.2)
 	layers.progress_bar.add(progress_bar_bck)
 
 	#fill progress bar
-	progress_bar_filling = UI_Image('progress_bar_tile', path_background, 21.5, 14, 1, 1)
+	progress_bar_filling = UI_Image('progress_bar_tile', path_background, 21.5, 14, 0, 1)
+	layers.progress_bar.add(progress_bar_filling)
+	"""
+
+	#create progress bar
+	progress_bar_bck = UI_Image('progress_bar_background', path_background, 28.6-7/3.0, 15, 7/3.0, 1.2/3.0)
+	layers.progress_bar.add(progress_bar_bck)
+
+	#fill progress bar
+	progress_bar_filling = UI_Image('progress_bar_tile', path_background, 28.6-7/3.0, 15, 0, 1.2/3.0)
 	layers.progress_bar.add(progress_bar_filling)
 
 
@@ -1575,6 +1595,7 @@ if game_is_running :
 	var.background_no_letter = window.copy()
 
 	layers.letters_on_board.draw(window)
+	#layers.progress_bar.draw(window)
 	var.current_background_no_text = window.copy()
 	var.current_background = window.copy()
 
@@ -1697,6 +1718,8 @@ while game_is_running:
 								layers.pop_up_window.draw(window)
 								layers.buttons_pop_up_window.draw(window)
 								layers.progress_bar.draw(window)
+								ui_text.drawTextProgressBar("1")
+
 								ui_text.drawTextPopUp2()
 
 								pygame.display.update()
@@ -1738,6 +1761,7 @@ while game_is_running:
 								layers.buttons_pop_up_window.add(button_ok)
 								layers.buttons_pop_up_window.draw(window)
 								layers.progress_bar.draw(window)
+								ui_text.drawTextProgressBar("3")
 
 								ui_text.drawTextPopUp4()
 								#TODO based on selected checkboxes
@@ -1796,6 +1820,7 @@ while game_is_running:
 
 								layers.buttons_pop_up_window.draw(window)
 								layers.progress_bar.draw(window)
+								ui_text.drawTextProgressBar("5")
 
 								ui_text.drawTextPopUp6()
 
@@ -1809,7 +1834,7 @@ while game_is_running:
 								var.current_action = "SELECT_A_LETTER"
 
 								#fill progress bar
-								progress_bar_filling.width = 6
+								progress_bar_filling.width = 6/3.0
 								progress_bar_filling.resize()
 
 								if checkbox_find_word.is_filled :
@@ -1836,6 +1861,7 @@ while game_is_running:
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
 								layers.progress_bar.draw(window)
+								ui_text.drawTextProgressBar("6")
 								ui_text.drawText()
 								var.current_background = window.copy()
 								layers.selected_letter.draw(window)
@@ -1846,7 +1872,7 @@ while game_is_running:
 							elif STEP == 10 :
 
 								#fill progress bar
-								progress_bar_filling.width = 1
+								progress_bar_filling.width = 0
 								progress_bar_filling.resize()
 
 								# Reset conf
@@ -1923,6 +1949,7 @@ while game_is_running:
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
+								#layers.progress_bar.draw(window)
 								var.current_background_no_text = window.copy()
 
 								var.current_background = window.copy()
@@ -1939,9 +1966,9 @@ while game_is_running:
 
 								#fill progress bar
 								if STEP == 2 :
-									progress_bar_filling.width = 2
+									progress_bar_filling.width = 2/3.0
 								elif STEP == 5 :
-									progress_bar_filling.width = 4
+									progress_bar_filling.width = 4/3.0
 								progress_bar_filling.resize()
 
 								layers.background.draw(window)
@@ -1957,6 +1984,10 @@ while game_is_running:
 								layers.progress_bar.draw(window)
 
 								ui_text.drawText()
+								if STEP == 2 :
+									ui_text.drawTextProgressBar("2")
+								if STEP == 5 :
+									ui_text.drawTextProgressBar("4")
 								var.current_background = window.copy()
 
 								pygame.display.flip()
@@ -2017,7 +2048,7 @@ while game_is_running:
 				if need_refresh_buttons_on_screen :
 					layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
 					layers.buttons_pop_up_window.draw(window)
-					layers.progress_bar.draw(window)
+					#layers.progress_bar.draw(window)
 					var.current_background_pop_up = window.copy() 
 					pygame.display.update()
 
@@ -2249,6 +2280,10 @@ while game_is_running:
 
 								if STEP == 0 :
 
+									#fill progress bar
+									progress_bar_filling.width = 1/3.0
+									progress_bar_filling.resize()
+
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 									layers.buttons_pop_up_window.add(button_ok)
@@ -2275,6 +2310,7 @@ while game_is_running:
 									layers.progress_bar.draw(window)
 
 									ui_text.drawTextPopUp1()
+									ui_text.drawTextProgressBar("1")
 
 									var.current_background_pop_up = window.copy()
 
@@ -2332,7 +2368,7 @@ while game_is_running:
 								if STEP == 3 :
 
 									#fill progress bar
-									progress_bar_filling.width = 3
+									progress_bar_filling.width = 3/3.0
 									progress_bar_filling.resize()
 
 									layers.letters_on_board.empty()
@@ -2374,6 +2410,7 @@ while game_is_running:
 									layers.buttons_pop_up_window.draw(window)
 									layers.progress_bar.draw(window)
 									ui_text.drawTextPopUp3()
+									ui_text.drawTextProgressBar("3")
 
 									STEP = STEP + 1
 
@@ -2381,7 +2418,7 @@ while game_is_running:
 								elif STEP == 6 :
 
 									#fill progress bar
-									progress_bar_filling.width = 5
+									progress_bar_filling.width = 5/3.0
 									progress_bar_filling.resize()
 
 									layers.letters_on_board.empty()
@@ -2431,6 +2468,7 @@ while game_is_running:
 
 									layers.buttons_pop_up_window.draw(window)
 									layers.progress_bar.draw(window)
+									ui_text.drawTextProgressBar("5")
 									ui_text.drawTextPopUp5()
 
 									STEP = STEP + 1
@@ -2439,7 +2477,7 @@ while game_is_running:
 								elif STEP == 9 :
 
 									#fill progress bar
-									progress_bar_filling.width = 7
+									progress_bar_filling.width = 7/3.0
 									progress_bar_filling.resize()
 
 									for letter in var.current_player.hand :
@@ -2471,6 +2509,7 @@ while game_is_running:
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
 									layers.progress_bar.draw(window)
+									ui_text.drawTextProgressBar("7")
 									ui_text.drawTextPopUp7()
 
 									STEP = STEP + 1
