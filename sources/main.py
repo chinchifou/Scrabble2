@@ -1540,6 +1540,8 @@ if game_is_running :
 
 	button_play = Button("play", 32/2.0 + 6, 8.5)
 
+	button_reinit = Button("reinit", 29, 15) #TODO button reinit
+
 
 	# ------- CHECKBOXES --------
 	checkbox_facile = Checkbox("checkbox", 3, 7 )
@@ -1592,6 +1594,7 @@ if game_is_running :
 if game_is_running :
 
 	layers.buttons.add(button_play)
+	#layers.buttons.add(button_reinit)
 
 	layers.background.draw(window)
 	layers.tiles.draw(window)
@@ -1830,7 +1833,6 @@ while game_is_running:
 								ui_text.drawTextPopUp6()
 
 								STEP = STEP + 1
-
 
 
 							elif STEP == 8 :
