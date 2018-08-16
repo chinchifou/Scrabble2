@@ -429,7 +429,7 @@ class UITextPrinter():
 		all_texts = [
 		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
 		UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
-		UIText( "Pouvez-vous m'aider à améliorer ce jeu ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
+		UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
 		]
 
 		for text_it in all_texts :
@@ -472,7 +472,7 @@ class UITextPrinter():
 		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.75) ),
 		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8.25) ),
 		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+10) ),
-		UIText( "Réussir à ajouter un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.25) ),
+		UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.25) ),
 		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.75) )
 		]
 
@@ -489,7 +489,7 @@ class UITextPrinter():
 		all_texts = [
 		UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
 		UIText( "Voici une nouvelle version dans laquelle", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-		UIText( "j'ai rajouté de nouvelles fonctionnalités.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
+		UIText( "j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
 		UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+6) ),
 		UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8) ),
 		UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+10) )
@@ -512,7 +512,7 @@ class UITextPrinter():
 		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.75) ),
 		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.25) ),
 		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
-		UIText( "Réussir à ajouter un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.25) ),
+		UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.25) ),
 		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.75) ),
 		UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.25) )
 		]
@@ -529,9 +529,9 @@ class UITextPrinter():
 
 		all_texts = [
 		UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Voici une dernière version dans laquelle j'ai rajouté de nouvelles fonctionnalités.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
+		UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
 		UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
-		UIText( "Fonctionalités :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
+		UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
 		UIText( "Pouvoir mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
 		UIText( "Afficher l'effet des cases bonus au survol.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8) ),
 		UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
