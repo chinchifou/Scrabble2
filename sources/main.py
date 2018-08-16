@@ -2313,6 +2313,9 @@ while game_is_running:
 
 								pygame.display.update()
 
+								#reset score between turns
+								var.current_player.score = 0
+
 
 								#TEMPO to see score
 								#TODO activate in final version
