@@ -1360,10 +1360,13 @@ ui_text = UITextPrinter(ui_content)
 #tmp_first_hand = ['B','E','S','O','I', 'N']
 #tmp_second_hand = ['S','Y','S','T','E','M','E']
 #tmp_third_hand = ['U','T','I','L','I','S','A']
+#tmp_second_hand = ['S','E','T','E','S','M','Y']
+#tmp_third_hand = ['U','A','S','L','I','T','I']
 
 tmp_first_hand = ['B','I','N','S','E', 'O']
-tmp_second_hand = ['S','E','T','E','S','M','Y']
-tmp_third_hand = ['U','A','S','L','I','T','I']
+tmp_second_hand = ['S','E','I','C','N','E','C']
+tmp_third_hand = ['A','R','E','V','I', 'N']
+
 
 start_hand = GroupOfSprites()
 hand_state = []
