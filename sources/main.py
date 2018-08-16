@@ -2316,7 +2316,7 @@ while game_is_running:
 
 								#TEMPO to see score
 								#TODO activate in final version
-								pygame.time.wait(1200)
+								#pygame.time.wait(1500)
 
 
 								if STEP == 3 :
