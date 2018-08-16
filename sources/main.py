@@ -427,9 +427,9 @@ class UITextPrinter():
 		limit_bottom = tiles1( pop_up_window.rect.bottom )
 
 		all_texts = [
-		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-		UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
-		UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
+		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
+		UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4) ),
+		UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+6) )
 		]
 
 		for text_it in all_texts :
@@ -447,10 +447,10 @@ class UITextPrinter():
 		limit_bottom = tiles1( pop_up_window.rect.bottom )
 
 		all_texts = [
-		UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-		UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
-		UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4) ),
-		UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ) ]
+		UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
+		UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+3) ),
+		UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) ),
+		UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+6) ) ]
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
@@ -1546,7 +1546,11 @@ if game_is_running :
 
 
 	#create avatar
+	"""
 	ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
+	layers.pop_up_window.add(ui_avatar)
+	"""
+	ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
 	layers.pop_up_window.add(ui_avatar)
 
 	#create progress bar
@@ -2708,6 +2712,7 @@ while game_is_running:
 									var.background_no_letter = window.copy()
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
+									layers.selected_letter.draw(window) #TODO to debug
 									var.current_player.hand.draw(window)
 									layers.progress_bar.draw(window)
 									var.current_background_no_text = window.copy()
