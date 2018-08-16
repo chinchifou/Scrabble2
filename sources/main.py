@@ -1333,7 +1333,7 @@ sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, 
 game_is_running = True
 
 fps_clock = pygame.time.Clock()
-clic_clock = pygame.time.Clock() #TODO to use
+clic_clock = pygame.time.Clock()
 logging.debug("INITIALIZATION")
 logging.debug("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.debug("Pygame started")
@@ -2570,7 +2570,7 @@ while game_is_running:
 						if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
 
 							#not a simple fast clic
-							if ( timer > 100 )  : 
+							if ( timer > 200 )  : 
 
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
