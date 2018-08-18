@@ -948,12 +948,16 @@ def logPlayersInfo():
 #Calculate points
 def calculatePoints(layer_letters_played) :
 
-	var.current_board_state, TILES_PER_LINE
+	#var.current_board_state, TILES_PER_LINE
 
-	#format letters_played {'a' : (x, y)}
+	#format letters_played {(y, x) : 'a' }
+	# 'x' and 'y' are swap here because 'board state' is a matrix
+	# eg : m =[[a, b], [c, d]] -> to get 'b' you need to access : m[1][2] which for the UI would be m(2, 1)
 	letters_played = {}
 	for letter in layer_letters_played :
 		letters_played[(int(letter.pos_y - DELTA), int(letter.pos_x - DELTA))] = letter.name
+
+	logging.debug("letters played : %s", letters_played)
 
 	if len(letters_played) > 1 :
 		logging.debug('%i letters played', len(letters_played))
@@ -984,12 +988,17 @@ def calculatePoints(layer_letters_played) :
 
 		#TODO not in diagonal
 		if (delta_x > 0 and delta_y > 0) :
-			#print("Please do not play in diagonal")
+			#TODO display error message
+			logging.debug("played in diagonal")
 			return []
 
-		#TODO there is a hole in the word
+		"""
+		#there is a hole in the word
 		if (delta_x+1 != len(letters_played) and delta_y+1 != len(letters_played) ) :
+			#TODO display error message
+			logging.debug("there is a hole in the word")
 			return []
+		"""
 
 		words_and_scores = []
 
@@ -1493,6 +1502,7 @@ if game_is_running :
 
 	# //////// Add letters to Board ///////////
 
+	"""
 	layers.letters_on_board.add( Letter('M',DELTA+2,DELTA+4) )
 	layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+5) )
 	layers.letters_on_board.add( Letter('T',DELTA+2,DELTA+6) )
@@ -1520,15 +1530,25 @@ if game_is_running :
 	layers.letters_on_board.add( Letter('O',DELTA+7,DELTA+10) )
 	layers.letters_on_board.add( Letter('M',DELTA+8,DELTA+10) )
 	layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
-	layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )
+	layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )	
+	"""
 
-	"""
-	layers.letters_on_board.add( Letter('B',DELTA+10,DELTA+9) )
-	layers.letters_on_board.add( Letter('S',DELTA+10,DELTA+11) )
-	layers.letters_on_board.add( Letter('O',DELTA+10,DELTA+12) )
-	layers.letters_on_board.add( Letter('I',DELTA+10,DELTA+13) )
-	layers.letters_on_board.add( Letter('N',DELTA+10,DELTA+14) )
-	"""
+	x, y = 2, 4
+	for letter in "METHODES" :
+		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+		y += 1
+
+	x, y = 1, 6
+	for letter in "UTILISATEUR" :
+		if (x, y) != (2,6) :
+			layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+		x += 1
+
+	x, y = 2, 10
+	for letter in "ERGONOMIE" :
+		if (x, y) != (2,10) :
+			layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+		x += 1	
 
 
 	# ------- CREATES BUTTONS --------
@@ -2287,6 +2307,17 @@ while game_is_running:
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+									x, y = 1, 6
+									for letter in "UTILISATEUR" :
+										layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
+										var.current_board_state[y][x] = letter
+										x += 1
+
+									logging.debug("Initial board state :")
+									for line in var.current_board_state :
+										logging.debug(line)
+
 									layers.buttons_pop_up_window.add(button_ok)
 									layers.buttons.empty()
 									layers.buttons.add(button_end_turn)	
@@ -2323,15 +2354,22 @@ while game_is_running:
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
+								logging.debug("End of turn board state : ")
+								for line in var.current_board_state :
+									logging.debug(line)
+
 								button_end_turn.release()
 
 								#scores
 								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
+
 								for association in var.last_words_and_scores :
 									var.current_player.score +=  association[1]
 								
 								var.predicted_score = 0
+
+								logging.debug("New Player score : %s", str(var.current_player.score))
 
 								#letters
 								for letter in layers.letters_just_played :
@@ -2359,13 +2397,19 @@ while game_is_running:
 
 								#TEMPO to see score
 								#TODO activate in final version
-								#pygame.time.wait(1500)
+								pygame.time.wait(1500)
 
 
 								if STEP == 3 :
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+									x, y = 2, 4
+									for letter in "METHODES" :
+										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+										var.current_board_state[y][x] = letter
+										y += 1
 
 									for letter in var.current_player.hand :
 										letter.kill()
