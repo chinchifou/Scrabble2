@@ -422,161 +422,87 @@ class UITextPrinter():
 					window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 
-	def drawTextPopUp1(self):
+	def drawTextPopUp(self, step):
 
 		pop_up_window = layers.pop_up_window.sprites()[0]
 		limit_left = tiles1( pop_up_window.rect.left )
 		limit_top = tiles1( pop_up_window.rect.top )
 
-		all_texts = [
-		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-		UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
-		UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
-		]
+		if step == 0 :
+			all_texts = [
+			UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
+			UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
+			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
+			]
+		elif step == 1 :
+			all_texts = [
+			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
+			UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
+			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4.5) ),
+			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+6) )
+			]
+		elif step == 3 :
+			all_texts = [
+			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
+			UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
+			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.25) ),
+			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.75) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+7.25) ),
+			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.25) ),
+			UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.75) )
+			]
+		elif step == 4 :
+			all_texts = [
+			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
+			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
+			UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+3) ),
+			UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
+			UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) )
+			]
+		elif step == 6 :
+			all_texts = [
+			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
+			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+3.25) ),
+			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.75) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.25) ),
+			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.25) ),
+			UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.75) ),
+			UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.25) )
+			]
+		elif step == 7 :
+			all_texts = [
+			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
+			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
+			UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
+			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
+			UIText( "Pouvoir mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
+			UIText( "Afficher l'effet des cases bonus au survol.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8) ),
+			UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
+			UIText( "Me proposer des mots", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11) )
+			]
+		elif step == 9 :			
+			all_texts = [
+			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
+			UIText( "Merci de m'avoir aidé à améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
+			UIText( "Il est bien mieux ainsi, n'est-ce pas ?", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
+			]
+		elif step == 10 :
+			all_texts = [
+			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
+			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.5) ),
+			UIText( "> Une science avec des méthodes pour améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
+			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.5) ),
+			UIText( "En fait, l'ergonomie c'est l'avenir !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_left+7.5) ),
+			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9.5) ),
+			UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+1, limit_top+11.5) ),
+			]			
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-	def drawTextPopUp2(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_right = tiles1( pop_up_window.rect.right )
-		limit_top = tiles1( pop_up_window.rect.top )
-		limit_bottom = tiles1( pop_up_window.rect.bottom )
-
-		all_texts = [
-		UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-		UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
-		UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4.5) ),
-		UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+6) ) ]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-	def drawTextPopUp3(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		#TODO - virer la deuxieme phrase (ou la mettre a la fin)
-		all_texts = [
-		UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
-		UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
-		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.25) ),
-		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.75) ),
-		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+7.25) ),
-		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
-		UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.25) ),
-		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.75) )
-		]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-	def drawTextPopUp4(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		all_texts = [
-		UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
-		UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
-		UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+3) ),
-		UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
-		UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) )
-		]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-	def drawTextPopUp5(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		all_texts = [
-		UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
-		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
-		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+3.25) ),
-		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.75) ),
-		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.25) ),
-		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
-		UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.25) ),
-		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.75) ),
-		UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.25) )
-		]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-	def drawTextPopUp6(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		all_texts = [
-		UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
-		UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
-		UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
-		UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
-		UIText( "Pouvoir mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
-		UIText( "Afficher l'effet des cases bonus au survol.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8) ),
-		UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
-		UIText( "Me proposer des mots", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11) )
-		]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-
-	def drawTextPopUp7(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		all_texts = [
-		UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
-		UIText( "Merci de m'avoir aidé à améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
-		UIText( "Il est bien mieux ainsi, n'est-ce pas ?", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
-		]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
-
-	def drawTextPopUp8(self):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		all_texts = [
-		UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
-		UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.5) ),
-		UIText( "> Une science avec des méthodes pour améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
-		UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.5) ),
-		UIText( "En fait, l'ergonomie c'est l'avenir !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_left+7.5) ),
-		UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9.5) ),
-		UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+1, limit_top+11.5) ),
-		]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
 
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
@@ -1668,14 +1594,7 @@ while game_is_running:
 				layers.pop_up_window.draw(window)
 				layers.buttons_pop_up_window.draw(window)
 				progress_bar.draw()
-
-				if STEP == 1 :
-					ui_text.drawTextPopUp1()
-				elif STEP == 2 :
-					ui_text.drawTextPopUp2()
-				elif STEP == 3 :
-					ui_text.drawTextPopUp2()
-				#TODO to refactor					
+				ui_text.drawTextPopUp(STEP)					
 
 			pygame.display.update()
 			
@@ -1725,7 +1644,7 @@ while game_is_running:
 
 								progress_bar.draw()
 
-								ui_text.drawTextPopUp2()
+								ui_text.drawTextPopUp(STEP)
 
 								pygame.display.update()
 
@@ -1768,7 +1687,7 @@ while game_is_running:
 
 								progress_bar.draw()
 
-								ui_text.drawTextPopUp4()
+								ui_text.drawTextPopUp(STEP)
 								#TODO based on selected checkboxes
 
 								STEP = STEP + 1
@@ -1829,7 +1748,7 @@ while game_is_running:
 								
 								progress_bar.draw()
 
-								ui_text.drawTextPopUp6()
+								ui_text.drawTextPopUp(STEP)
 
 								STEP = STEP + 1
 
@@ -1887,7 +1806,7 @@ while game_is_running:
 
 								layers.buttons_pop_up_window.draw(window)
 								progress_bar.draw()
-								ui_text.drawTextPopUp8()
+								ui_text.drawTextPopUp(STEP)
 
 								STEP = STEP + 1
 
@@ -2290,7 +2209,6 @@ while game_is_running:
 
 								if STEP == 0 :
 
-
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
@@ -2299,10 +2217,6 @@ while game_is_running:
 										layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
 										var.current_board_state[y][x] = letter
 										x += 1
-
-									logging.debug("Initial board state :")
-									for line in var.current_board_state :
-										logging.debug(line)
 
 									layers.buttons_pop_up_window.add(button_ok)
 									layers.buttons.empty()
@@ -2330,7 +2244,7 @@ while game_is_running:
 
 									progress_bar.fill()
 									progress_bar.draw()
-									ui_text.drawTextPopUp1()
+									ui_text.drawTextPopUp(STEP)
 
 									pygame.display.update()
 
@@ -2439,7 +2353,7 @@ while game_is_running:
 									progress_bar.fill()
 									progress_bar.draw()
 
-									ui_text.drawTextPopUp3()
+									ui_text.drawTextPopUp(STEP)
 
 									STEP = STEP + 1
 
@@ -2496,7 +2410,7 @@ while game_is_running:
 									progress_bar.fill()
 									progress_bar.draw()
 
-									ui_text.drawTextPopUp5()
+									ui_text.drawTextPopUp(STEP)
 
 									STEP = STEP + 1
 
@@ -2524,7 +2438,7 @@ while game_is_running:
 									progress_bar.fill()
 									progress_bar.draw()
 
-									ui_text.drawTextPopUp7()
+									ui_text.drawTextPopUp(STEP)
 
 									STEP = STEP + 1
 
