@@ -1603,13 +1603,10 @@ if game_is_running :
 	var.background_no_letter = window.copy()
 
 	layers.letters_on_board.draw(window)
-	#layers.progress_bar.draw(window)
 	var.current_background_no_text = window.copy()
 	var.current_background = window.copy()
 
-	pygame.display.flip()
-
-	#pygame.display.update()
+	pygame.display.update()
 
 
 #~~~~~~ MAIN  ~~~~~~
@@ -1656,20 +1653,23 @@ while game_is_running:
 			layers.hand_holder.draw(window)
 			layers.buttons.draw(window)
 			var.background_no_letter = window.copy()
+
 			layers.letters_on_board.draw(window)
 			layers.letters_just_played.draw(window)
 			var.current_player.hand.draw(window)
-			layers.progress_bar.draw(window)
 			var.current_background_no_text = window.copy()
+
+			progress_bar.draw()
 			ui_text.drawText()
 			var.current_background = window.copy()
+
 			layers.selected_letter.draw(window)
 
 			if var.current_action == "POP_UP_DISPLAYED":
 				layers.dark_filter.draw(window)
 				layers.pop_up_window.draw(window)
 				layers.buttons_pop_up_window.draw(window)
-				layers.progress_bar.draw(window)
+				progress_bar.draw()
 
 				if STEP == 1 :
 					ui_text.drawTextPopUp1()
@@ -1677,8 +1677,7 @@ while game_is_running:
 					ui_text.drawTextPopUp2()
 				elif STEP == 3 :
 					ui_text.drawTextPopUp2()
-				#TODO to complete					
-
+				#TODO to refactor					
 
 			pygame.display.update()
 			
@@ -1801,11 +1800,13 @@ while game_is_running:
 								layers.hand_holder.draw(window)
 								layers.buttons.draw(window)
 								var.background_no_letter = window.copy()
+
 								layers.letters_on_board.draw(window)
 								layers.letters_just_played.draw(window)
 								var.current_player.hand.draw(window)
-								layers.progress_bar.draw(window)
 								var.current_background_no_text = window.copy()
+
+								progress_bar.draw()
 								ui_text.drawText()
 								var.current_background = window.copy()
 								layers.selected_letter.draw(window)
@@ -1946,16 +1947,13 @@ while game_is_running:
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.buttons.draw(window)
-
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
-								#layers.progress_bar.draw(window)
 								var.current_background_no_text = window.copy()
-
 								var.current_background = window.copy()
 
-								pygame.display.flip()
+								pygame.display.update()
 
 								var.current_action = "SELECT_A_LETTER"							
 
@@ -1969,17 +1967,18 @@ while game_is_running:
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
 								layers.buttons.draw(window)
-
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
+
 								progress_bar.fill()
 								progress_bar.draw()
+								ui_text.drawText()
 								var.current_background = window.copy()
 
-								pygame.display.flip()
+								pygame.display.update()
 
 								STEP = STEP + 1
 								var.current_action = "SELECT_A_LETTER"
@@ -2037,7 +2036,6 @@ while game_is_running:
 				if need_refresh_buttons_on_screen :
 					layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
 					layers.buttons_pop_up_window.draw(window)
-					#layers.progress_bar.draw(window)
 					var.current_background_pop_up = window.copy() 
 					pygame.display.update()
 
@@ -2189,8 +2187,9 @@ while game_is_running:
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
-											layers.progress_bar.draw(window)
+											
 											var.current_background_no_text = window.copy()
+											progress_bar.draw()
 											ui_text.drawText()
 											var.current_background = window.copy()
 
@@ -2237,8 +2236,9 @@ while game_is_running:
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
-											layers.progress_bar.draw(window)
+											
 											var.current_background_no_text = window.copy()
+											progress_bar.draw()
 											ui_text.drawText()
 											var.current_background = window.copy()
 
@@ -2295,12 +2295,10 @@ while game_is_running:
 									layers.buttons_pop_up_window.draw(window)
 									progress_bar.fill()
 									progress_bar.draw()
-
 									ui_text.drawTextPopUp1()
-
 									var.current_background_pop_up = window.copy()
 
-									pygame.display.flip()
+									pygame.display.update()
 
 									STEP = STEP + 1
 
@@ -2326,20 +2324,16 @@ while game_is_running:
 
 								layers.letters_just_played.empty()
 								window.blit(var.background_no_letter, (0,0))
+
 								var.current_player.hand.clear(window, var.background_no_letter)
-
 								layers.letters_just_played.clear(window, var.background_no_letter)
+
 								layers.letters_on_board.draw(window)
-
 								var.current_player.hand.draw(window)
-								layers.progress_bar.draw(window)
-
 								var.current_background_no_text = window.copy()
 
 								progress_bar.draw()
-
 								ui_text.drawText(COLOR.GREEN)
-
 								var.current_background = window.copy()
 
 								pygame.display.update()
@@ -2505,7 +2499,7 @@ while game_is_running:
 
 								var.current_background_pop_up = window.copy()
 
-								pygame.display.flip()
+								pygame.display.update()
 
 								var.current_action = "POP_UP_DISPLAYED"
 
@@ -2537,10 +2531,12 @@ while game_is_running:
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
 									var.current_player.hand.draw(window)
-									layers.progress_bar.draw(window)
+									
 									var.current_background_no_text = window.copy()
+									progress_bar.draw()
 									ui_text.drawText()
 									var.current_background = window.copy()
+
 									layers.selected_letter.draw(window)
 									
 									pygame.display.update()
@@ -2570,7 +2566,7 @@ while game_is_running:
 						if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
 
 							#not a simple fast clic
-							if ( timer > 100 )  : 
+							if ( timer > 250 )  : 
 
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
@@ -2609,14 +2605,15 @@ while game_is_running:
 											layers.hand_holder.draw(window)
 											layers.buttons.draw(window)
 											var.background_no_letter = window.copy()
+
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
-											layers.progress_bar.draw(window)
+											
 											var.current_background_no_text = window.copy()
+											progress_bar.draw()
 											ui_text.drawText()
 											var.current_background = window.copy()
-
 
 											pygame.display.update()
 
@@ -2657,11 +2654,13 @@ while game_is_running:
 											layers.hand_holder.draw(window)
 											layers.buttons.draw(window)
 											var.background_no_letter = window.copy()
+
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
-											layers.progress_bar.draw(window)
 											var.current_background_no_text = window.copy()
+
+											progress_bar.draw()
 											ui_text.drawText()
 											var.current_background = window.copy()
 
@@ -2729,12 +2728,14 @@ while game_is_running:
 									layers.hand_holder.draw(window)
 									layers.buttons.draw(window)
 									var.background_no_letter = window.copy()
+
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
 									layers.selected_letter.draw(window) #TODO to debug
 									var.current_player.hand.draw(window)
-									layers.progress_bar.draw(window)
 									var.current_background_no_text = window.copy()
+
+									progress_bar.draw()
 									ui_text.drawText()
 									
 									ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
@@ -2756,11 +2757,12 @@ while game_is_running:
 						layers.hand_holder.draw(window)
 						layers.buttons.draw(window)
 						var.background_no_letter = window.copy()
+
 						layers.letters_on_board.draw(window)
 						layers.letters_just_played.draw(window)
 						var.current_player.hand.draw(window)
-						layers.progress_bar.draw(window)
 						var.current_background_no_text = window.copy()
+						progress_bar.draw()
 						ui_text.drawText()
 						var.current_background = window.copy()
 
