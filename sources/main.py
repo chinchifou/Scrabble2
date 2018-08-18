@@ -466,20 +466,20 @@ class UITextPrinter():
 		limit_left = tiles1( pop_up_window.rect.left )
 		limit_top = tiles1( pop_up_window.rect.top )
 
-		if step == 0 :
+		if step == 1 :
 			all_texts = [
 			UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
 			UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
 			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
 			]
-		elif step == 1 :
+		elif step == 2 :
 			all_texts = [
 			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
 			UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
 			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4.5) ),
 			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+6) )
 			]
-		elif step == 3 :
+		elif step == 4 :
 			all_texts = [
 			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
 			UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
@@ -491,7 +491,7 @@ class UITextPrinter():
 			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.25) ),
 			UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.75) )
 			]
-		elif step == 4 :
+		elif step == 5 :
 			all_texts = [
 			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
@@ -499,7 +499,7 @@ class UITextPrinter():
 			UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
 			UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) )
 			]
-		elif step == 6 :
+		elif step == 7 :
 			all_texts = [
 			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
@@ -511,7 +511,7 @@ class UITextPrinter():
 			UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.75) ),
 			UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.25) )
 			]
-		elif step == 7 :
+		elif step == 8 :
 			all_texts = [
 			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
@@ -522,13 +522,13 @@ class UITextPrinter():
 			UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
 			UIText( "Me proposer des mots", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11) )
 			]
-		elif step == 9 :			
+		elif step == 10 :			
 			all_texts = [
 			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
 			UIText( "Merci de m'avoir aidé à améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
 			UIText( "Il est bien mieux ainsi, n'est-ce pas ?", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
 			]
-		elif step == 10 :
+		elif step == 11 :
 			all_texts = [
 			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
 			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.5) ),
@@ -1668,9 +1668,15 @@ while game_is_running:
 			if var.current_action == "POP_UP_DISPLAYED":
 				layers.dark_filter.draw(window)
 				layers.pop_up_window.draw(window)
+				layers.background_pop_up_empty = window.copy()
 				layers.buttons_pop_up_window.draw(window)
 				progress_bar.draw()
-				ui_text.drawTextPopUp(STEP)					
+				ui_text.drawTextPopUp(STEP)	
+			else :
+				layers.dark_filter.draw(window)
+				layers.pop_up_window.draw(window)
+				layers.background_pop_up_empty = window.copy()
+				window.blit(var.current_background, (0,0))
 
 			pygame.display.update()
 			
@@ -1712,6 +1718,8 @@ while game_is_running:
 
 							if STEP == 1 :
 
+								STEP = STEP + 1
+
 								window.blit(var.current_background, (0,0))
 
 								layers.dark_filter.draw(window)
@@ -1719,16 +1727,14 @@ while game_is_running:
 								layers.buttons_pop_up_window.draw(window)
 
 								progress_bar.draw()
-
 								ui_text.drawTextPopUp(STEP)
 
 								pygame.display.update()
 
-								STEP = STEP + 1
-
 
 							elif STEP == 4 :
 
+								STEP = STEP + 1
 
 								if checkbox_function_shuffle.is_filled :
 									enable_shuffle_letter = True
@@ -1766,10 +1772,10 @@ while game_is_running:
 								ui_text.drawTextPopUp(STEP)
 								#TODO based on selected checkboxes
 
-								STEP = STEP + 1
-
 
 							elif STEP == 7 :
+
+								STEP = STEP + 1
 
 								# Keep track of choice
 								tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
@@ -1825,15 +1831,12 @@ while game_is_running:
 								progress_bar.draw()
 
 								ui_text.drawTextPopUp(STEP)
-
-								STEP = STEP + 1
-
+								
 
 							elif STEP == 8 :
 
 								STEP = STEP + 1
-								var.current_action = "SELECT_A_LETTER"
-
+								
 								if checkbox_find_word.is_filled :
 									enable_shuffle_letter = True
 									layers.buttons.add(button_shuffle)
@@ -1875,8 +1878,11 @@ while game_is_running:
 								layers.selected_letter.draw(window)
 
 								pygame.display.update()
+								var.current_action = "SELECT_A_LETTER"
 
 							elif STEP == 10 :
+
+								STEP = STEP + 1
 
 								window.blit(var.background_pop_up_empty, (0,0))
 
@@ -1884,11 +1890,10 @@ while game_is_running:
 								progress_bar.draw()
 								ui_text.drawTextPopUp(STEP)
 
-								STEP = STEP + 1
-
 
 							elif STEP == 11 :
 
+								STEP = 0
 								progress_bar.fill()
 
 								# Reset conf
@@ -1956,14 +1961,13 @@ while game_is_running:
 								var.current_background = window.copy()
 
 								pygame.display.update()
-
-								var.current_action = "SELECT_A_LETTER"							
-
-								STEP = 0
+								var.current_action = "SELECT_A_LETTER"															
 
 
 							#STEP 2 / STEP 5
 							elif STEP == 2 or STEP == 5 :
+
+								STEP = STEP + 1
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
@@ -1981,8 +1985,6 @@ while game_is_running:
 								var.current_background = window.copy()
 
 								pygame.display.update()
-
-								STEP = STEP + 1
 								var.current_action = "SELECT_A_LETTER"
 								break
 
@@ -2285,6 +2287,8 @@ while game_is_running:
 
 								if STEP == 0 :
 
+									STEP = STEP + 1
+
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
@@ -2323,9 +2327,6 @@ while game_is_running:
 									ui_text.drawTextPopUp(STEP)
 
 									pygame.display.update()
-
-									STEP = STEP + 1
-
 									var.current_action = "POP_UP_DISPLAYED"
 
 
@@ -2382,6 +2383,8 @@ while game_is_running:
 
 								if STEP == 3 :
 
+									STEP = STEP + 1
+
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
@@ -2429,12 +2432,12 @@ while game_is_running:
 									progress_bar.fill()
 									progress_bar.draw()
 
-									ui_text.drawTextPopUp(STEP)
-
-									STEP = STEP + 1
+									ui_text.drawTextPopUp(STEP)							
 
 
 								elif STEP == 6 :
+
+									STEP = STEP + 1
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2487,11 +2490,12 @@ while game_is_running:
 									progress_bar.draw()
 
 									ui_text.drawTextPopUp(STEP)
-
-									STEP = STEP + 1
+									
 
 								#LAST STEP
 								elif STEP == 9 :
+
+									STEP = STEP + 1
 
 									for letter in var.current_player.hand :
 										letter.kill()
@@ -2515,9 +2519,6 @@ while game_is_running:
 									progress_bar.draw()
 
 									ui_text.drawTextPopUp(STEP)
-
-									STEP = STEP + 1
-
 								
 								pygame.display.update()
 								var.current_action = "POP_UP_DISPLAYED"
