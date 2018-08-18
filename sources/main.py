@@ -64,9 +64,9 @@ UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
 # UI Sprites wich need to load image with transparency
-UI_TRANSPARENT_COMPONENTS = ["letter", "button","ui_image"]
+UI_TRANSPARENT_COMPONENTS = ["letter", "ui_image"]
 # UI Sprites wich need to load an image without transparency 
-UI_COMPONENTS = ["board", "hand_holder", "tile"]
+UI_COMPONENTS = ["board", "hand_holder", "tile", "button", "checkbox"]
 
 global PLAYERS, STEP
 #all players
@@ -127,7 +127,7 @@ class GameVariable():
 
 var = GameVariable()
 
-#class used to print error in console and log file
+#class used to print error messages in console and log file
 class ErrorPrinter():
 
 	def not_enough_letters(self):
@@ -139,6 +139,7 @@ class ErrorPrinter():
 		logging.error('  2. reduce number of letters authorized per player')
 		logging.error('  3. reduce the number of players')
 		logging.error('! ! ! . . . . . . . . ! ! !')
+		logging.error('')
 
 		print('INITIAL SETTINGS ERROR : not enough letters at game start.')
 		print('Some player has less letters than the others.')
@@ -148,7 +149,45 @@ class ErrorPrinter():
 		print('  3. reduce the number of players')
 		print('')
 
+	def typeUndefined(self, object) :
+		logging.error('! ! ! . . . . . . . . ! ! !')
+		logging.error('TYPE UNDEFINED : Object "%s" does not have a type.', object.name)
+		logging.error('To fix this error :')
+		logging.error('  - give your component a "type" attribute in its class definition')
+		logging.error('! ! ! . . . . . . . . ! ! !')
+		logging.error('')
+
+		print('TYPE UNDEFINED : Object "%s" does not have a type.', object.name)
+		print('To fix this error :')
+		print('  - give your component a "type" attribute in its class definition')
+		print('')
+
+
+	def typeOfComponentNotRecognize(self, object):
+		logging.error('! ! ! . . . . . . . . ! ! !')
+		logging.error('COMPONENT NOT RECOGNIZE : unable to determine the transparency of the Sprite "%s" of type "%s".', object.name, object.type)
+		logging.error('All graphical components must be declared either as transparent component or opaque.')
+		logging.error('To do so :')
+		logging.error('  - give your component a "type" attribute in its class definition')
+		logging.error('  - add this "type attribute" in one of the global variable array UI_TRANSPARENT_COMPONENTS or UI_COMPONENTS')
+		logging.error('! ! ! . . . . . . . . ! ! !')
+		logging.error('')
+
+		print('COMPONENT NOT RECOGNIZE : unable to determine if the component is transparent or not.')
+		print('All graphical components must be declared either as transparent component or opaque.')
+		print('To do so :')
+		print('  - give your component a "type" attribute in its class definition')
+		print('  - add this "type attribute" in one of the global variable array UI_TRANSPARENT_COMPONENTS or UI_COMPONENTS')
+		print('')
+
 ERROR = ErrorPrinter()
+
+
+#class used to print warning messages in console and log file
+class WarningPrinter():
+	pass
+
+WARNING = WarningPrinter()
 	
 
 #class to store the different colors used in the game
@@ -275,7 +314,6 @@ class UserInterFacePopUp(UIText):
 class UITextPrinter():
 
 	def __init__(self, ui_content):
-
 
 		#UI text init
 		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2*UI_INTERLIGNE) )
@@ -549,6 +587,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 	nb_created_instances = 0
 	#received coordinates are expresed in tiles
 	def __init__(self, name, pos_x, pos_y):
+
+		if self.type == None :
+			ERROR.typeUndefined(self)
 		#super class constructor
 		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
 
@@ -564,9 +605,13 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#load image
 		if self.type in UI_TRANSPARENT_COMPONENTS :
 			self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
+
 		elif self.type in UI_COMPONENTS :
 			self.image = loadImage(path.join(self.path, self.name+'.png'))
-
+		elif self.type == "ui_surface" :
+			pass
+		else :
+			ERROR.typeOfComponentNotRecognize(self)
 
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
 			#auto detect width and height
@@ -585,6 +630,10 @@ class ResizableSprite(pygame.sprite.Sprite):
 			self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
 		elif self.type in UI_COMPONENTS :
 			self.image = loadImage(path.join(self.path, self.name+'.png'))
+		elif self.type == "ui_surface" :
+			pass
+		else :
+			ERROR.typeOfComponentNotRecognize(self)
 
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height) )
@@ -631,7 +680,6 @@ class Hand_holder(ResizableSprite):
 class UI_Surface(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y, surface):
 		self.type = 'ui_surface'
-
 		self.image = surface
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
@@ -777,6 +825,7 @@ class ProgressBar():
 Board.containers = layers.all, layers.background
 Hand_holder.containers = layers.all, layers.hand_holder
 Tile.containers = layers.all, layers.tiles
+
 Button.containers = layers.all
 Letter.containers = layers.all
 UI_Surface.containers = layers.all
@@ -815,7 +864,7 @@ class Player :
 
 #~~~~~~ FUNCTIONS ~~~~~~
 
-#----- Game window creation -----
+#----- Game window creation and resize -----
 def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_window_height, double_buffer, hardware_accelerated) :
 	
 	logging.info("WINDOW Creation")
@@ -836,6 +885,32 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	logging.info("")
 
 
+	if fullscreen :
+		if double_buffer :
+			if hardware_accelerated :
+				window = pygame.display.set_mode( (width, height), pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
+			else :
+				window = pygame.display.set_mode( (width, height), pygame.FULLSCREEN | pygame.DOUBLEBUF)
+		else:
+			window = pygame.display.set_mode( (width, height), pygame.FULLSCREEN)
+	else :
+		if resizable :
+			if double_buffer :
+				if hardware_accelerated :
+					window = pygame.display.set_mode( (width, height), pygame.RESIZABLE | pygame.DOUBLEBUF | pygame.HWSURFACE)
+				else :
+					window = pygame.display.set_mode( (width, height), pygame.RESIZABLE | pygame.DOUBLEBUF)
+			else:
+				window = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
+		else:
+			window = pygame.display.set_mode( (width, height))
+
+	pygame.event.clear(pygame.VIDEORESIZE) #remove the event pygame.VIDEORESIZE from the queue
+
+	return window
+
+#----- Resize window but do not resize Sprites -----
+def resizeWindowNoSpritesUpdate(width, height, fullscreen, resizable, resolution_auto, custom_window_height, double_buffer, hardware_accelerated) :
 	if fullscreen :
 		if double_buffer :
 			if hardware_accelerated :
@@ -1171,6 +1246,7 @@ def incrementPredictedScore():
 #----- Init logger -----
 
 path_log_file = path.join(path_log,'scrabble.log')
+# levels : NOTSET < DEBUG < INFO < WARNING < ERROR < CRITICAL
 logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
@@ -1566,7 +1642,7 @@ while game_is_running:
 			height = event.dict['size'][1]
 
 			#create a fullscreen image fully black to prevent later artefacts
-			window = resizeWindow(var.monitor_resolution.current_w, var.monitor_resolution.current_h, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
+			window = resizeWindowNoSpritesUpdate(var.monitor_resolution.current_w, var.monitor_resolution.current_h, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 			pygame.draw.rect(window, COLOR.BLACK, ( (0,0), (var.monitor_resolution.current_w, var.monitor_resolution.current_h) ) )
 			pygame.display.update()
 
