@@ -120,7 +120,7 @@ class GameVariable():
 
 		self.background_no_letter = []
 		self.current_background = []
-		self.current_background_pop_up = []
+		self.background_pop_up_empty = []
 		self.current_background_no_text = []
 
 		self.points_for_scrabble = 50
@@ -182,6 +182,8 @@ class LineHeights():
 	def __init__(self):
 		#size of the ui text used for title expressed in tile
 		self.TITLE = 0.9
+		#size of the ui text used for subtitle expressed in tile
+		self.SUBTITLE = 0.7
 		#size of the common ui text expressed in tile
 		self.NORMAL = 0.6		
 		#size for small pop up
@@ -427,14 +429,13 @@ class UITextPrinter():
 		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
-		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
-		UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4) ),
-		UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+6) )
+		UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
+		UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
+		UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
 		]
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
 
 
 	def drawTextPopUp2(self):
@@ -447,14 +448,13 @@ class UITextPrinter():
 		limit_bottom = tiles1( pop_up_window.rect.bottom )
 
 		all_texts = [
-		UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
-		UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+3) ),
-		UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) ),
-		UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+6) ) ]
+		UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
+		UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
+		UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4.5) ),
+		UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+6) ) ]
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-
 
 
 	def drawTextPopUp3(self):
@@ -465,15 +465,15 @@ class UITextPrinter():
 
 		#TODO - virer la deuxieme phrase (ou la mettre a la fin)
 		all_texts = [
-		UIText( "Bien ! Aidez moi maintenant à améliorer l'ergonomie ", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+2) ),
-		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
-		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.25) ),
-		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.75) ),
-		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8.25) ),
-		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+10) ),
-		UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.25) ),
-		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.75) )
+		UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
+		UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
+		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
+		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.25) ),
+		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.75) ),
+		UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+7.25) ),
+		UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
+		UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.25) ),
+		UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.75) )
 		]
 
 		for text_it in all_texts :
@@ -487,12 +487,11 @@ class UITextPrinter():
 		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
-		UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Voici une nouvelle version dans laquelle", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-		UIText( "j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
-		UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+6) ),
-		UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8) ),
-		UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+10) )
+		UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
+		UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
+		UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+3) ),
+		UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
+		UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) )
 		]
 
 		for text_it in all_texts :
@@ -506,7 +505,7 @@ class UITextPrinter():
 		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
-		UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1) ),
+		UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
 		UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
 		UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+3.25) ),
 		UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.75) ),
@@ -528,7 +527,7 @@ class UITextPrinter():
 		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
-		UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
+		UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 		UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
 		UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
 		UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
@@ -550,11 +549,29 @@ class UITextPrinter():
 		limit_top = tiles1( pop_up_window.rect.top )
 
 		all_texts = [
-		UIText( "Félicitations et merci de votre participation !", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1) ),
-		UIText( "Comme vous venez de le voir, l'ergonomie c'est :", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
-		UIText( "- Des méthodes pour cerner efficacement le besoin", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+4) ),
-		UIText( "- Recommencer et améliorer jusqu'à satisfaction du besoin utilisateur", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+5) ),
-		UIText( "Mais aussi bien plus que cela ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+7) )
+		UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
+		UIText( "Merci de m'avoir aidé à améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
+		UIText( "Il est bien mieux ainsi, n'est-ce pas ?", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
+		]
+
+		for text_it in all_texts :
+			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+
+
+	def drawTextPopUp8(self):
+
+		pop_up_window = layers.pop_up_window.sprites()[0]
+		limit_left = tiles1( pop_up_window.rect.left )
+		limit_top = tiles1( pop_up_window.rect.top )
+
+		all_texts = [
+		UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
+		UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.5) ),
+		UIText( "> Une science avec des méthodes pour améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
+		UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.5) ),
+		UIText( "En fait, l'ergonomie c'est l'avenir !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_left+7.5) ),
+		UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9.5) ),
+		UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+1, limit_top+11.5) ),
 		]
 
 		for text_it in all_texts :
@@ -1325,7 +1342,9 @@ if cfg_enable_windows_ten_upscaling == False :
 
 
 game_engine = pygame.init() #init() -> (numpass, numfail)
+"""
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
+"""
 game_is_running = True
 
 fps_clock = pygame.time.Clock()
@@ -1339,10 +1358,12 @@ logging.info("GAME STARTED")
 logging.info("-------------------")
 logging.info("")
 
+"""
 #----- Load Sounds -----
 SOUNDS = Sounds()
 logging.debug("SOUNDS loaded")
 logging.debug("")
+"""
 
 #----- Window init -----
 
@@ -1487,39 +1508,7 @@ if game_is_running :
 		y_pos += 1
 
 
-	# //////// Add letters to Board ///////////
-
-	"""
-	layers.letters_on_board.add( Letter('M',DELTA+2,DELTA+4) )
-	layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+5) )
-	layers.letters_on_board.add( Letter('T',DELTA+2,DELTA+6) )
-	layers.letters_on_board.add( Letter('H',DELTA+2,DELTA+7) )
-	layers.letters_on_board.add( Letter('O',DELTA+2,DELTA+8) )
-	layers.letters_on_board.add( Letter('D',DELTA+2,DELTA+9) )
-	layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+10) )
-	layers.letters_on_board.add( Letter('S',DELTA+2,DELTA+11) )
-
-	layers.letters_on_board.add( Letter('U',DELTA+1,DELTA+6) )
-	layers.letters_on_board.add( Letter('I',DELTA+3,DELTA+6) )
-	layers.letters_on_board.add( Letter('L',DELTA+4,DELTA+6) )
-	layers.letters_on_board.add( Letter('I',DELTA+5,DELTA+6) )
-	layers.letters_on_board.add( Letter('S',DELTA+6,DELTA+6) )
-	layers.letters_on_board.add( Letter('A',DELTA+7,DELTA+6) )
-	layers.letters_on_board.add( Letter('T',DELTA+8,DELTA+6) )
-	layers.letters_on_board.add( Letter('E',DELTA+9,DELTA+6) )
-	layers.letters_on_board.add( Letter('U',DELTA+10,DELTA+6) )
-	layers.letters_on_board.add( Letter('R',DELTA+11,DELTA+6) )
-
-	layers.letters_on_board.add( Letter('R',DELTA+3,DELTA+10) )
-	layers.letters_on_board.add( Letter('G',DELTA+4,DELTA+10) )
-	layers.letters_on_board.add( Letter('O',DELTA+5,DELTA+10) )
-	layers.letters_on_board.add( Letter('N',DELTA+6,DELTA+10) )
-	layers.letters_on_board.add( Letter('O',DELTA+7,DELTA+10) )
-	layers.letters_on_board.add( Letter('M',DELTA+8,DELTA+10) )
-	layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
-	layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )	
-	"""
-
+	# //////// Add letters on Board ///////////
 	x, y = 2, 4
 	for letter in "METHODES" :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
@@ -1535,8 +1524,7 @@ if game_is_running :
 	for letter in "ERGONOMIE" :
 		if (x, y) != (2,10) :
 			layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-		x += 1	
-
+		x += 1
 
 	# ------- CREATES BUTTONS --------
 	button_ok = Button("ok", 32/2.0 - 1, 14.5 )
@@ -1551,17 +1539,17 @@ if game_is_running :
 
 
 	# ------- CHECKBOXES --------
-	checkbox_facile = Checkbox("checkbox", 3, 7 )
-	checkbox_moyen = Checkbox("checkbox", 3, 8.5 )
-	checkbox_difficile = Checkbox("checkbox", 3, 10 )
+	checkbox_facile = Checkbox("checkbox", 3, 6 )
+	checkbox_moyen = Checkbox("checkbox", 3, 7.5 )
+	checkbox_difficile = Checkbox("checkbox", 3, 9 )
 
 	checkbox_facile2 = Checkbox("checkbox", 3, 5 )
 	checkbox_moyen2 = Checkbox("checkbox", 3, 6.5 )
 	checkbox_difficile2 = Checkbox("checkbox", 3, 8 )
 
-	checkbox_function_shuffle = Checkbox("checkbox", 3, 13 )
-	checkbox_function_display_bonus = Checkbox("checkbox", 3, 14.5 )
-	checkbox_function_score = Checkbox("checkbox", 3, 16 )
+	checkbox_function_shuffle = Checkbox("checkbox", 3, 12 )
+	checkbox_function_display_bonus = Checkbox("checkbox", 3, 13.5 )
+	#checkbox_function_score = Checkbox("checkbox", 3, 16 )
 
 	checkbox_function_shuffle2 = Checkbox("checkbox", 3, 11 )
 	checkbox_function_display_bonus2 = Checkbox("checkbox", 3, 12.50 )
@@ -1589,7 +1577,9 @@ if game_is_running :
 
 	#create avatar
 	#ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
-	ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
+	#ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
+	#ui_avatar = UI_Image('ergonome', path_background, 24, 9, 5, 5) #Screen 32*18
+	ui_avatar = UI_Image('ergonome', path_background, 24, 6.5, 5, 5) #Screen 32*18
 	layers.pop_up_window.add(ui_avatar)
 
 	#create progress bar
@@ -1862,25 +1852,46 @@ while game_is_running:
 										button.empty()
 								layers.buttons_pop_up_window.empty()
 
+								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+								x, y = 2, 10
+								for letter in "ERGONOMIE" :
+									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+									var.current_board_state[y][x] = letter
+									x += 1
+
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
 								layers.buttons.draw(window)
 								var.background_no_letter = window.copy()
+
 								layers.letters_on_board.draw(window)
 								layers.letters_just_played.draw(window)
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
+
 								progress_bar.fill()
 								progress_bar.draw()
 								ui_text.drawText()
 								var.current_background = window.copy()
+
 								layers.selected_letter.draw(window)
 
 								pygame.display.update()
 
-
 							elif STEP == 10 :
+
+								window.blit(var.background_pop_up_empty, (0,0))
+
+								layers.buttons_pop_up_window.draw(window)
+								progress_bar.draw()
+								ui_text.drawTextPopUp8()
+
+								STEP = STEP + 1
+
+
+							elif STEP == 11 :
 
 								progress_bar.fill()
 
@@ -1902,34 +1913,22 @@ while game_is_running:
 								for letter in var.current_player.hand :
 									letter.kill()
 
-								layers.letters_on_board.add( Letter('M',DELTA+2,DELTA+4) )
-								layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+5) )
-								layers.letters_on_board.add( Letter('T',DELTA+2,DELTA+6) )
-								layers.letters_on_board.add( Letter('H',DELTA+2,DELTA+7) )
-								layers.letters_on_board.add( Letter('O',DELTA+2,DELTA+8) )
-								layers.letters_on_board.add( Letter('D',DELTA+2,DELTA+9) )
-								layers.letters_on_board.add( Letter('E',DELTA+2,DELTA+10) )
-								layers.letters_on_board.add( Letter('S',DELTA+2,DELTA+11) )
+								x, y = 2, 4
+								for letter in "METHODES" :
+									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+									y += 1
 
-								layers.letters_on_board.add( Letter('U',DELTA+1,DELTA+6) )
-								layers.letters_on_board.add( Letter('I',DELTA+3,DELTA+6) )
-								layers.letters_on_board.add( Letter('L',DELTA+4,DELTA+6) )
-								layers.letters_on_board.add( Letter('I',DELTA+5,DELTA+6) )
-								layers.letters_on_board.add( Letter('S',DELTA+6,DELTA+6) )
-								layers.letters_on_board.add( Letter('A',DELTA+7,DELTA+6) )
-								layers.letters_on_board.add( Letter('T',DELTA+8,DELTA+6) )
-								layers.letters_on_board.add( Letter('E',DELTA+9,DELTA+6) )
-								layers.letters_on_board.add( Letter('U',DELTA+10,DELTA+6) )
-								layers.letters_on_board.add( Letter('R',DELTA+11,DELTA+6) )
+								x, y = 1, 6
+								for letter in "UTILISATEUR" :
+									if (x, y) != (2,6) :
+										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+									x += 1
 
-								layers.letters_on_board.add( Letter('R',DELTA+3,DELTA+10) )
-								layers.letters_on_board.add( Letter('G',DELTA+4,DELTA+10) )
-								layers.letters_on_board.add( Letter('O',DELTA+5,DELTA+10) )
-								layers.letters_on_board.add( Letter('N',DELTA+6,DELTA+10) )
-								layers.letters_on_board.add( Letter('O',DELTA+7,DELTA+10) )
-								layers.letters_on_board.add( Letter('M',DELTA+8,DELTA+10) )
-								layers.letters_on_board.add( Letter('I',DELTA+9,DELTA+10) )
-								layers.letters_on_board.add( Letter('E',DELTA+10,DELTA+10) )
+								x, y = 2, 10
+								for letter in "ERGONOMIE" :
+									if (x, y) != (2,10) :
+										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+									x += 1
 
 								layers.buttons.empty()
 								layers.buttons_pop_up_window.empty()
@@ -1996,8 +1995,8 @@ while game_is_running:
 
 								#TO DEBUG
 								# Check if resolution changed during pop_up
-								same_width = var.current_background.get_width() == var.current_background_pop_up.get_width()
-								same_height = var.current_background.get_height() == var.current_background_pop_up.get_height()
+								same_width = var.current_background.get_width() == var.background_pop_up_empty.get_width()
+								same_height = var.current_background.get_height() == var.background_pop_up_empty.get_height()
 								#Same resolution
 								if same_width and same_height :
 									window.blit(var.current_background, (0,0))
@@ -2041,9 +2040,8 @@ while game_is_running:
 								need_refresh_buttons_on_screen = True
 
 				if need_refresh_buttons_on_screen :
-					layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
+					layers.buttons_pop_up_window.clear(window, var.background_pop_up_empty)
 					layers.buttons_pop_up_window.draw(window)
-					var.current_background_pop_up = window.copy() 
 					pygame.display.update()
 
 
@@ -2066,7 +2064,7 @@ while game_is_running:
 							buttons_changed = True
 
 					if buttons_changed :
-						layers.buttons_pop_up_window.clear(window, var.current_background_pop_up)
+						layers.buttons_pop_up_window.clear(window, var.background_pop_up_empty)
 						layers.buttons_pop_up_window.draw(window)
 
 						pygame.display.update()
@@ -2326,10 +2324,12 @@ while game_is_running:
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
+
+									var.background_pop_up_empty = window.copy()									
+
 									progress_bar.fill()
 									progress_bar.draw()
 									ui_text.drawTextPopUp1()
-									var.current_background_pop_up = window.copy()
 
 									pygame.display.update()
 
@@ -2384,7 +2384,7 @@ while game_is_running:
 
 								#TEMPO to see score
 								#TODO activate in final version
-								pygame.time.wait(1500)
+								#pygame.time.wait(1500)
 
 
 								if STEP == 3 :
@@ -2503,23 +2503,12 @@ while game_is_running:
 									for letter in var.current_player.hand :
 										letter.kill()
 
-									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1
-
-									hand_state = []
-									for tmp_letter in tmp_second_hand :
-
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										var.current_player.hand.add(letter)
-										hand_state.append(letter.id)
-										pos_x = pos_x+1
-
-									PLAYERS[0].hand_state = hand_state
 
 									window.blit(var.background_no_letter, (0,0))
 									
 									var.current_player.hand.draw(window)
 									var.current_background_no_text = window.copy()
+
 									ui_text.drawText(COLOR.GREY_LIGHT)
 									var.current_background = window.copy()
 
@@ -2528,27 +2517,17 @@ while game_is_running:
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
+
 									progress_bar.fill()
 									progress_bar.draw()
+
 									ui_text.drawTextPopUp7()
 
 									STEP = STEP + 1
 
-
-								#update display
-
-								#layers.letters_just_played.clear(window, var.background_no_letter)
-								#layers.letters_on_board.draw(window)
-
-								#layers.buttons_pop_up_window.draw(window)
-								#ui_text.drawTextPopUp()
-
-								var.current_background_pop_up = window.copy()
-
+								
 								pygame.display.update()
-
 								var.current_action = "POP_UP_DISPLAYED"
-
 								break 
 
 
@@ -2660,6 +2639,7 @@ while game_is_running:
 											var.current_background_no_text = window.copy()
 											progress_bar.draw()
 											ui_text.drawText()
+
 											var.current_background = window.copy()
 
 											pygame.display.update()
@@ -2749,8 +2729,6 @@ while game_is_running:
 				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 
 				layers.selected_letter.clear(window, var.current_background)
-				#var.current_background = window.copy()
-
 				layers.selected_letter.draw(window)
 
 				pygame.display.update()
