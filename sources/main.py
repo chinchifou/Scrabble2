@@ -2089,16 +2089,17 @@ while game_is_running:
 									var.delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
 									layers.selected_letter.add(letter_from_hand)
 									
+									#remove letter from hand
 									var.current_player.hand.remove(letter_from_hand)
 									hand_state_index = var.current_player.hand_state.index(letter_from_hand.id)
-
 									var.current_player.hand_state[hand_state_index] = 0
+
+									#refresh screen
 									var.current_player.hand.clear(window, var.background_no_letter)
 									var.current_player.hand.draw(window)
 
-									var.current_background = window.copy()
+									var.current_background = window.copy()									
 									layers.selected_letter.draw(window)
-
 									pygame.display.update()
 
 									var.current_action = "PLAY_A_LETTER"
@@ -2119,12 +2120,12 @@ while game_is_running:
 									layers.letters_just_played.remove(letter_from_board)
 									layers.selected_letter.add(letter_from_board)
 
+									#refresh screen
 									layers.letters_just_played.clear(window, var.background_no_letter)
-
-									var.current_background = window.copy()
 									layers.letters_just_played.draw(window)
-									layers.selected_letter.draw(window)
 
+									var.current_background = window.copy()									
+									layers.selected_letter.draw(window)
 									pygame.display.update()
 
 									var.current_action = "PLAY_A_LETTER"
@@ -2139,6 +2140,7 @@ while game_is_running:
 									layers.buttons.clear(window, var.current_background)
 									layers.buttons.draw(window) 
 							pygame.display.update()
+
 
 
 						#------ PLAY A LETTER -------
@@ -2164,12 +2166,13 @@ while game_is_running:
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
+											#change letter from layers
 											var.current_player.hand.add(selected_letter)
 											layers.selected_letter.remove(selected_letter)
 
+											#refresh screen
 											layers.selected_letter.clear(window, var.current_background)
 											var.current_player.hand.draw(window)
-
 
 											#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
 
@@ -2179,20 +2182,26 @@ while game_is_running:
 											#TODO SIMPLIFY (separate stuff)
 											#TODO CREATE A FUNCTION
 											#remove previously displayed text
+											"""
 											layers.background.draw(window)
 											layers.tiles.draw(window)
 											layers.hand_holder.draw(window)
 											layers.buttons.draw(window)
 											var.background_no_letter = window.copy()
+
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
-											var.current_player.hand.draw(window)
 											
+											var.current_player.hand.draw(window)
+										
 											var.current_background_no_text = window.copy()
+
 											progress_bar.draw()
 											ui_text.drawText()
-											var.current_background = window.copy()
+											"""
 
+											#TODO REFRESH TEXT
+											var.current_background = window.copy()
 
 											pygame.display.update()
 
@@ -2225,21 +2234,27 @@ while game_is_running:
 											#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
 
 											if display_new_score_in_real_time :
-												incrementPredictedScore()									
+												incrementPredictedScore()
 
+
+											"""
 											#remove previously displayed text
 											layers.background.draw(window)
 											layers.tiles.draw(window)
 											layers.hand_holder.draw(window)
 											layers.buttons.draw(window)
 											var.background_no_letter = window.copy()
+
 											layers.letters_on_board.draw(window)
 											layers.letters_just_played.draw(window)
 											var.current_player.hand.draw(window)
-											
 											var.current_background_no_text = window.copy()
+
 											progress_bar.draw()
 											ui_text.drawText()
+											"""
+
+											#TODO REFRESH TEXT
 											var.current_background = window.copy()
 
 											pygame.display.update()
@@ -2565,8 +2580,9 @@ while game_is_running:
 						#------ PLAY A SELECTED LETTER-------
 						if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
 
+							#TODO to improve based on "is a mouse" or "is tactical"
 							#not a simple fast clic
-							if ( timer > 250 )  : 
+							if ( timer > 200 )  : 
 
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
@@ -2694,7 +2710,6 @@ while game_is_running:
 				if buttons_changed :
 					layers.buttons.clear(window, var.current_background)
 					layers.buttons.draw(window)
-
 					pygame.display.update()
 
 
@@ -2704,12 +2719,14 @@ while game_is_running:
 
 				layers.selected_letter.clear(window, var.current_background)
 				#var.current_background = window.copy()
+
 				layers.selected_letter.draw(window)
 
 				pygame.display.update()
 
+
 			#------ INFO ABOUT HOVERED TILE ------
-			#TODO if diaplay help is defined in configuration
+			#TODO improve logic for better performance
 			if display_type_of_tile_on_hoovering :
 				if var.current_action == 'SELECT_A_LETTER' or var.current_action == 'PLAY_A_LETTER':
 					cursor_on_a_special_tile = False
@@ -2719,6 +2736,7 @@ while game_is_running:
 						if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
 							if  ( tile.name != 'normal' ) :
 								cursor_on_a_special_tile = True
+
 								#pop up not already displayed for this tile
 								if tile.id != ui_text.id_tile_pop_up :
 
@@ -2748,7 +2766,6 @@ while game_is_running:
 									ui_text.pop_up_displayed = True
 									break
 
-
 					#If cursor on a normal tile
 					if ( not cursor_on_a_special_tile and ui_text.pop_up_displayed ):
 						#remove previously displayed text
@@ -2762,6 +2779,7 @@ while game_is_running:
 						layers.letters_just_played.draw(window)
 						var.current_player.hand.draw(window)
 						var.current_background_no_text = window.copy()
+
 						progress_bar.draw()
 						ui_text.drawText()
 						var.current_background = window.copy()
