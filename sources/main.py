@@ -560,6 +560,9 @@ class UITextPrinter():
 def tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(var.tile_size) ), round( value_in_pixels2/float(var.tile_size) ) )
 
+def in_reference_tiles(value_in_pixels1, value_in_pixels2) :
+	return ( round( value_in_pixels1/float(REFERENCE_TILE_SIZE) ), round( value_in_pixels2/float(REFERENCE_TILE_SIZE) ) )
+
 def tiles1(value_in_pixels) :
 	return ( round( value_in_pixels/float(var.tile_size) ) )
 
@@ -590,6 +593,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 		if self.type == None :
 			ERROR.typeUndefined(self)
+
 		#super class constructor
 		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
 
@@ -614,12 +618,13 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
 			#auto detect width and height
-			self.width, self.height = tiles (self.image.get_width(), self.image.get_height())
+			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
 
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height ) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
+
 
 	def resize(self):
 
@@ -766,10 +771,9 @@ class Letter(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 		self.type = 'letter'
 		self.path = path_letters
+		self.points = POINTS_FOR[name]
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)		
-
-		self.points = POINTS_FOR[name]
 
 	#move a letter at a given position expressed in tiles
 	def moveAtTile(self, pos_x, pos_y) :
@@ -1718,12 +1722,9 @@ while game_is_running:
 
 								STEP = STEP + 1
 
-								window.blit(var.current_background, (0,0))
+								window.blit(var.background_pop_up_empty, (0,0))
 
-								layers.dark_filter.draw(window)
-								layers.pop_up_window.draw(window)
 								layers.buttons_pop_up_window.draw(window)
-
 								progress_bar.draw()
 								ui_text.drawTextPopUp(STEP)
 
@@ -1834,7 +1835,8 @@ while game_is_running:
 							elif STEP == 8 :
 
 								STEP = STEP + 1
-								
+
+								# settings
 								if checkbox_find_word.is_filled :
 									enable_shuffle_letter = True
 									layers.buttons.add(button_shuffle)
@@ -1847,8 +1849,10 @@ while game_is_running:
 								for button in layers.buttons_pop_up_window :
 									if button.type == "checkbox":
 										button.empty()
+
 								layers.buttons_pop_up_window.empty()
 
+								# letters
 								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
 								x, y = 2, 10
@@ -1857,6 +1861,20 @@ while game_is_running:
 									var.current_board_state[y][x] = letter
 									x += 1
 
+								pos_x = (UI_LEFT_LIMIT)
+								pos_y = ui_text.current_player_turn.pos_y_tiles+1
+								hand_state = []
+								
+								for tmp_letter in tmp_third_hand :
+
+									letter = Letter(tmp_letter, pos_x, pos_y)
+									var.current_player.hand.add(letter)
+									hand_state.append(letter.id)
+									pos_x = pos_x+1
+
+								PLAYERS[0].hand_state = hand_state
+
+								# display
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
@@ -1965,19 +1983,51 @@ while game_is_running:
 							#STEP 2 / STEP 5
 							elif STEP == 2 or STEP == 5 :
 
+
+								if STEP == 2 :
+									# letters on board
+									x, y = 1, 6
+									for letter in "UTILISATEUR" :
+										layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
+										var.current_board_state[y][x] = letter
+										x += 1
+								elif STEP == 5 :
+									# letters on board
+									x, y = 2, 4
+									for letter in "METHODES" :
+										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+										var.current_board_state[y][x] = letter
+										y += 1
+
+									# letters in hand
+									pos_x = (UI_LEFT_LIMIT)
+									pos_y = ui_text.current_player_turn.pos_y_tiles+1
+									hand_state = []
+									
+									for tmp_letter in tmp_second_hand :
+
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										var.current_player.hand.add(letter)
+										hand_state.append(letter.id)
+										pos_x = pos_x+1
+
+									PLAYERS[0].hand_state = hand_state
+
+
 								STEP = STEP + 1
+								progress_bar.fill()	
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
 								layers.buttons.draw(window)
+
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
 
-								progress_bar.fill()
 								progress_bar.draw()
 								ui_text.drawText()
 								var.current_background = window.copy()
@@ -2247,12 +2297,6 @@ while game_is_running:
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
-									x, y = 1, 6
-									for letter in "UTILISATEUR" :
-										layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
-										var.current_board_state[y][x] = letter
-										x += 1
-
 									layers.buttons_pop_up_window.add(button_ok)
 									layers.buttons.empty()
 									layers.buttons.add(button_end_turn)	
@@ -2343,27 +2387,8 @@ while game_is_running:
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
-									x, y = 2, 4
-									for letter in "METHODES" :
-										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-										var.current_board_state[y][x] = letter
-										y += 1
-
 									for letter in var.current_player.hand :
 										letter.kill()
-
-									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1
-
-									hand_state = []
-									for tmp_letter in tmp_second_hand :
-
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										var.current_player.hand.add(letter)
-										hand_state.append(letter.id)
-										pos_x = pos_x+1
-
-									PLAYERS[0].hand_state = hand_state
 
 									window.blit(var.background_no_letter, (0,0))
 									
@@ -2399,20 +2424,6 @@ while game_is_running:
 
 									for letter in var.current_player.hand :
 										letter.kill()
-
-									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1
-
-									hand_state = []
-									for tmp_letter in tmp_third_hand :
-
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										var.current_player.hand.add(letter)
-										hand_state.append(letter.id)
-										pos_x = pos_x+1
-
-									PLAYERS[0].hand_state = hand_state
-
 
 									window.blit(var.background_no_letter, (0,0))
 									var.current_player.hand.draw(window)
@@ -2451,28 +2462,17 @@ while game_is_running:
 								elif STEP == 9 :
 
 									STEP = STEP + 1
+									progress_bar.fill()
 
+									#reset
 									for letter in var.current_player.hand :
 										letter.kill()
 
-
-									window.blit(var.background_no_letter, (0,0))
-									
-									var.current_player.hand.draw(window)
-									var.current_background_no_text = window.copy()
-
-									ui_text.drawText(COLOR.GREY_LIGHT)
-									var.current_background = window.copy()
-
 									layers.buttons_pop_up_window.add(button_ok)
 
-									layers.dark_filter.draw(window)
-									layers.pop_up_window.draw(window)
+									window.blit(var.background_pop_up_empty, (0,0))
 									layers.buttons_pop_up_window.draw(window)
-
-									progress_bar.fill()
 									progress_bar.draw()
-
 									ui_text.drawTextPopUp(STEP)
 								
 								pygame.display.update()
