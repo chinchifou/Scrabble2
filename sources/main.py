@@ -262,7 +262,7 @@ class UIText():
 	all = []
 	def __init__(self, text, line_heigh, bold, pos_in_tiles):
 		self.text = text
-		self.line_heigh = line_heigh #TODO change to line height
+		self.line_heigh = line_heigh
 		self.bold = int(bold)	
 
 		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
@@ -605,7 +605,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#load image
 		if self.type in UI_TRANSPARENT_COMPONENTS :
 			self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
-
 		elif self.type in UI_COMPONENTS :
 			self.image = loadImage(path.join(self.path, self.name+'.png'))
 		elif self.type == "ui_surface" :
@@ -619,7 +618,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height ) )
-
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
@@ -639,9 +637,10 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
-
+		"""
 		if self.type == "board":
 			ui_text.drawText()
+		"""
 
 	def info(self) :
 		logging.debug("Sprite info :")
@@ -666,7 +665,6 @@ class Board(ResizableSprite):
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
-
 #----- Hand holder -----
 class Hand_holder(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
@@ -684,7 +682,6 @@ class UI_Surface(ResizableSprite):
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
-
 #----- UI Image -----
 class UI_Image(ResizableSprite):
 	def __init__(self, name, path, pos_x, pos_y, width, height):
@@ -697,7 +694,6 @@ class UI_Image(ResizableSprite):
 		self.width, self.height = width, height
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
-
 
 #----- Board -----
 class Board(ResizableSprite):
@@ -1351,7 +1347,7 @@ sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, 
 game_is_running = True
 
 fps_clock = pygame.time.Clock()
-clic_clock = pygame.time.Clock() #TODO to use
+clic_clock = pygame.time.Clock()
 logging.debug("INITIALIZATION")
 logging.debug("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
 logging.debug("Pygame started")
@@ -1664,6 +1660,8 @@ while game_is_running:
 			var.current_background = window.copy()
 
 			layers.selected_letter.draw(window)
+
+			#TODO : specific for STEP == 0
 
 			if var.current_action == "POP_UP_DISPLAYED":
 				layers.dark_filter.draw(window)
@@ -2177,31 +2175,8 @@ while game_is_running:
 											layers.selected_letter.clear(window, var.current_background)
 											var.current_player.hand.draw(window)
 
-											#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
-
 											if display_new_score_in_real_time :
-												incrementPredictedScore()									
-
-											#TODO SIMPLIFY (separate stuff)
-											#TODO CREATE A FUNCTION
-											#remove previously displayed text
-											"""
-											layers.background.draw(window)
-											layers.tiles.draw(window)
-											layers.hand_holder.draw(window)
-											layers.buttons.draw(window)
-											var.background_no_letter = window.copy()
-
-											layers.letters_on_board.draw(window)
-											layers.letters_just_played.draw(window)
-											
-											var.current_player.hand.draw(window)
-										
-											var.current_background_no_text = window.copy()
-
-											progress_bar.draw()
-											ui_text.drawText()
-											"""
+												incrementPredictedScore()
 
 											#TODO REFRESH TEXT
 											var.current_background = window.copy()
@@ -2234,28 +2209,8 @@ while game_is_running:
 											layers.letters_just_played.draw(window)
 
 
-											#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
-
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
-
-
-											"""
-											#remove previously displayed text
-											layers.background.draw(window)
-											layers.tiles.draw(window)
-											layers.hand_holder.draw(window)
-											layers.buttons.draw(window)
-											var.background_no_letter = window.copy()
-
-											layers.letters_on_board.draw(window)
-											layers.letters_just_played.draw(window)
-											var.current_player.hand.draw(window)
-											var.current_background_no_text = window.copy()
-
-											progress_bar.draw()
-											ui_text.drawText()
-											"""
 
 											#TODO REFRESH TEXT
 											var.current_background = window.copy()
@@ -2611,9 +2566,6 @@ while game_is_running:
 											layers.selected_letter.clear(window, var.current_background)
 											var.current_player.hand.draw(window)
 
-
-											#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
-
 											if display_new_score_in_real_time :
 												incrementPredictedScore()									
 
@@ -2662,9 +2614,6 @@ while game_is_running:
 
 											layers.selected_letter.clear(window, var.current_background)	
 											layers.letters_just_played.draw(window)
-
-
-											#print( calculatePoints(layers.letters_just_played) ) #TODO POINTS
 
 											if display_new_score_in_real_time :
 												incrementPredictedScore()									
