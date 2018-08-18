@@ -2580,7 +2580,7 @@ while game_is_running:
 						#------ PLAY A SELECTED LETTER-------
 						if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
 
-							#TODO to improve based on "is a mouse" or "is tactical"
+							#TODO to improve based on "is a mouse" or "is a touchescreen"
 							#not a simple fast clic
 							if ( timer > 200 )  : 
 
@@ -2749,17 +2749,15 @@ while game_is_running:
 
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
-									layers.selected_letter.draw(window) #TODO to debug
 									var.current_player.hand.draw(window)
 									var.current_background_no_text = window.copy()
 
 									progress_bar.draw()
 									ui_text.drawText()
-									
 									ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
 
 									var.current_background = window.copy()
-
+									layers.selected_letter.draw(window)
 									pygame.display.update()
 
 									ui_text.id_tile_pop_up = tile.id
@@ -2782,8 +2780,9 @@ while game_is_running:
 
 						progress_bar.draw()
 						ui_text.drawText()
-						var.current_background = window.copy()
 
+						var.current_background = window.copy()
+						layers.selected_letter.draw(window)
 						pygame.display.update()
 
 						ui_text.id_tile_pop_up = 0
