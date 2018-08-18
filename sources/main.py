@@ -1139,9 +1139,9 @@ def calculatePoints(layer_letters_played) :
 				end_x = end_x + 1
 
 			#TODO not close to older letters
-			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
+			if (start_x == min_x and end_x == max_x and len( layers.letters_on_board.sprites() ) > 0):
 				logging.debug("not played close to another word")
-				if (delta_y+1 != len(letters_played) ) :
+				if (delta_x+1 != len(letters_played) ) :
 					logging.debug("there is a hole in the word")
 				pass
 
