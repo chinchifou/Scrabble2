@@ -1010,7 +1010,7 @@ def calculatePoints(layer_letters_played) :
 				logging.debug("not played close to another word")
 				if (delta_y+1 != len(letters_played) ) :
 					logging.debug("there is a hole in the word")
-				pass
+					return []
 
 			#TODO : do not allow one letter in first turn
 			# prevent one letter word
@@ -1117,7 +1117,7 @@ def calculatePoints(layer_letters_played) :
 				logging.debug("not played close to another word")
 				if (delta_x+1 != len(letters_played) ) :
 					logging.debug("there is a hole in the word")
-				pass
+					return []
 
 			#TODO : do not allow one letter in first turn
 			#prevent one letter word
@@ -1213,6 +1213,7 @@ def incrementPredictedScore():
 	var.predicted_score = 0
 	for h_word_point in calculatePoints(layers.letters_just_played) :
 		var.predicted_score = var.predicted_score + h_word_point[1]
+
 
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
