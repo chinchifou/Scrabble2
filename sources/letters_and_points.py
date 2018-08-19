@@ -143,31 +143,15 @@ points_french = {
 }
 
 
-#~~~~~~ BONUSES ON THE BOARD LAYOUT ~~~~~~
+#~~~~~~ BOARD LAYOUT ~~~~~~
 
-#----- encoding -----
+#LAYOUT FOR THE BONUSES ON THE BOARD
 # 0 : start
 # 1 : normal tile
 # 2 : double letter
 # 3 : triple letter
 # 4 : double word
 # 5 : triple word
-
-# format : { bonus_value -> (letter_multiplier, word_multiplier) }
-MULTIPLIERS = {
-0 : (1, 2),
-1 : (1, 1),
-2 : (2, 1),
-3 : (3, 1),
-4 : (1, 2),
-5 : (1, 3)
-}
-
-#Override this bonuses' settings to customize the game to your will
-
-
-#~~~~~~ BOARD LAYOUT ~~~~~~
-
 BOARD_LAYOUT = [
 [5,1,1,2,1,1,1,5,1,1,1,2,1,1,5],
 [1,4,1,1,1,3,1,1,1,3,1,1,1,4,1],
@@ -186,7 +170,7 @@ BOARD_LAYOUT = [
 [5,1,1,2,1,1,1,5,1,1,1,2,1,1,5]
 ]
 
-#Override the board layout to customize the game to your will
+#Override the board layout to customize it to your will
 BOARD_LAYOUT = [
 [5,1,1,3,1,1,3,1,3,1,1,3,1,1,5],
 [1,1,3,1,1,4,1,1,1,4,1,1,3,1,1],
@@ -195,7 +179,7 @@ BOARD_LAYOUT = [
 [1,1,4,1,1,2,1,2,1,2,1,1,4,1,1],
 [1,4,1,1,2,1,1,1,1,1,2,1,1,4,1],
 [3,1,1,3,1,1,1,1,1,1,1,3,1,1,3],
-[1,1,2,1,2,1,1,1,1,1,2,1,2,1,1],
+[1,1,2,1,2,1,1,0,1,1,2,1,2,1,1],
 [3,1,1,3,1,1,1,1,1,1,1,3,1,1,3],
 [1,4,1,1,2,1,1,1,1,1,2,1,1,4,1],
 [1,1,4,1,1,2,1,2,1,2,1,1,4,1,1],

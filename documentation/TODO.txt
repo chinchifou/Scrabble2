@@ -1,36 +1,11 @@
 __________  PRIMARY  __________
 
-
-check TODO in code
-
-
 Special dev :
 
 add avatar
 
 
-Common dev :
-
-	#TODO SIMPLIFY (separate stuff)
-	#TODO CREATE A FUNCTION
-
-	layers.background.draw(window)
-	layers.tiles.draw(window)
-	layers.hand_holder.draw(window)
-	layers.buttons.draw(window)
-	var.background_no_letter = window.copy()
-
-	layers.letters_on_board.draw(window)
-	layers.letters_just_played.draw(window)
-	
-	var.current_player.hand.draw(window)
-
-	var.current_background_no_text = window.copy()
-
-	progress_bar.draw()
-	ui_text.drawText()
-
-	var.current_background = window.copy()
+check TODO in code
 
 
 Refactor calculatePoints()
