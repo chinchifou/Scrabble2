@@ -780,7 +780,7 @@ class ProgressBar():
 
 		layers.progress_bar.draw(window)
 
-		text = UIText( "Etape : "+str(self.state)+" / 7", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+		text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
 		window.blit( text.font.render(text.text, 1, COLOR.WHITE), (text.pos_x, text.pos_y) )
 
 	def fill(self):
@@ -1556,7 +1556,7 @@ if game_is_running :
 	layers.pop_up_window.add(ui_avatar)
 
 	#create progress bar
-	progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 8)
+	progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
 
 
 #----- first image -----
@@ -1641,7 +1641,6 @@ while game_is_running:
 
 			layers.selected_letter.draw(window)
 
-			#TODO : specific for STEP == 0
 
 			if var.current_action == "POP_UP_DISPLAYED":
 				layers.dark_filter.draw(window)
@@ -1704,6 +1703,7 @@ while game_is_running:
 							if STEP == 1 :
 
 								STEP = STEP + 1
+								progress_bar.fill()
 
 								window.blit(var.background_pop_up_empty, (0,0))
 
@@ -1717,6 +1717,7 @@ while game_is_running:
 							elif STEP == 4 :
 
 								STEP = STEP + 1
+								progress_bar.fill()
 
 								if checkbox_function_shuffle.is_filled :
 									enable_shuffle_letter = True
@@ -1758,6 +1759,7 @@ while game_is_running:
 							elif STEP == 7 :
 
 								STEP = STEP + 1
+								progress_bar.fill()
 
 								# Keep track of choice
 								tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
@@ -1818,6 +1820,7 @@ while game_is_running:
 							elif STEP == 8 :
 
 								STEP = STEP + 1
+								progress_bar.fill()
 
 								# settings
 								if checkbox_find_word.is_filled :
@@ -1869,7 +1872,6 @@ while game_is_running:
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
 
-								progress_bar.fill()
 								progress_bar.draw()
 								ui_text.drawText()
 								var.current_background = window.copy()
@@ -1882,6 +1884,7 @@ while game_is_running:
 							elif STEP == 10 :
 
 								STEP = STEP + 1
+								progress_bar.fill()
 
 								window.blit(var.background_pop_up_empty, (0,0))
 
@@ -2276,6 +2279,7 @@ while game_is_running:
 								if STEP == 0 :
 
 									STEP = STEP + 1
+									progress_bar.fill()
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2304,7 +2308,7 @@ while game_is_running:
 
 									var.background_pop_up_empty = window.copy()									
 
-									progress_bar.fill()
+									
 									progress_bar.draw()
 									ui_text.drawTextPopUp(STEP)
 
@@ -2366,6 +2370,7 @@ while game_is_running:
 								if STEP == 3 :
 
 									STEP = STEP + 1
+									progress_bar.fill()
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2392,7 +2397,7 @@ while game_is_running:
 									layers.pop_up_window.draw(window)
 									layers.buttons_pop_up_window.draw(window)
 									
-									progress_bar.fill()
+									
 									progress_bar.draw()
 
 									ui_text.drawTextPopUp(STEP)							
@@ -2401,6 +2406,7 @@ while game_is_running:
 								elif STEP == 6 :
 
 									STEP = STEP + 1
+									progress_bar.fill()
 
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2435,7 +2441,7 @@ while game_is_running:
 
 									layers.buttons_pop_up_window.draw(window)
 
-									progress_bar.fill()
+									
 									progress_bar.draw()
 
 									ui_text.drawTextPopUp(STEP)
