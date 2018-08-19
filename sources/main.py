@@ -225,8 +225,7 @@ class Layer():
 		self.letters_just_played = GroupOfSprites()
 		self.selected_letter = GroupOfSprites()
 
-		self.buttons = GroupOfSprites()
-		self.buttons_pop_up_window = GroupOfSprites()
+		self.buttons_on_screen = GroupOfSprites()
 
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
@@ -986,7 +985,7 @@ def calculatePoints(layer_letters_played) :
 
 		#___ ERROR CHECKING ___	
 		# played in diagonal ?
-		if (delta_x > 0 and delta_y > 0) :
+		if (delta_x != 0 and delta_y != 0) :
 			#TODO display error message
 			logging.debug("played in diagonal")
 			return []
@@ -1005,12 +1004,29 @@ def calculatePoints(layer_letters_played) :
 			while( ( (end_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
 				end_y = end_y + 1
 
-			#TODO not close to older letters
+
+			#away from older letters (above or below)
 			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
 				logging.debug("not played close to another word")
-				if (delta_y+1 != len(letters_played) ) :
-					logging.debug("there is a hole in the word")
+
+
+			if (delta_y+1 != len(letters_played) ) :
+				logging.debug("there is a hole between letters played")
+				#browse all letters
+				it_y = start_y
+				while( ( (it_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[it_y + 1][min_x] != '?') ) :
+					it_y = it_y + 1
+				if ( (it_y-start_y) != (end_y-start_y) ) :
+					logging.debug("there is a hole between letters played - even using old letters")
 					return []
+				"""
+				logging.debug("min_y : %i, max_y : %i, start_y : %i, end_y : %i", min_y, max_y, start_y, end_y)
+
+				if not ( (end_y - start_y == max_y - start_y) or (end_y - start_y == end_y - min_y) ):
+					logging.debug("there is a hole in the word - even using old letters")
+					return []
+				"""		
+
 
 			#TODO : do not allow one letter in first turn
 			# prevent one letter word
@@ -1112,11 +1128,22 @@ def calculatePoints(layer_letters_played) :
 			while( ( (end_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
 				end_x = end_x + 1
 
-			#TODO not close to older letters
+
+			#away from older letters (left or right)
 			if (start_x == min_x and end_x == max_x and len( layers.letters_on_board.sprites() ) > 0):
 				logging.debug("not played close to another word")
-				if (delta_x+1 != len(letters_played) ) :
-					logging.debug("there is a hole in the word")
+
+
+			if (delta_x+1 != len(letters_played) ) :
+				logging.debug("there is a hole between letters played")
+				#browse all letters
+				it_x = start_x
+				while( ( (it_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x + 1] != '?') ) :
+					it_x = it_x + 1
+
+				logging.debug("it_x : %i, start_x : %i, end_x : %i", it_x, start_x, end_x)
+				if ( (it_x-start_x) != (end_x-start_x) ) :
+					logging.debug("there is a hole between letters played - even using old letters")
 					return []
 
 			#TODO : do not allow one letter in first turn
@@ -1565,22 +1592,19 @@ if game_is_running :
 
 if game_is_running :
 
-	layers.buttons.add(button_play)
-	layers.buttons.add(progress_bar.button_reinit)
+	layers.buttons_on_screen.add(button_play)
+	#layers.buttons_on_screen.add(progress_bar.button_reinit)
 
 	layers.background.draw(window)
 	layers.tiles.draw(window)
 	var.background_no_buttons = window.copy()
 
-	layers.buttons.draw(window)
+	layers.buttons_on_screen.draw(window)
 	var.background_no_letter = window.copy()
 
 	layers.letters_on_board.draw(window)
 	var.current_background_no_text = window.copy()
 	var.current_background = window.copy()
-
-	for button in layers.buttons :
-		button.info()
 
 	pygame.display.update()
 
@@ -1629,7 +1653,7 @@ while game_is_running:
 			layers.hand_holder.draw(window)
 			var.background_no_buttons = window.copy()
 
-			layers.buttons.draw(window)
+			layers.buttons_on_screen.draw(window)
 			var.background_no_letter = window.copy()
 
 			layers.letters_on_board.draw(window)
@@ -1648,7 +1672,7 @@ while game_is_running:
 				layers.dark_filter.draw(window)
 				layers.pop_up_window.draw(window)
 				layers.background_pop_up_empty = window.copy()
-				layers.buttons_pop_up_window.draw(window)
+				layers.buttons_on_screen.draw(window)
 				progress_bar.draw()
 				ui_text.drawTextPopUp(STEP)	
 			else :
@@ -1661,7 +1685,7 @@ while game_is_running:
 			if STEP == 0 :
 				layers.background.draw(window)
 				layers.tiles.draw(window)
-				layers.buttons.draw(window)
+				layers.buttons_on_screen.draw(window)
 				layers.letters_on_board.draw(window)
 
 			pygame.display.update()
@@ -1687,7 +1711,7 @@ while game_is_running:
 						cursor_pos_x, cursor_pos_y = event.pos[0], event.pos[1]
 
 						#------ CLIC ON BUTTONS (VISUAL) -------
-						for button in layers.buttons_pop_up_window :
+						for button in layers.buttons_on_screen :
 							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 								#change button state
 								button.is_highlighted = False
@@ -1709,7 +1733,7 @@ while game_is_running:
 
 								window.blit(var.background_pop_up_empty, (0,0))
 
-								layers.buttons_pop_up_window.draw(window)
+								layers.buttons_on_screen.draw(window)
 								progress_bar.draw()
 								ui_text.drawTextPopUp(STEP)
 
@@ -1723,19 +1747,19 @@ while game_is_running:
 
 								if checkbox_function_shuffle.is_filled :
 									enable_shuffle_letter = True
-									layers.buttons.add(button_shuffle)
+									layers.buttons_on_screen.add(button_shuffle)
 								if checkbox_function_display_bonus.is_filled :
 									display_type_of_tile_on_hoovering = True
 
 								# Reset checkboxes
-								for button in layers.buttons_pop_up_window :
+								for button in layers.buttons_on_screen :
 									if button.is_a_checkbox :
 										button.empty()
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
-								layers.buttons.draw(window)
+								layers.buttons_on_screen.draw(window)
 								var.background_no_letter = window.copy()
 								layers.letters_on_board.draw(window)
 								layers.letters_just_played.draw(window)
@@ -1748,9 +1772,10 @@ while game_is_running:
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
 
-								layers.buttons_pop_up_window.empty()
-								layers.buttons_pop_up_window.add(button_ok)
-								layers.buttons_pop_up_window.draw(window)
+								layers.buttons_on_screen.empty()
+								layers.buttons_on_screen.add(button_ok)
+								layers.buttons_on_screen.add(progress_bar.button_reinit)
+								layers.buttons_on_screen.draw(window)
 
 								progress_bar.draw()
 
@@ -1774,16 +1799,16 @@ while game_is_running:
 									tmp_display_score = True
 
 								# Reset
-								for button in layers.buttons_pop_up_window :
+								for button in layers.buttons_on_screen :
 									if button.is_a_checkbox :
 										button.empty()
-								layers.buttons_pop_up_window.empty()
+								layers.buttons_on_screen.empty()
 
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
-								layers.buttons.draw(window)
+								layers.buttons_on_screen.draw(window)
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
@@ -1799,11 +1824,12 @@ while game_is_running:
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
 
-								layers.buttons_pop_up_window.add(button_ok)
-								layers.buttons_pop_up_window.add(checkbox_find_word)
-								layers.buttons_pop_up_window.add(checkbox_bonus_cases)
-								layers.buttons_pop_up_window.add(checkbox_calculate_score)
-								layers.buttons_pop_up_window.add(checkbox_suggest_word)
+								layers.buttons_on_screen.add(button_ok)
+								layers.buttons_on_screen.add(progress_bar.button_reinit)
+								layers.buttons_on_screen.add(checkbox_find_word)
+								layers.buttons_on_screen.add(checkbox_bonus_cases)
+								layers.buttons_on_screen.add(checkbox_calculate_score)
+								layers.buttons_on_screen.add(checkbox_suggest_word)
 
 								if tmp_enable_shuffle :
 									checkbox_find_word.fill()
@@ -1812,7 +1838,7 @@ while game_is_running:
 								if tmp_display_score :
 									checkbox_calculate_score.fill()
 
-								layers.buttons_pop_up_window.draw(window)
+								layers.buttons_on_screen.draw(window)
 								
 								progress_bar.draw()
 
@@ -1827,18 +1853,20 @@ while game_is_running:
 								# settings
 								if checkbox_find_word.is_filled :
 									enable_shuffle_letter = True
-									layers.buttons.add(button_shuffle)
+									layers.buttons_on_screen.add(button_shuffle)
 								if checkbox_bonus_cases.is_filled :
 									display_type_of_tile_on_hoovering = True
 								if checkbox_calculate_score.is_filled :
 									display_new_score_in_real_time = True
 
 								# Reset
-								for button in layers.buttons_pop_up_window :
+								for button in layers.buttons_on_screen :
 									if button.is_a_checkbox :
 										button.empty()
 
-								layers.buttons_pop_up_window.empty()
+								layers.buttons_on_screen.empty()
+								layers.buttons_on_screen.add(button_end_turn)
+								layers.buttons_on_screen.add(progress_bar.button_reinit)
 
 								# letters
 								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -1866,7 +1894,7 @@ while game_is_running:
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
-								layers.buttons.draw(window)
+								layers.buttons_on_screen.draw(window)
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
@@ -1890,7 +1918,7 @@ while game_is_running:
 
 								window.blit(var.background_pop_up_empty, (0,0))
 
-								layers.buttons_pop_up_window.draw(window)
+								layers.buttons_on_screen.draw(window)
 								progress_bar.draw()
 								ui_text.drawTextPopUp(STEP)
 
@@ -1935,9 +1963,8 @@ while game_is_running:
 										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
 
-								layers.buttons.empty()
-								layers.buttons_pop_up_window.empty()
-								layers.buttons.add(button_play)
+								layers.buttons_on_screen.empty()
+								layers.buttons_on_screen.add(button_play)
 
 								# Reset player
 								var.current_player.score = 0
@@ -1954,10 +1981,9 @@ while game_is_running:
 
 								PLAYERS[0].hand_state = hand_state
 
-
 								layers.background.draw(window)
 								layers.tiles.draw(window)
-								layers.buttons.draw(window)
+								layers.buttons_on_screen.draw(window)
 								var.background_no_letter = window.copy()
 
 								layers.letters_on_board.draw(window)
@@ -1979,6 +2005,8 @@ while game_is_running:
 										layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
 										var.current_board_state[y][x] = letter
 										x += 1
+
+
 								elif STEP == 5 :
 									# letters on board
 									x, y = 2, 4
@@ -2005,10 +2033,13 @@ while game_is_running:
 								STEP = STEP + 1
 								progress_bar.fill()	
 
+								layers.buttons_on_screen.remove(button_ok)
+								layers.buttons_on_screen.add(button_end_turn)
+
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
-								layers.buttons.draw(window)
+								layers.buttons_on_screen.draw(window)
 
 								var.background_no_letter = window.copy()
 
@@ -2042,7 +2073,7 @@ while game_is_running:
 
 
 						#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
-						for button in layers.buttons_pop_up_window :
+						for button in layers.buttons_on_screen :
 							if button.is_a_checkbox :
 								if ( (button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
 									if button.is_filled :
@@ -2059,7 +2090,7 @@ while game_is_running:
 
 						#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------
 						
-						for button in layers.buttons_pop_up_window :
+						for button in layers.buttons_on_screen :
 
 							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 								button.turnOnHighlighted()
@@ -2074,8 +2105,8 @@ while game_is_running:
 								need_refresh_buttons_on_screen = True
 
 				if need_refresh_buttons_on_screen :
-					layers.buttons_pop_up_window.clear(window, var.background_pop_up_empty)
-					layers.buttons_pop_up_window.draw(window)
+					layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
+					layers.buttons_on_screen.draw(window)
 					pygame.display.update()
 
 
@@ -2089,7 +2120,7 @@ while game_is_running:
 
 					#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
 					buttons_changed = False
-					for button in layers.buttons_pop_up_window :
+					for button in layers.buttons_on_screen :
 						if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 							button.turnOnHighlighted()
 							buttons_changed = True
@@ -2098,8 +2129,8 @@ while game_is_running:
 							buttons_changed = True
 
 					if buttons_changed :
-						layers.buttons_pop_up_window.clear(window, var.background_pop_up_empty)
-						layers.buttons_pop_up_window.draw(window)
+						layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
+						layers.buttons_on_screen.draw(window)
 
 						pygame.display.update()
 
@@ -2171,13 +2202,13 @@ while game_is_running:
 							
 
 							#------ CLIC ON BUTTONS (VISUAL) -------
-							for button in layers.buttons :
+							for button in layers.buttons_on_screen :
 								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 									#change button state
 									button.is_highlighted = False
 									button.push()
-									layers.buttons.clear(window, var.background_no_buttons)
-									layers.buttons.draw(window) 
+									layers.buttons_on_screen.clear(window, var.background_no_buttons)
+									layers.buttons_on_screen.draw(window) 
 							pygame.display.update()
 
 
@@ -2266,12 +2297,12 @@ while game_is_running:
 
 						
 							#------ RELEASE CLIC ON A BUTTON (VISUAL) -------
-							for button in layers.buttons :
+							for button in layers.buttons_on_screen :
 
 								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 									button.turnOnHighlighted()
-									layers.buttons.clear(window, var.background_no_buttons)
-									layers.buttons.draw(window)
+									layers.buttons_on_screen.clear(window, var.background_no_buttons)
+									layers.buttons_on_screen.draw(window)
 
 							#------ RELEASE CLIC ON PLAY BUTTON -------
 							if ( (button_play.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
@@ -2286,31 +2317,27 @@ while game_is_running:
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
-									layers.buttons_pop_up_window.add(button_ok)
-									layers.buttons.empty()
-									layers.buttons.add(button_end_turn)	
+									layers.buttons_on_screen.add(button_end_turn)
 
 									layers.background.draw(window)
 									layers.tiles.draw(window)
 									layers.hand_holder.draw(window)
-									layers.buttons.draw(window)
+									layers.buttons_on_screen.draw(window)
 
 									var.background_no_letter = window.copy()
-
-									layers.letters_on_board.draw(window)
-									var.current_player.hand.draw(window)
 									var.current_background_no_text = window.copy()
-
 									ui_text.drawText()
 									var.current_background = window.copy()
 
+									layers.buttons_on_screen.empty()
+									layers.buttons_on_screen.add(button_ok)
+									layers.buttons_on_screen.add(progress_bar.button_reinit)
+
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
-									layers.buttons_pop_up_window.draw(window)
+									layers.buttons_on_screen.draw(window)
 
-									var.background_pop_up_empty = window.copy()									
-
-									
+									var.background_pop_up_empty = window.copy()			
 									progress_bar.draw()
 									ui_text.drawTextPopUp(STEP)
 
@@ -2374,6 +2401,9 @@ while game_is_running:
 									STEP = STEP + 1
 									progress_bar.fill()
 
+									layers.buttons_on_screen.remove(button_end_turn)
+									layers.buttons_on_screen.add(button_ok)
+
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
@@ -2388,16 +2418,16 @@ while game_is_running:
 									ui_text.drawText(COLOR.GREY_LIGHT)
 									var.current_background = window.copy()
 
-									layers.buttons_pop_up_window.add(checkbox_facile)
-									layers.buttons_pop_up_window.add(checkbox_moyen)
-									layers.buttons_pop_up_window.add(checkbox_difficile)
+									layers.buttons_on_screen.add(checkbox_facile)
+									layers.buttons_on_screen.add(checkbox_moyen)
+									layers.buttons_on_screen.add(checkbox_difficile)
 
-									layers.buttons_pop_up_window.add(checkbox_function_shuffle)
-									layers.buttons_pop_up_window.add(checkbox_function_display_bonus)
+									layers.buttons_on_screen.add(checkbox_function_shuffle)
+									layers.buttons_on_screen.add(checkbox_function_display_bonus)
 
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
-									layers.buttons_pop_up_window.draw(window)
+									layers.buttons_on_screen.draw(window)
 									
 									
 									progress_bar.draw()
@@ -2427,21 +2457,24 @@ while game_is_running:
 									layers.pop_up_window.draw(window)
 
 									# Reset
-									for button in layers.buttons_pop_up_window :
+									for button in layers.buttons_on_screen :
 										if button.is_a_checkbox :
 											button.empty()
-									layers.buttons_pop_up_window.empty()
+									layers.buttons_on_screen.empty()
 
-									layers.buttons_pop_up_window.add(button_ok)
-									layers.buttons_pop_up_window.add(checkbox_facile2)
-									layers.buttons_pop_up_window.add(checkbox_moyen2)
-									layers.buttons_pop_up_window.add(checkbox_difficile2)
+									layers.buttons_on_screen.add(button_ok)
 
-									layers.buttons_pop_up_window.add(checkbox_function_shuffle2)
-									layers.buttons_pop_up_window.add(checkbox_function_display_bonus2)
-									layers.buttons_pop_up_window.add(checkbox_function_score2)
+									layers.buttons_on_screen.add(progress_bar.button_reinit)
 
-									layers.buttons_pop_up_window.draw(window)
+									layers.buttons_on_screen.add(checkbox_facile2)
+									layers.buttons_on_screen.add(checkbox_moyen2)
+									layers.buttons_on_screen.add(checkbox_difficile2)
+
+									layers.buttons_on_screen.add(checkbox_function_shuffle2)
+									layers.buttons_on_screen.add(checkbox_function_display_bonus2)
+									layers.buttons_on_screen.add(checkbox_function_score2)
+
+									layers.buttons_on_screen.draw(window)
 
 									
 									progress_bar.draw()
@@ -2459,10 +2492,11 @@ while game_is_running:
 									for letter in var.current_player.hand :
 										letter.kill()
 
-									layers.buttons_pop_up_window.add(button_ok)
+									layers.buttons_on_screen.remove(button_end_turn)
+									layers.buttons_on_screen.add(button_ok)
 
 									window.blit(var.background_pop_up_empty, (0,0))
-									layers.buttons_pop_up_window.draw(window)
+									layers.buttons_on_screen.draw(window)
 									progress_bar.draw()
 									ui_text.drawTextPopUp(STEP)
 								
@@ -2491,7 +2525,7 @@ while game_is_running:
 									layers.background.draw(window)
 									layers.tiles.draw(window)
 									layers.hand_holder.draw(window)
-									layers.buttons.draw(window)
+									layers.buttons_on_screen.draw(window)
 									var.background_no_letter = window.copy()
 									layers.letters_on_board.draw(window)
 									layers.letters_just_played.draw(window)
@@ -2508,7 +2542,7 @@ while game_is_running:
 
 
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
-							for button in layers.buttons :
+							for button in layers.buttons_on_screen :
 								if button.is_pushed :
 									button.release() #release all pushed buttons
 									if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
@@ -2516,8 +2550,8 @@ while game_is_running:
 									else :
 										button.turnOffHighlighted()
 
-									layers.buttons.clear(window, var.background_no_buttons)
-									layers.buttons.draw(window)
+									layers.buttons_on_screen.clear(window, var.background_no_buttons)
+									layers.buttons_on_screen.draw(window)
 									
 									#TO DO - prevent artefact see line 1287 ?
 									layers.selected_letter.clear(window, var.current_background)
@@ -2566,7 +2600,7 @@ while game_is_running:
 											layers.background.draw(window)
 											layers.tiles.draw(window)
 											layers.hand_holder.draw(window)
-											layers.buttons.draw(window)
+											layers.buttons_on_screen.draw(window)
 											var.background_no_letter = window.copy()
 
 											layers.letters_on_board.draw(window)
@@ -2613,7 +2647,7 @@ while game_is_running:
 											layers.background.draw(window)
 											layers.tiles.draw(window)
 											layers.hand_holder.draw(window)
-											layers.buttons.draw(window)
+											layers.buttons_on_screen.draw(window)
 											var.background_no_letter = window.copy()
 
 											layers.letters_on_board.draw(window)
@@ -2644,7 +2678,7 @@ while game_is_running:
 				#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
 				buttons_changed = False
 				#TODO restrict area to boost performance
-				for button in layers.buttons :
+				for button in layers.buttons_on_screen :
 					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 						button.turnOnHighlighted()
 						buttons_changed = True
@@ -2653,8 +2687,8 @@ while game_is_running:
 						buttons_changed = True
 
 				if buttons_changed :
-					layers.buttons.clear(window, var.background_no_buttons)
-					layers.buttons.draw(window)
+					layers.buttons_on_screen.clear(window, var.background_no_buttons)
+					layers.buttons_on_screen.draw(window)
 					pygame.display.update()
 
 
@@ -2687,7 +2721,7 @@ while game_is_running:
 									layers.background.draw(window)
 									layers.tiles.draw(window)
 									layers.hand_holder.draw(window)
-									layers.buttons.draw(window)
+									layers.buttons_on_screen.draw(window)
 									var.background_no_letter = window.copy()
 
 									layers.letters_on_board.draw(window)
@@ -2713,7 +2747,7 @@ while game_is_running:
 						layers.background.draw(window)
 						layers.tiles.draw(window)
 						layers.hand_holder.draw(window)
-						layers.buttons.draw(window)
+						layers.buttons_on_screen.draw(window)
 						var.background_no_letter = window.copy()
 
 						layers.letters_on_board.draw(window)
