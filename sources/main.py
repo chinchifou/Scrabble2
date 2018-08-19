@@ -54,7 +54,7 @@ REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
 TILES_PER_LINE = 15
 
-global DELTA, UI_LEFT_LIMIT, UI_LEFT_INDENT, UI_INTERLIGNE, UI_TRANSPARENT_COMPONENTS, UI_COMPONENTS
+global DELTA, UI_LEFT_LIMIT, UI_LEFT_INDENT, UI_INTERLIGNE
 #delta expressed in tiles from top left corner of the Window
 DELTA = 1.5
 #Left limit for text of the user interface
@@ -63,10 +63,6 @@ UI_LEFT_LIMIT = DELTA + TILES_PER_LINE + DELTA + 1.0
 UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
-# UI Sprites wich need to load image with transparency
-UI_TRANSPARENT_COMPONENTS = ["letter", "ui_image"]
-# UI Sprites wich need to load an image without transparency 
-UI_COMPONENTS = ["board", "hand_holder", "tile", "button", "checkbox"]
 
 global PLAYERS, STEP
 #all players
@@ -118,6 +114,7 @@ class GameVariable():
 
 		self.current_action = 'SELECT_A_LETTER'
 
+		self.background_no_buttons = []
 		self.background_no_letter = []
 		self.current_background = []
 		self.background_pop_up_empty = []
@@ -148,7 +145,7 @@ class ErrorPrinter():
 		print('  2. reduce number of letters authorized per player')
 		print('  3. reduce the number of players')
 		print('')
-
+	"""
 	def typeUndefined(self, object) :
 		logging.error('! ! ! . . . . . . . . ! ! !')
 		logging.error('TYPE UNDEFINED : Object "%s" does not have a type.', object.name)
@@ -161,24 +158,7 @@ class ErrorPrinter():
 		print('To fix this error :')
 		print('  - give your component a "type" attribute in its class definition')
 		print('')
-
-
-	def typeOfComponentNotRecognize(self, object):
-		logging.error('! ! ! . . . . . . . . ! ! !')
-		logging.error('COMPONENT NOT RECOGNIZE : unable to determine the transparency of the Sprite "%s" of type "%s".', object.name, object.type)
-		logging.error('All graphical components must be declared either as transparent component or opaque.')
-		logging.error('To do so :')
-		logging.error('  - give your component a "type" attribute in its class definition')
-		logging.error('  - add this "type attribute" in one of the global variable array UI_TRANSPARENT_COMPONENTS or UI_COMPONENTS')
-		logging.error('! ! ! . . . . . . . . ! ! !')
-		logging.error('')
-
-		print('COMPONENT NOT RECOGNIZE : unable to determine if the component is transparent or not.')
-		print('All graphical components must be declared either as transparent component or opaque.')
-		print('To do so :')
-		print('  - give your component a "type" attribute in its class definition')
-		print('  - add this "type attribute" in one of the global variable array UI_TRANSPARENT_COMPONENTS or UI_COMPONENTS')
-		print('')
+	"""
 
 ERROR = ErrorPrinter()
 
@@ -251,7 +231,6 @@ class Layer():
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
 		self.progress_bar = GroupOfSprites()
-
 
 		self.all = GroupOfSprites()
 
@@ -587,12 +566,12 @@ def indexInHandHolder(cursor_pos_x):
 #----- ResizableSprite -----
 #add native capacity to be resized
 class ResizableSprite(pygame.sprite.Sprite):
-	nb_created_instances = 0
-	#received coordinates are expresed in tiles
-	def __init__(self, name, pos_x, pos_y):
 
-		if self.type == None :
-			ERROR.typeUndefined(self)
+	#class attributes to count number of instances
+	nb_created_instances = 0
+
+	#received coordinates are expresed in tiles
+	def __init__(self, name, pos_x, pos_y, transparent=False):
 
 		#super class constructor
 		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
@@ -600,24 +579,18 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#unique id
 		ResizableSprite.nb_created_instances += 1
 		self.id = ResizableSprite.nb_created_instances
-		#name and type
-		self.name = name
-		#position
-		self.pos_x = pos_x
-		self.pos_y = pos_y
+
+		self.name, self.pos_x, self.pos_y, self.transparent = name, pos_x, pos_y, transparent
 
 		#load image
-		if self.type in UI_TRANSPARENT_COMPONENTS :
-			self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
-		elif self.type in UI_COMPONENTS :
-			self.image = loadImage(path.join(self.path, self.name+'.png'))
-		elif self.type == "ui_surface" :
-			pass
-		else :
-			ERROR.typeOfComponentNotRecognize(self)
+		if self.path != None :
+			if self.transparent :
+				self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
+			else :
+				self.image = loadImage(path.join(self.path, self.name+'.png'))
 
+		#auto detect width and height
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
-			#auto detect width and height
 			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
 
 		#resize image
@@ -629,29 +602,22 @@ class ResizableSprite(pygame.sprite.Sprite):
 	def resize(self):
 
 		#reload image
-		if self.type in UI_TRANSPARENT_COMPONENTS :
-			self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
-		elif self.type in UI_COMPONENTS :
-			self.image = loadImage(path.join(self.path, self.name+'.png'))
-		elif self.type == "ui_surface" :
-			pass
-		else :
-			ERROR.typeOfComponentNotRecognize(self)
+		if self.path != None :
+			if self.transparent :
+				self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
+			else :
+				self.image = loadImage(path.join(self.path, self.name+'.png'))
 
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
-		"""
-		if self.type == "board":
-			ui_text.drawText()
-		"""
+
 
 	def info(self) :
 		logging.debug("Sprite info :")
 		logging.debug("id : %s", self.id)
 		logging.debug("name : %s", self.name)
-		logging.debug("type : %s", self.type)
 		logging.debug("at position : %s, %s", self.pos_x, self.pos_y)
 		logging.debug("pixel position is : %s, %s", self.rect.x, self.rect.y)
 		logging.debug("width : %s / height : %s", self.width, self.height)
@@ -664,48 +630,48 @@ class ResizableSprite(pygame.sprite.Sprite):
 #----- Board -----
 class Board(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
-		self.type = 'board'
-		self.width, self.height = 32, 18
+
 		self.path = path_background
-		
+		self.width, self.height = 32, 18
+
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
 
 #----- Hand holder -----
 class Hand_holder(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
-		self.type = 'hand_holder'
-		#create custom width and height 
-		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
+
 		self.path = path_background
+		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
+		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
 
 #----- UI Surface -----
 class UI_Surface(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y, surface):
-		self.type = 'ui_surface'
+		self.path = None
 		self.image = surface
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
 
 #----- UI Image -----
 class UI_Image(ResizableSprite):
 	def __init__(self, name, path, pos_x, pos_y, width, height):
 
-		self.type = 'ui_image'
-
-		self.name = name
 		self.path = path
-
+		self.name = name
 		self.width, self.height = width, height
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
+
 
 #----- Board -----
 class Board(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
-		self.type = 'board'
-		self.width, self.height = 32, 18
 		self.path = path_background
+		self.width, self.height = 32, 18
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
@@ -713,19 +679,21 @@ class Board(ResizableSprite):
 #----- Tiles -----
 class Tile(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
-		self.type = 'tile'
+
 		self.path = path_tiles
+
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
 #----- Buttons -----
 class Button(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y):
-		self.type = 'button'
-		#self.width, self.height = 3, 1
+	def __init__(self, name, pos_x, pos_y, is_a_checkbox=False):
+
 		self.path = path_buttons
 		self.is_highlighted = False
 		self.is_pushed = False
+		self.is_a_checkbox = is_a_checkbox
+
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 	def turnOnHighlighted(self):
@@ -751,8 +719,7 @@ class Button(ResizableSprite):
 
 class Checkbox(Button):
 	def __init__(self, name, pos_x, pos_y):
-		Button.__init__(self, name, pos_x, pos_y)
-		self.type = 'checkbox'
+		Button.__init__(self, name, pos_x, pos_y, is_a_checkbox=True)
 		self.is_filled = False
 
 	def fill(self):
@@ -769,11 +736,11 @@ class Checkbox(Button):
 #----- Letter -----
 class Letter(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
-		self.type = 'letter'
+
 		self.path = path_letters
 		self.points = POINTS_FOR[name]
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y)		
+		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)		
 
 	#move a letter at a given position expressed in tiles
 	def moveAtTile(self, pos_x, pos_y) :
@@ -798,11 +765,16 @@ class ProgressBar():
 		self.progress_bar_filling = UI_Image('progress_bar_tile', path_background, pos_x, pos_y, 0, height)
 		layers.progress_bar.add(self.progress_bar_filling)
 
+		#reinit progress bar
+		self.button_reinit = Button("reinit", pos_x-1.25, pos_y-0.56)
+		#self.button_reinit.width, self.button_reinit.height = height, height
+		#self.button_reinit.resize()
+		layers.progress_bar.add(self.button_reinit)
+
+ 		#diggerent states of the progress bar
 		self.state = 0
 		self.nb_state = nb_state
-
 		self.ratio_width = width/float(nb_state-1)
-
 
 	def draw(self):
 
@@ -1418,7 +1390,7 @@ ui_text = UITextPrinter(ui_content)
 #tmp_third_hand = ['U','A','S','L','I','T','I']
 
 tmp_first_hand = ['B','I','N','S','E', 'O']
-tmp_second_hand = ['S','E','I','C','N','E','C']
+tmp_second_hand = ['S','I','C','E','N','E','C']
 tmp_third_hand = ['A','R','E','V','I', 'N']
 
 
@@ -1538,8 +1510,6 @@ if game_is_running :
 
 	button_play = Button("play", 32/2.0 + 6, 8.5)
 
-	button_reinit = Button("reinit", 29, 15) #TODO button reinit
-
 
 	# ------- CHECKBOXES --------
 	checkbox_facile = Checkbox("checkbox", 3, 6 )
@@ -1594,17 +1564,21 @@ if game_is_running :
 if game_is_running :
 
 	layers.buttons.add(button_play)
-	#layers.buttons.add(button_reinit)
+	layers.buttons.add(progress_bar.button_reinit)
 
 	layers.background.draw(window)
 	layers.tiles.draw(window)
-	layers.buttons.draw(window)
+	var.background_no_buttons = window.copy()
 
+	layers.buttons.draw(window)
 	var.background_no_letter = window.copy()
 
 	layers.letters_on_board.draw(window)
 	var.current_background_no_text = window.copy()
 	var.current_background = window.copy()
+
+	for button in layers.buttons :
+		button.info()
 
 	pygame.display.update()
 
@@ -1651,6 +1625,8 @@ while game_is_running:
 			layers.background.draw(window)
 			layers.tiles.draw(window)
 			layers.hand_holder.draw(window)
+			var.background_no_buttons = window.copy()
+
 			layers.buttons.draw(window)
 			var.background_no_letter = window.copy()
 
@@ -1679,6 +1655,13 @@ while game_is_running:
 				layers.pop_up_window.draw(window)
 				layers.background_pop_up_empty = window.copy()
 				window.blit(var.current_background, (0,0))
+
+			# ///// DIRTY PATCH /////
+			if STEP == 0 :
+				layers.background.draw(window)
+				layers.tiles.draw(window)
+				layers.buttons.draw(window)
+				layers.letters_on_board.draw(window)
 
 			pygame.display.update()
 			
@@ -1743,7 +1726,7 @@ while game_is_running:
 
 								# Reset checkboxes
 								for button in layers.buttons_pop_up_window :
-									if button.type == "checkbox":
+									if button.is_a_checkbox :
 										button.empty()
 
 								layers.background.draw(window)
@@ -1788,7 +1771,7 @@ while game_is_running:
 
 								# Reset
 								for button in layers.buttons_pop_up_window :
-									if button.type == "checkbox":
+									if button.is_a_checkbox :
 										button.empty()
 								layers.buttons_pop_up_window.empty()
 
@@ -1847,7 +1830,7 @@ while game_is_running:
 
 								# Reset
 								for button in layers.buttons_pop_up_window :
-									if button.type == "checkbox":
+									if button.is_a_checkbox :
 										button.empty()
 
 								layers.buttons_pop_up_window.empty()
@@ -2055,7 +2038,7 @@ while game_is_running:
 
 						#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
 						for button in layers.buttons_pop_up_window :
-							if button.type == "checkbox":
+							if button.is_a_checkbox :
 								if ( (button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
 									if button.is_filled :
 										button.release()
@@ -2188,7 +2171,7 @@ while game_is_running:
 									#change button state
 									button.is_highlighted = False
 									button.push()
-									layers.buttons.clear(window, var.current_background)
+									layers.buttons.clear(window, var.background_no_buttons)
 									layers.buttons.draw(window) 
 							pygame.display.update()
 
@@ -2282,7 +2265,7 @@ while game_is_running:
 
 								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 									button.turnOnHighlighted()
-									layers.buttons.clear(window, var.current_background)
+									layers.buttons.clear(window, var.background_no_buttons)
 									layers.buttons.draw(window)
 
 							#------ RELEASE CLIC ON PLAY BUTTON -------
@@ -2437,7 +2420,7 @@ while game_is_running:
 
 									# Reset
 									for button in layers.buttons_pop_up_window :
-										if button.type == "checkbox":
+										if button.is_a_checkbox :
 											button.empty()
 									layers.buttons_pop_up_window.empty()
 
@@ -2525,7 +2508,7 @@ while game_is_running:
 									else :
 										button.turnOffHighlighted()
 
-									layers.buttons.clear(window, var.current_background)
+									layers.buttons.clear(window, var.background_no_buttons)
 									layers.buttons.draw(window)
 									
 									#TO DO - prevent artefact see line 1287 ?
@@ -2662,7 +2645,7 @@ while game_is_running:
 						buttons_changed = True
 
 				if buttons_changed :
-					layers.buttons.clear(window, var.current_background)
+					layers.buttons.clear(window, var.background_no_buttons)
 					layers.buttons.draw(window)
 					pygame.display.update()
 
