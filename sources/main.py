@@ -475,8 +475,9 @@ class UITextPrinter():
 			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
 			UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+3) ),
-			UIText( "> Mélanger les lettres.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
-			UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) )
+			UIText( "> Mélanger les lettres", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
+			UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) ),
+			UIText( "Essayons de nouveau.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+7) )
 			]
 		elif step == 7 :
 			all_texts = [
@@ -1389,9 +1390,9 @@ ui_text = UITextPrinter(ui_content)
 #tmp_second_hand = ['S','E','T','E','S','M','Y']
 #tmp_third_hand = ['U','A','S','L','I','T','I']
 
-tmp_first_hand = ['B','I','N','S','E', 'O']
-tmp_second_hand = ['S','I','C','E','N','E','C']
-tmp_third_hand = ['A','R','E','V','I', 'N']
+tmp_first_hand = ['B','O','E','S','I','N']
+tmp_second_hand = ['S','C','E','I','N','E','C']
+tmp_third_hand = ['A','E','V','I','N','R']
 
 
 start_hand = GroupOfSprites()
