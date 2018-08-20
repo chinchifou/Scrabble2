@@ -725,7 +725,7 @@ class Checkbox(Button):
 	def fill(self):
 		self.name = 'filled_'+self.name
 		self.is_filled = True
-		self.turnOnHighlighted()
+		self.turnOnHighlighted() #TODO - bad
 
 	def empty(self):
 		self.name = self.name.replace("filled_", "")
@@ -1537,7 +1537,10 @@ if game_is_running :
 
 	button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
-	button_play = Button("play", 32/2.0 + 6, 8.5)
+	#button_play = Button("play", 32/2.0 + 6, 8.5)
+	button_play = Button("play", 32/2.0 + 6, 7.5)
+	button_play.width, button_play.height = 6, 2
+	button_play.resize()
 
 
 	# ------- CHECKBOXES --------
@@ -1791,9 +1794,9 @@ while game_is_running:
 								# Keep track of choice
 								tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
 
-								if checkbox_function_shuffle2.is_filled :
+								if checkbox_function_shuffle2.is_filled or enable_shuffle_letter :
 									tmp_enable_shuffle = True
-								if checkbox_function_display_bonus2.is_filled :
+								if checkbox_function_display_bonus2.is_filled or display_type_of_tile_on_hoovering :
 									tmp_display_pop_up = True
 								if checkbox_function_score2.is_filled :
 									tmp_display_score = True
@@ -1832,7 +1835,7 @@ while game_is_running:
 								layers.buttons_on_screen.add(checkbox_suggest_word)
 
 								if tmp_enable_shuffle :
-									checkbox_find_word.fill()
+									checkbox_find_word.fill() #TODO fix - turn off highlighted
 								if tmp_display_pop_up :
 									checkbox_bonus_cases.fill()
 								if tmp_display_score :
@@ -1850,14 +1853,19 @@ while game_is_running:
 								STEP = STEP + 1
 								progress_bar.fill()
 
+								"""
 								# settings
 								if checkbox_find_word.is_filled :
 									enable_shuffle_letter = True
-									layers.buttons_on_screen.add(button_shuffle)
 								if checkbox_bonus_cases.is_filled :
 									display_type_of_tile_on_hoovering = True
 								if checkbox_calculate_score.is_filled :
 									display_new_score_in_real_time = True
+								"""
+								# settings
+								enable_shuffle_letter = checkbox_find_word.is_filled
+								display_type_of_tile_on_hoovering = checkbox_bonus_cases.is_filled
+								display_new_score_in_real_time = checkbox_calculate_score.is_filled
 
 								# Reset
 								for button in layers.buttons_on_screen :
@@ -1865,6 +1873,8 @@ while game_is_running:
 										button.empty()
 
 								layers.buttons_on_screen.empty()
+								if enable_shuffle_letter :
+									layers.buttons_on_screen.add(button_shuffle)
 								layers.buttons_on_screen.add(button_end_turn)
 								layers.buttons_on_screen.add(progress_bar.button_reinit)
 
@@ -2035,6 +2045,8 @@ while game_is_running:
 
 								layers.buttons_on_screen.remove(button_ok)
 								layers.buttons_on_screen.add(button_end_turn)
+								if enable_shuffle_letter :
+									layers.buttons_on_screen.add(button_shuffle)
 
 								layers.background.draw(window)
 								layers.tiles.draw(window)
@@ -2493,6 +2505,7 @@ while game_is_running:
 										letter.kill()
 
 									layers.buttons_on_screen.remove(button_end_turn)
+									layers.buttons_on_screen.remove(button_shuffle)
 									layers.buttons_on_screen.add(button_ok)
 
 									window.blit(var.background_pop_up_empty, (0,0))
