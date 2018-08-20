@@ -294,7 +294,7 @@ class UITextPrinter():
 	def __init__(self, ui_content):
 
 		#UI text init
-		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2*UI_INTERLIGNE) )
+		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], 1.0, False, ( UI_LEFT_LIMIT, 3*UI_INTERLIGNE) )
 
 		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1.2+1*UI_INTERLIGNE) )
 
@@ -303,7 +303,7 @@ class UITextPrinter():
 		if display_next_player_hand :
 			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
 		else :
-			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1+UI_INTERLIGNE) )
+			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+2+UI_INTERLIGNE) )
 
 		self.player_score = UIText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles) )
 
@@ -453,9 +453,10 @@ class UITextPrinter():
 		elif step == 2 :
 			all_texts = [
 			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-			UIText( "Jouer un mot et marquer le plus de points possible.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
-			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4.5) ),
-			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+6) )
+			UIText( "Marquer le plus de points possibles en plaçant un mot", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
+			UIText( "sur le plateau.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+3.5) ),
+			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5.5) ),
+			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+7) )
 			]
 		elif step == 4 :
 			all_texts = [
@@ -781,7 +782,7 @@ class ProgressBar():
 		layers.progress_bar.draw(window)
 
 		text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-		window.blit( text.font.render(text.text, 1, COLOR.WHITE), (text.pos_x, text.pos_y) )
+		window.blit( text.font.render(text.text, 1, COLOR.GREY_LIGHT), (text.pos_x, text.pos_y) )
 
 	def fill(self):
 
@@ -1426,7 +1427,7 @@ tmp_third_hand = ['A','E','V','I','N','R']
 start_hand = GroupOfSprites()
 hand_state = []
 pos_x = (UI_LEFT_LIMIT)
-pos_y = ui_text.current_player_turn.pos_y_tiles+1
+pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
 
 
 for tmp_letter in tmp_first_hand :
@@ -1481,114 +1482,110 @@ else :
 
 #----- Create board game -----
 
-if game_is_running :
+#create background
+board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
-	#create background
-	board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
+#create hand_holder
+hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+1.4)#automatically stored in the corresponding layer
 
-	#create hand_holder
-	hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+0.9)#automatically stored in the corresponding layer
-
-	#create tiles
-	DELTA = 1.5
+#create tiles
+DELTA = 1.5
+x_pos = 0 + DELTA
+y_pos = 0 + DELTA
+for row in range(0,TILES_PER_LINE) :
+	for column in range(0, TILES_PER_LINE) :
+		if rules.BOARD_LAYOUT[row][column] == 0 :
+			Tile('start', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 1 :
+			Tile('normal', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 2 :
+			Tile('double_letter', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 3 :
+			Tile('triple_letter', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 4 :
+			Tile('double_word', x_pos, y_pos)
+		elif rules.BOARD_LAYOUT[row][column] == 5 :
+			Tile('triple_word', x_pos, y_pos)
+		x_pos += 1
 	x_pos = 0 + DELTA
-	y_pos = 0 + DELTA
-	for row in range(0,TILES_PER_LINE) :
-		for column in range(0, TILES_PER_LINE) :
-			if rules.BOARD_LAYOUT[row][column] == 0 :
-				Tile('start', x_pos, y_pos)
-			elif rules.BOARD_LAYOUT[row][column] == 1 :
-				Tile('normal', x_pos, y_pos)
-			elif rules.BOARD_LAYOUT[row][column] == 2 :
-				Tile('double_letter', x_pos, y_pos)
-			elif rules.BOARD_LAYOUT[row][column] == 3 :
-				Tile('triple_letter', x_pos, y_pos)
-			elif rules.BOARD_LAYOUT[row][column] == 4 :
-				Tile('double_word', x_pos, y_pos)
-			elif rules.BOARD_LAYOUT[row][column] == 5 :
-				Tile('triple_word', x_pos, y_pos)
-			x_pos += 1
-		x_pos = 0 + DELTA
-		y_pos += 1
+	y_pos += 1
 
 
-	# //////// Add letters on Board ///////////
-	x, y = 2, 4
-	for letter in "METHODES" :
+# //////// Add letters on Board ///////////
+x, y = 2, 4
+for letter in "METHODES" :
+	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+	y += 1
+
+x, y = 1, 6
+for letter in "UTILISATEUR" :
+	if (x, y) != (2,6) :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-		y += 1
+	x += 1
 
-	x, y = 1, 6
-	for letter in "UTILISATEUR" :
-		if (x, y) != (2,6) :
-			layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-		x += 1
+x, y = 2, 10
+for letter in "ERGONOMIE" :
+	if (x, y) != (2,10) :
+		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+	x += 1
 
-	x, y = 2, 10
-	for letter in "ERGONOMIE" :
-		if (x, y) != (2,10) :
-			layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-		x += 1
+# ------- CREATES BUTTONS --------
+button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 
-	# ------- CREATES BUTTONS --------
-	button_ok = Button("ok", 32/2.0 - 1, 14.5 )
+button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1.5)
 
-	button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1)
+button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
-	button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
-
-	#button_play = Button("play", 32/2.0 + 6, 8.5)
-	button_play = Button("play", 32/2.0 + 6, 7.5)
-	button_play.width, button_play.height = 6, 2
-	button_play.resize()
+#button_play = Button("play", 32/2.0 + 6, 8.5)
+button_play = Button("play", 32/2.0 + 6, 7.5)
 
 
-	# ------- CHECKBOXES --------
-	checkbox_facile = Checkbox("checkbox", 3, 6 )
-	checkbox_moyen = Checkbox("checkbox", 3, 7.5 )
-	checkbox_difficile = Checkbox("checkbox", 3, 9 )
+# ------- CHECKBOXES --------
+checkbox_facile = Checkbox("checkbox", 3, 6 )
+checkbox_moyen = Checkbox("checkbox", 3, 7.5 )
+checkbox_difficile = Checkbox("checkbox", 3, 9 )
 
-	checkbox_facile2 = Checkbox("checkbox", 3, 5 )
-	checkbox_moyen2 = Checkbox("checkbox", 3, 6.5 )
-	checkbox_difficile2 = Checkbox("checkbox", 3, 8 )
+checkbox_facile2 = Checkbox("checkbox", 3, 5 )
+checkbox_moyen2 = Checkbox("checkbox", 3, 6.5 )
+checkbox_difficile2 = Checkbox("checkbox", 3, 8 )
 
-	checkbox_function_shuffle = Checkbox("checkbox", 3, 12 )
-	checkbox_function_display_bonus = Checkbox("checkbox", 3, 13.5 )
-	#checkbox_function_score = Checkbox("checkbox", 3, 16 )
+checkbox_function_shuffle = Checkbox("checkbox", 3, 12 )
+checkbox_function_display_bonus = Checkbox("checkbox", 3, 13.5 )
+#checkbox_function_score = Checkbox("checkbox", 3, 16 )
 
-	checkbox_function_shuffle2 = Checkbox("checkbox", 3, 11 )
-	checkbox_function_display_bonus2 = Checkbox("checkbox", 3, 12.50 )
-	checkbox_function_score2 = Checkbox("checkbox", 3, 14 )
+checkbox_function_shuffle2 = Checkbox("checkbox", 3, 11 )
+checkbox_function_display_bonus2 = Checkbox("checkbox", 3, 12.50 )
+checkbox_function_score2 = Checkbox("checkbox", 3, 14 )
 
-	checkbox_find_word = Checkbox("checkbox", 3, 8.25 )
-	checkbox_bonus_cases = Checkbox("checkbox", 3, 9.75 )
-	checkbox_calculate_score = Checkbox("checkbox", 3, 11.25 )
-	checkbox_suggest_word = Checkbox("checkbox", 3, 12.75 )
+checkbox_find_word = Checkbox("checkbox", 3, 8.25 )
+checkbox_bonus_cases = Checkbox("checkbox", 3, 9.75 )
+checkbox_calculate_score = Checkbox("checkbox", 3, 11.25 )
+checkbox_suggest_word = Checkbox("checkbox", 3, 12.75 )
 
 
-	#create dark_filter
-	mask_surface = pygame.Surface((var.window_width, var.window_height))
-	mask_surface.fill(COLOR.BLACK)
-	mask_surface.set_alpha(180)
-	mask_surface = mask_surface.convert_alpha()
-	dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface)
-	layers.dark_filter.add(dark_filter)
+#create dark_filter
+mask_surface = pygame.Surface((var.window_width, var.window_height))
+mask_surface.fill(COLOR.BLACK)
+mask_surface.set_alpha(180)
+mask_surface = mask_surface.convert_alpha()
+dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface)
+layers.dark_filter.add(dark_filter)
 
-	#create window_pop_up
-	pop_up_window_surface = pygame.Surface((28*var.tile_size, 14*var.tile_size))
-	pop_up_window_surface.fill(COLOR.GREY_DEEP)				
-	pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
-	layers.pop_up_window.add(pop_up_window)
+#create window_pop_up
+pop_up_window_surface = pygame.Surface((28*var.tile_size, 14*var.tile_size))
+pop_up_window_surface.fill(COLOR.GREY_DEEP)				
+pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
+layers.pop_up_window.add(pop_up_window)
 
-	#create avatar
-	#ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
-	#ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
-	ui_avatar = UI_Image('ergonome', path_background, 24, 9, 5, 5) #Screen 32*18
+#create avatar
+#ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
+#ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
+ui_avatar = UI_Image('ergonome', path_background, 24, 9, 5, 5) #Screen 32*18
 
-	layers.pop_up_window.add(ui_avatar)
+layers.pop_up_window.add(ui_avatar)
 
-	#create progress bar
-	progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
+#create progress bar
+progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
 
 
 #----- first image -----
@@ -1888,7 +1885,7 @@ while game_is_running:
 									x += 1
 
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y_tiles+1
+								pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
 								hand_state = []
 								
 								for tmp_letter in tmp_third_hand :
@@ -1980,7 +1977,7 @@ while game_is_running:
 								var.current_player.score = 0
 
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y_tiles+1
+								pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
 
 								hand_state = []
 								for tmp_letter in tmp_first_hand :
@@ -2027,7 +2024,7 @@ while game_is_running:
 
 									# letters in hand
 									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1
+									pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
 									hand_state = []
 									
 									for tmp_letter in tmp_second_hand :
@@ -2526,7 +2523,7 @@ while game_is_running:
 									shuffle(var.current_player.hand_state)
 
 									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1
+									pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
 
 									hand_state = []
 									for index in var.current_player.hand_state :
