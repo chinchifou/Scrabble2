@@ -447,7 +447,7 @@ class UITextPrinter():
 		if step == 1 :
 			all_texts = [
 			UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-			UIText( "Je suis votre ergonome virtuel.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
+			UIText( "Je suis votre ergonome virtuelle.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
 			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
 			]
 		elif step == 2 :
@@ -558,6 +558,8 @@ def int_pixels(value1_in_tiles, value2_in_tiles) :
 def indexInHandHolder(cursor_pos_x):
 	delta_x_hand_holder_pix = layers.hand_holder.sprites()[0].rect.x
 	index_in_hand = int( floor( (cursor_pos_x - delta_x_hand_holder_pix) / float(var.tile_size) ) )
+	print("Hand holder index calculated : %i", index_in_hand)
+	logging.debug("Hand holder index calculated : %i", index_in_hand)
 	return index_in_hand
 
 
@@ -644,8 +646,12 @@ class Hand_holder(ResizableSprite):
 
 		self.path = path_background
 		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
+
+		#TODO rect coll
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
+		self.rect_col = pygame.Rect( pixels(self.pos_x+0.1, self.pos_y+0.1), pixels(self.width-0.2, self.height-0.2) )
 
 
 #----- UI Surface -----
@@ -1895,6 +1901,8 @@ while game_is_running:
 									hand_state.append(letter.id)
 									pos_x = pos_x+1
 
+								hand_state.append(0)
+
 								PLAYERS[0].hand_state = hand_state
 
 								# display
@@ -2231,7 +2239,7 @@ while game_is_running:
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if hand_holder.rect_col.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
 										index_in_hand = indexInHandHolder(cursor_pos_x)
 
@@ -2581,7 +2589,7 @@ while game_is_running:
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if hand_holder.rect_col.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
 										index_in_hand = indexInHandHolder(cursor_pos_x)
 
