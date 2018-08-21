@@ -475,7 +475,7 @@ class UITextPrinter():
 			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
 			UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+3) ),
-			UIText( "> Mélanger les lettres", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
+			UIText( "> Pouvoir mélanger mes lettres", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
 			UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) ),
 			UIText( "Essayons de nouveau.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+7) )
 			]
@@ -497,7 +497,7 @@ class UITextPrinter():
 			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
 			UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
 			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
-			UIText( "Pouvoir mélanger les lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
+			UIText( "Pouvoir mélanger mes lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
 			UIText( "Afficher l'effet des cases bonus au survol.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8) ),
 			UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
 			UIText( "Me proposer des mots", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11) )
@@ -505,8 +505,9 @@ class UITextPrinter():
 		elif step == 10 :			
 			all_texts = [
 			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
-			UIText( "Merci de m'avoir aidé à améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
-			UIText( "Il est bien mieux ainsi, n'est-ce pas ?", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
+			UIText( "Ensemble nous avons améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
+			UIText( "Merci de votre participation !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
+			UIText( "Un récapitulatif concernant l'ergonomie vous attends à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+8) )
 			]
 		elif step == 11 :
 			all_texts = [
@@ -791,6 +792,13 @@ class ProgressBar():
 	def fill(self):
 
 		self.state = (self.state+1)%(self.nb_state)
+
+		self.progress_bar_filling.width = self.state * self.ratio_width
+		self.progress_bar_filling.resize()
+
+	def empty(self):
+
+		self.state = 0
 
 		self.progress_bar_filling.width = self.state * self.ratio_width
 		self.progress_bar_filling.resize()
@@ -1356,6 +1364,97 @@ sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, 
 """
 game_is_running = True
 
+
+#Create custom pointer
+
+arrow_strings = ( #sized 24x24
+  "X                       ",
+  "XX                      ",
+  "X.X                     ",
+  "X..X                    ",
+  "X...X                   ",
+  "X....X                  ",
+  "X.....X                 ",
+  "X......X                ",
+  "X.......X               ",
+  "X........X              ",
+  "X.........X             ",
+  "X..........X            ",
+  "X......XXXXXX           ",
+  "X...X..X                ",
+  "X..XX..X                ",
+  "X.X  X..X               ",
+  "XX   X..X               ",
+  "X     X..X              ",
+  "      X..X              ",
+  "       XXX              ",
+  "                        ",
+  "                        ",
+  "                        ",
+  "                        ",
+)
+arrow=((24,24),(0,0))+pygame.cursors.compile(arrow_strings,"X",".")
+
+hand_strings = ( #sized 24x24
+  "     XX                 ",
+  "    X..X                ",
+  "    X..X                ",
+  "    X..X                ",
+  "    X..X                ",
+  "    X..XXX              ",
+  "    X..X..XXX           ",
+  "    X..X..X..XX         ",
+  "    X..X..X..X.X        ",
+  "XXX X..X..X..X..X       ",
+  "X..XX........X..X       ",
+  "X...X...........X       ",
+  " X..X...........X       ",
+  "  X.X...........X       ",
+  "  X.............X       ",
+  "   X............X       ",
+  "   X...........X        ",
+  "    X..........X        ",
+  "    X..........X        ",
+  "     X........X         ",
+  "     X........X         ",
+  "     XXXXXXXXXX         ",
+  "                        ",
+  "                        ",
+)
+hand=((24,24),(5,0))+pygame.cursors.compile(hand_strings,"X",".")
+
+hand_clic_strings = ( #sized 24x24
+  "                        ",
+  "                        ",
+  "                        ",
+  "                        ",
+  "    XXX                 ",
+  "    X..XXX              ",
+  "    X..X..XXX           ",
+  "    X..X..X..XX         ",
+  "    X..X..X..X.X        ",
+  "XXX X..X..X..X..X       ",
+  "X..XX........X..X       ",
+  "X...X...........X       ",
+  " X..X...........X       ",
+  "  X.X...........X       ",
+  "  X.............X       ",
+  "   X............X       ",
+  "   X...........X        ",
+  "    X..........X        ",
+  "    X..........X        ",
+  "     X........X         ",
+  "     X........X         ",
+  "     XXXXXXXXXX         ",
+  "                        ",
+  "                        ",
+)
+hand_clic=((24,24),(5,0))+pygame.cursors.compile(hand_clic_strings,"X",".")
+
+pygame.mouse.set_cursor(*arrow)
+
+
+
 fps_clock = pygame.time.Clock()
 clic_clock = pygame.time.Clock()
 logging.debug("INITIALIZATION")
@@ -1636,6 +1735,81 @@ while game_is_running:
 		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_ESCAPE ) :
 			logging.info("ESCAPE key pressed")
 			game_is_running = False #exit the game
+
+		#~~~~~~ KEY PRESSED - RESTART GAME ~~~~~~			
+		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_SPACE ) :
+			logging.info("SPACE key pressed")
+			STEP = 0
+			progress_bar.empty()
+
+			# Reset conf
+			enable_shuffle_letter = False
+			display_type_of_tile_on_hoovering = False
+			display_new_score_in_real_time = False
+
+			# Reset Board
+			var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+			# Reset letters
+			for letter in layers.letters_on_board :
+				letter.kill()
+			
+			for letter in layers.letters_just_played :
+				letter.kill()
+
+			for letter in var.current_player.hand :
+				letter.kill()
+
+			x, y = 2, 4
+			for letter in "METHODES" :
+				layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+				y += 1
+
+			x, y = 1, 6
+			for letter in "UTILISATEUR" :
+				if (x, y) != (2,6) :
+					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+				x += 1
+
+			x, y = 2, 10
+			for letter in "ERGONOMIE" :
+				if (x, y) != (2,10) :
+					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+				x += 1
+
+			layers.buttons_on_screen.empty()
+			layers.buttons_on_screen.add(button_play)
+
+			# Reset player
+			var.current_player.score = 0
+
+			pos_x = (UI_LEFT_LIMIT)
+			pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+
+			hand_state = []
+			for tmp_letter in tmp_first_hand :
+				letter = Letter(tmp_letter, pos_x, pos_y)
+				var.current_player.hand.add(letter)
+				hand_state.append(letter.id)
+				pos_x = pos_x+1
+			hand_state.append(0)
+
+			PLAYERS[0].hand_state = hand_state
+
+			layers.background.draw(window)
+			layers.tiles.draw(window)
+			layers.buttons_on_screen.draw(window)
+			var.background_no_letter = window.copy()
+
+			layers.letters_on_board.draw(window)
+			var.current_background_no_text = window.copy()
+			var.current_background = window.copy()
+
+			pygame.display.update()
+			var.current_action = "SELECT_A_LETTER"		
+			
+
+
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		#TODO create a specific function ?
@@ -1991,6 +2165,8 @@ while game_is_running:
 									var.current_player.hand.add(letter)
 									hand_state.append(letter.id)
 									pos_x = pos_x+1
+
+								hand_state.append(0)
 
 								PLAYERS[0].hand_state = hand_state
 
@@ -2697,9 +2873,11 @@ while game_is_running:
 				for button in layers.buttons_on_screen :
 					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 						button.turnOnHighlighted()
+						#pygame.mouse.set_cursor(*hand)
 						buttons_changed = True
 					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
 						button.turnOffHighlighted()
+						#pygame.mouse.set_cursor(*hand)
 						buttons_changed = True
 
 				if buttons_changed :
