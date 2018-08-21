@@ -555,13 +555,6 @@ def solo_pixels(value_in_tiles) :
 def int_pixels(value1_in_tiles, value2_in_tiles) :
 	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
-def indexInHandHolder(cursor_pos_x):
-	delta_x_hand_holder_pix = layers.hand_holder.sprites()[0].rect.x
-	index_in_hand = int( floor( (cursor_pos_x - delta_x_hand_holder_pix) / float(var.tile_size) ) )
-	print("Hand holder index calculated : %i", index_in_hand)
-	logging.debug("Hand holder index calculated : %i", index_in_hand)
-	return index_in_hand
-
 
 #~~~~~~ GAME CLASSES ~~~~~~
 
@@ -642,16 +635,21 @@ class Board(ResizableSprite):
 
 #----- Hand holder -----
 class Hand_holder(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y):
+	def __init__(self, name, pos_x, pos_y, max_nb_letters):
 
 		self.path = path_background
 		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
-
-		#TODO rect coll
+		self.max_nb_letters = max_nb_letters
 		
 		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
-		self.rect_col = pygame.Rect( pixels(self.pos_x+0.1, self.pos_y+0.1), pixels(self.width-0.2, self.height-0.2) )
+	def indexAtPos(self, cursor_pos_x):
+
+		index_in_hand = ( int( floor( (cursor_pos_x - self.rect.left) / float(var.tile_size) ) ) )
+		if index_in_hand+1 > self.max_nb_letters :
+			index_in_hand -= 1
+
+		return index_in_hand
 
 
 #----- UI Surface -----
@@ -1492,7 +1490,7 @@ else :
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
 #create hand_holder
-hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+1.4)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+1.4, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 
 #create tiles
 DELTA = 1.5
@@ -2239,9 +2237,9 @@ while game_is_running:
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.rect_col.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
-										index_in_hand = indexInHandHolder(cursor_pos_x)
+										index_in_hand = hand_holder.indexAtPos(cursor_pos_x)
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
@@ -2589,9 +2587,9 @@ while game_is_running:
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.rect_col.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
-										index_in_hand = indexInHandHolder(cursor_pos_x)
+										index_in_hand = hand_holder.indexAtPos(cursor_pos_x)
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
