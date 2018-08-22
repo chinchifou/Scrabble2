@@ -175,7 +175,7 @@ class ColorPannel():
 	def __init__(self):
 		self.BLACK = (0,0,0)
 		self.GREY_LIGHT = (143,144,138)
-		self.GREY_DEEP = (40,41,35)
+		self.GREY_DEEP = (39,40,34)
 
 		self.BLUE_DEEP = (21, 109, 255)
 		self.BLUE_LIGHT = (113, 201, 249)
@@ -230,6 +230,7 @@ class Layer():
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
 		self.progress_bar = GroupOfSprites()
+		self.mask_text = GroupOfSprites() 
 
 		self.all = GroupOfSprites()
 
@@ -301,9 +302,9 @@ class UITextPrinter():
 		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.pos_y_tiles+1) )
 
 		if display_next_player_hand :
-			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
+			self.scores = UIText(ui_content['scores'][language_id], 1.0, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
 		else :
-			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+2+UI_INTERLIGNE) )
+			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+2+UI_INTERLIGNE) )
 
 		self.player_score = UIText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles) )
 
@@ -375,26 +376,26 @@ class UITextPrinter():
 			text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
 			window.blit(text, (self.scores.pos_x, self.scores.pos_y))		
 
-			text = self.player_score.font.render( self.player_score.text.replace('<SCORE>', str(var.current_player.score) ), 1, COLOR.GREY_LIGHT )
-			window.blit(text, (self.player_score.pos_x, self.player_score.pos_y))
+			#text = self.player_score.font.render( self.player_score.text.replace('<SCORE>', str(var.current_player.score) ), 1, COLOR.GREY_LIGHT )
+			#window.blit(text, (self.player_score.pos_x, self.player_score.pos_y))
 
-
-		"""
-		#score of each player
-		pos_y_delta = 0
-		for player in PLAYERS :
-			if ( player == var.current_player ) :
-				self.player_score.font.set_bold(1)
-				if var.predicted_score == 0 : #move does not give points
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, custom_color )
+			#score of each player
+			pos_y_delta = 0
+			for player in PLAYERS :
+				if ( player == var.current_player ) :
+					self.player_score.font.set_bold(1)
+					if var.predicted_score == 0 : #move does not give points
+						text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, custom_color )
+					else :
+						text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, custom_color )
+					self.player_score.font.set_bold(0)
+					window.blit(text, (self.player_score.pos_x+(( pos_y_delta+0.2)*var.tile_size), self.player_score.pos_y+(( pos_y_delta+0.4)*var.tile_size) ) )
 				else :
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, custom_color )
-				self.player_score.font.set_bold(0)
-				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-			else :
-				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
-				window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
-			pos_y_delta += 0.8
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
+					window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+				pos_y_delta += 0.8
+
+			"""
 
 		#previous turn summary
 		if False :
@@ -1699,6 +1700,12 @@ pop_up_window_surface.fill(COLOR.GREY_DEEP)
 pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
 layers.pop_up_window.add(pop_up_window)
 
+#create mask for text
+surf_mask_text = pygame.Surface((4*var.tile_size, 3*var.tile_size))
+surf_mask_text.fill(COLOR.GREY_DEEP)				
+mask_text = UI_Surface('mask_text', 19, 6, surf_mask_text)
+layers.mask_text.add(mask_text)
+
 #create avatar
 #ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
 #ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
@@ -2058,9 +2065,7 @@ while game_is_running:
 									checkbox_calculate_score2.turnOffHighlighted()
 
 								layers.buttons_on_screen.draw(window)
-								
 								progress_bar.draw()
-
 								ui_text.drawTextPopUp(STEP)
 								
 
@@ -2260,6 +2265,7 @@ while game_is_running:
 
 								progress_bar.draw()
 								ui_text.drawText()
+
 								var.current_background = window.copy()
 
 								pygame.display.update()
@@ -2524,8 +2530,9 @@ while game_is_running:
 
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText()
 
-											#TODO REFRESH TEXT
 											var.current_background = window.copy()
 
 											pygame.display.update()
@@ -2558,6 +2565,8 @@ while game_is_running:
 
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText()
 
 											#TODO REFRESH TEXT
 											var.current_background = window.copy()
@@ -2652,8 +2661,8 @@ while game_is_running:
 
 								#display score
 								#logging.debug("New Player score : %s", str(var.current_player.score))
-								ui_text.drawText(COLOR.GREEN)
-								pygame.display.update()
+								#ui_text.drawText(COLOR.GREEN)
+								#pygame.display.update()
 
 								#TODO !!! activate TEMPO in final version
 								#pygame.time.wait(1500)
@@ -2885,7 +2894,9 @@ while game_is_running:
 											var.current_player.hand.draw(window)
 
 											if display_new_score_in_real_time :
-												incrementPredictedScore()								
+												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText()								
 
 											"""
 											#TODO SIMPLIFY (separate stuff)
@@ -2937,7 +2948,9 @@ while game_is_running:
 											layers.letters_just_played.draw(window)
 
 											if display_new_score_in_real_time :
-												incrementPredictedScore()									
+												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText()								
 
 											"""
 											#remove previously displayed text
