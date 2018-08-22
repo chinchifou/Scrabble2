@@ -472,12 +472,12 @@ class UITextPrinter():
 			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
 			UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+4.25) ),
-			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+5.75) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+7.25) ),
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+4.25) ),
+			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+5.75) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+7.25) ),
 			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+10.25) ),
-			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+11.75) )
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.25) ),
+			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+11.75) )
 			]
 		elif step == 5 :
 			all_texts = [
@@ -486,33 +486,32 @@ class UITextPrinter():
 			UIText( "Voici ma proposition, vous pouvez la modifier si vous le souhaitez.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
 			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4.5) ),
 			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.5) ),
-			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+6.75) ),
+			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+6.75) ),
 			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
-			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+9.5) )
+			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+9.5) )
 			]
 		elif step == 7 :
 			all_texts = [
 			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+3.25) ),
-			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+4.75) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+6.25) ),
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+3.25) ),
+			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+4.75) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+6.25) ),
 			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+9.25) ),
-			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+10.75) )
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+9.25) ),
+			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.75) )
 			]
 		elif step == 8 :
 			all_texts = [
 			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+1.5) ),
-			UIText( "Voici ma proposition, vous pouvez la modifier si vous le souhaitez.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
-			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4.5) ),
-			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.5) ),
-			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+6.75) ),
-			UIText( "Me proposer des mots possibles", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+8) ),
-			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+9) ),
-			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+10.25) ),
-			UIText( "Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+11.5) )
+			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
+			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+4.25) ),
+			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+5.75) ),
+			UIText( "Me proposer des mots possibles", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+7.25) ),
+			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.75) ),
+			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+10.25) ),
+			UIText( "Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+11.5) )
 			]
 		elif step == 10 :			
 			all_texts = [
@@ -524,12 +523,12 @@ class UITextPrinter():
 		elif step == 11 :
 			all_texts = [
 			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
-			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.5) ),
+			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.75) ),
 			UIText( "> Une science avec des méthodes pour améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
-			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.5) ),
+			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.25) ),
 			UIText( "En fait, l'ergonomie c'est l'avenir !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_left+7.5) ),
-			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9.5) ),
-			UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+1, limit_top+11.5) ),
+			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) ),
+			UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+12.25, limit_top+11) ),
 			]			
 
 		for text_it in all_texts :
@@ -1679,8 +1678,8 @@ checkbox_function_display_bonus2 = Checkbox("checkbox", 3.5, 12.50 )
 checkbox_function_score2 = Checkbox("checkbox", 3.5, 14 )
 
 #STEP 8
-checkbox_find_word2 = Checkbox("checkbox", 5, 8.5)
-checkbox_suggest_word2 = Checkbox("checkbox", 5, 9.75)
+checkbox_find_word2 = Checkbox("checkbox", 5, 7.5)
+checkbox_suggest_word2 = Checkbox("checkbox", 5, 9)
 
 checkbox_bonus_cases2 = Checkbox("checkbox", 5, 12 )
 checkbox_calculate_score2 = Checkbox("checkbox", 5, 13.25 )
