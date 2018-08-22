@@ -307,6 +307,7 @@ class UITextPrinter():
 
 		self.player_score = UIText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles) )
 
+		"""
 		#previous turn summary
 		if False :
 			self.previous_turn_summary = UIText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
@@ -326,7 +327,7 @@ class UITextPrinter():
 			self.remaining_letter = UIText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 		
 			self.no_remaining_letter = UIText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
-		
+		"""
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
 		self.pop_up_displayed = False
@@ -347,8 +348,9 @@ class UITextPrinter():
 
 		#Current player hand
 		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY_LIGHT )
-		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))
+		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))		
 
+		"""
 		#display next player hand
 		if display_next_player_hand :
 			#Next player hand header
@@ -366,11 +368,18 @@ class UITextPrinter():
 
 			text = self.next_player_hand.font.render( str_hand , 1, COLOR.GREY_LIGHT )
 			window.blit(text, (self.next_player_hand.pos_x, self.next_player_hand.pos_y))
+		"""
 
 		#Scores header
-		text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
-		window.blit(text, (self.scores.pos_x, self.scores.pos_y))
+		if display_new_score_in_real_time :
+			text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
+			window.blit(text, (self.scores.pos_x, self.scores.pos_y))		
 
+			text = self.player_score.font.render( self.player_score.text.replace('<SCORE>', str(var.current_player.score) ), 1, COLOR.GREY_LIGHT )
+			window.blit(text, (self.player_score.pos_x, self.player_score.pos_y))
+
+
+		"""
 		#score of each player
 		pos_y_delta = 0
 		for player in PLAYERS :
@@ -436,7 +445,7 @@ class UITextPrinter():
 					window.blit(text, (self.remaining_letters.pos_x, self.remaining_letters.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
 				else :
 					window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
-
+			"""
 
 	def drawTextPopUp(self, step):
 
@@ -1903,6 +1912,8 @@ while game_is_running:
 						if ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
 
 							button_ok.release()
+							#pygame.mouse.set_cursor(*arrow)
+							#TODO to imrpove if the cursor is still on the button
 
 							if STEP == 1 :
 
@@ -2502,36 +2513,43 @@ while game_is_running:
 
 								if STEP == 0 :
 
-									STEP = STEP + 1
-									progress_bar.fill()
-
+									#reset Board
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
-									layers.buttons_on_screen.add(button_end_turn)
-
+									# ___ DRAW BOARD ___
+									#screeshot background empty (USELESS ?)
 									layers.background.draw(window)
 									layers.tiles.draw(window)
 									layers.hand_holder.draw(window)
-									layers.buttons_on_screen.draw(window)
+									#layers.buttons_on_screen.draw(window)
 
+									#screeshot background no letter (USELESS ?)
 									var.background_no_letter = window.copy()
 									var.current_background_no_text = window.copy()
 									ui_text.drawText()
 									var.current_background = window.copy()
 
-									layers.buttons_on_screen.empty()
+									# ___ UI elements new screen ___
+									STEP = STEP + 1
+
+									layers.buttons_on_screen.remove(button_play)
+
+									progress_bar.fill()
 									layers.buttons_on_screen.add(button_ok)
 									layers.buttons_on_screen.add(progress_bar.button_reinit)
 
+									# ___ DRAW WINDOW ___
+									#draw new screen
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_on_screen.draw(window)
+									var.background_pop_up_empty = window.copy()	
 
-									var.background_pop_up_empty = window.copy()			
 									progress_bar.draw()
 									ui_text.drawTextPopUp(STEP)
 
+									#UPDATE
 									pygame.display.update()
 									var.current_action = "POP_UP_DISPLAYED"
 
@@ -2547,60 +2565,57 @@ while game_is_running:
 
 								button_end_turn.release()
 
-								#scores
+								#SCORES
+								#calculate score
 								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
-
 
 								for association in var.last_words_and_scores :
 									var.current_player.score +=  association[1]
 								
 								var.predicted_score = 0
 
-								logging.debug("New Player score : %s", str(var.current_player.score))
+								#display score
+								#logging.debug("New Player score : %s", str(var.current_player.score))
+								ui_text.drawText(COLOR.GREEN)
+								pygame.display.update()
 
-								#letters
+								#TODO !!! activate TEMPO in final version
+								#pygame.time.wait(1500)
+
+								"""
+								#LETTERS (USELESS ?)
 								for letter in layers.letters_just_played :
 									layers.letters_on_board.add(letter)
-
+								"""
+								# ___ RESET ___
+								#reset letters		
 								layers.letters_just_played.empty()
-								window.blit(var.background_no_letter, (0,0))
+								for letter in var.current_player.hand :
+									letter.kill()
+								layers.letters_on_board.empty()
 
+								#reset board state
+								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+								#reset score between turns
+								var.current_player.score = 0
+
+								# ___ RESET VISUAL ___
+								#reset screenshot background no letter (USELESS ?)
+								window.blit(var.background_no_letter, (0,0))
 								var.current_player.hand.clear(window, var.background_no_letter)
 								layers.letters_just_played.clear(window, var.background_no_letter)
 
 								layers.letters_on_board.draw(window)
 								var.current_player.hand.draw(window)
 								var.current_background_no_text = window.copy()
-
-								progress_bar.draw()
-								ui_text.drawText(COLOR.GREEN)
+								#progress_bar.draw()
 								var.current_background = window.copy()
-
-								pygame.display.update()
-
-								#reset score between turns
-								var.current_player.score = 0
-
-
-								#TEMPO to see score
-								#TODO activate in final version
-								#pygame.time.wait(1500)
 
 
 								if STEP == 3 :
 
-									STEP = STEP + 1
-									progress_bar.fill()
-
-									layers.buttons_on_screen.remove(button_end_turn)
-									layers.buttons_on_screen.add(button_ok)
-
-									layers.letters_on_board.empty()
-									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-									for letter in var.current_player.hand :
-										letter.kill()
-
+									# ___ DRAW BOARD ___
 									window.blit(var.background_no_letter, (0,0))
 									
 									var.current_player.hand.draw(window)
@@ -2608,6 +2623,14 @@ while game_is_running:
 									var.current_background_no_text = window.copy()
 									ui_text.drawText(COLOR.GREY_LIGHT)
 									var.current_background = window.copy()
+
+									#NEW SCREEN
+									STEP = STEP + 1
+									progress_bar.fill()									
+
+									# ADD BUTTONS									
+									layers.buttons_on_screen.remove(button_end_turn)
+									layers.buttons_on_screen.add(button_ok)
 
 									layers.buttons_on_screen.add(checkbox_facile)
 									layers.buttons_on_screen.add(checkbox_moyen)
@@ -2616,27 +2639,33 @@ while game_is_running:
 									layers.buttons_on_screen.add(checkbox_function_shuffle)
 									layers.buttons_on_screen.add(checkbox_function_display_bonus)
 
+									# DRAW WINDOW
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_on_screen.draw(window)
 									
-									
 									progress_bar.draw()
-
 									ui_text.drawTextPopUp(STEP)							
 
 
 								elif STEP == 6 :
 
-									STEP = STEP + 1
-									progress_bar.fill()
-
+									# ___ RESET ___
+									#reset Board
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
+									#reset letters
 									for letter in var.current_player.hand :
 										letter.kill()
 
+									# Reset buttons
+									for button in layers.buttons_on_screen :
+										if button.is_a_checkbox :
+											button.empty()
+									
+									# ___ DRAW BOARD ___
+									#screeshot background no letter (USELESS ?)
 									window.blit(var.background_no_letter, (0,0))
 									var.current_player.hand.draw(window)
 
@@ -2644,18 +2673,17 @@ while game_is_running:
 									ui_text.drawText(COLOR.GREY_LIGHT)
 									var.current_background = window.copy()
 
-									layers.dark_filter.draw(window)
-									layers.pop_up_window.draw(window)
 
-									# Reset
-									for button in layers.buttons_on_screen :
-										if button.is_a_checkbox :
-											button.empty()
-									layers.buttons_on_screen.empty()
+									# ___ NEXT STEP ___	
+									STEP = STEP + 1
+									progress_bar.fill()
+
+									# new buttons
+									layers.buttons_on_screen.remove(button_end_turn)
+									if enable_shuffle_letter :
+										layers.buttons_on_screen.remove(button_shuffle)	
 
 									layers.buttons_on_screen.add(button_ok)
-
-									layers.buttons_on_screen.add(progress_bar.button_reinit)
 
 									layers.buttons_on_screen.add(checkbox_facile2)
 									layers.buttons_on_screen.add(checkbox_moyen2)
@@ -2665,28 +2693,38 @@ while game_is_running:
 									layers.buttons_on_screen.add(checkbox_function_display_bonus2)
 									layers.buttons_on_screen.add(checkbox_function_score2)
 
+
+									# ___ DRAW WINDOW ___
+									#draw new screen
+									layers.dark_filter.draw(window)
+									layers.pop_up_window.draw(window)
 									layers.buttons_on_screen.draw(window)
 
 									
 									progress_bar.draw()
-
 									ui_text.drawTextPopUp(STEP)
 									
 
 								#LAST STEP
 								elif STEP == 9 :
 
-									STEP = STEP + 1
-									progress_bar.fill()
-
-									#reset
+									# ___ RESET ___
+									#reset letters
 									for letter in var.current_player.hand :
 										letter.kill()
 
+									# ___ NEXT STEP ___
+									STEP = STEP + 1
+									progress_bar.fill()
+
+									# new buttons
 									layers.buttons_on_screen.remove(button_end_turn)
-									layers.buttons_on_screen.remove(button_shuffle)
+									if enable_shuffle_letter :
+										layers.buttons_on_screen.remove(button_shuffle)	
+
 									layers.buttons_on_screen.add(button_ok)
 
+									# ___ DRAW WINDOW ___
 									window.blit(var.background_pop_up_empty, (0,0))
 									layers.buttons_on_screen.draw(window)
 									progress_bar.draw()
@@ -2694,7 +2732,7 @@ while game_is_running:
 								
 								pygame.display.update()
 								var.current_action = "POP_UP_DISPLAYED"
-								break 
+								#break 
 
 
 							if enable_shuffle_letter :
@@ -2702,6 +2740,7 @@ while game_is_running:
 								if ( (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
 									button_shuffle.release()
 
+									# ___ SHUFFLE ___
 									shuffle(var.current_player.hand_state)
 
 									pos_x = (UI_LEFT_LIMIT)
@@ -2714,22 +2753,9 @@ while game_is_running:
 											var.current_player.hand.findByIndex(index).moveAtTile(pos_x, pos_y)
 										pos_x = pos_x + 1
 
-									layers.background.draw(window)
-									layers.tiles.draw(window)
-									layers.hand_holder.draw(window)
-									layers.buttons_on_screen.draw(window)
-									var.background_no_letter = window.copy()
-									layers.letters_on_board.draw(window)
-									layers.letters_just_played.draw(window)
-									var.current_player.hand.draw(window)
-									
-									var.current_background_no_text = window.copy()
-									progress_bar.draw()
-									ui_text.drawText()
-									var.current_background = window.copy()
-
-									layers.selected_letter.draw(window)
-									
+									# ___ UPDATE DISPLAY ___
+									var.current_player.hand.clear(window, var.background_no_letter)
+									var.current_player.hand.draw(window)	
 									pygame.display.update()
 
 
@@ -2770,8 +2796,7 @@ while game_is_running:
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
 
-											selected_letter = layers.selected_letter.sprites()[0]
-											
+											selected_letter = layers.selected_letter.sprites()[0]	
 											delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
@@ -2784,8 +2809,9 @@ while game_is_running:
 											var.current_player.hand.draw(window)
 
 											if display_new_score_in_real_time :
-												incrementPredictedScore()									
+												incrementPredictedScore()								
 
+											"""
 											#TODO SIMPLIFY (separate stuff)
 											#TODO CREATE A FUNCTION
 											#remove previously displayed text
@@ -2804,6 +2830,8 @@ while game_is_running:
 											ui_text.drawText()
 
 											var.current_background = window.copy()
+											"""
+											#TODO pop up score
 
 											pygame.display.update()
 
@@ -2835,6 +2863,7 @@ while game_is_running:
 											if display_new_score_in_real_time :
 												incrementPredictedScore()									
 
+											"""
 											#remove previously displayed text
 											layers.background.draw(window)
 											layers.tiles.draw(window)
@@ -2850,6 +2879,8 @@ while game_is_running:
 											progress_bar.draw()
 											ui_text.drawText()
 											var.current_background = window.copy()
+											"""
+											# TODo pop up score
 
 											pygame.display.update()
 
@@ -2877,7 +2908,7 @@ while game_is_running:
 						buttons_changed = True
 					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
 						button.turnOffHighlighted()
-						#pygame.mouse.set_cursor(*hand)
+						#pygame.mouse.set_cursor(*arrow)
 						buttons_changed = True
 
 				if buttons_changed :
