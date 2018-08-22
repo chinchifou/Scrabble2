@@ -1985,7 +1985,10 @@ while game_is_running:
 								layers.buttons_on_screen.add(button_ok)
 
 								layers.buttons_on_screen.add(checkbox_find_word)
+								checkbox_find_word.fill()
 								layers.buttons_on_screen.add(checkbox_bonus_cases)
+								if display_type_of_tile_on_hoovering :
+									checkbox_bonus_cases.fill()
 
 								layers.buttons_on_screen.add(progress_bar.button_reinit)
 								layers.buttons_on_screen.draw(window)
@@ -2008,7 +2011,7 @@ while game_is_running:
 								if checkbox_function_display_bonus2.is_filled or display_type_of_tile_on_hoovering :
 									tmp_display_pop_up = True
 								#if checkbox_function_score2.is_filled :
-								#tmp_display_score = True
+								tmp_display_score = True
 
 								# Reset
 								for button in layers.buttons_on_screen :
@@ -2078,7 +2081,9 @@ while game_is_running:
 								# settings
 								enable_shuffle_letter = checkbox_find_word2.is_filled
 								display_type_of_tile_on_hoovering = checkbox_bonus_cases2.is_filled
+
 								display_new_score_in_real_time = checkbox_calculate_score2.is_filled
+
 
 								# Reset
 								for button in layers.buttons_on_screen :
@@ -2263,7 +2268,10 @@ while game_is_running:
 
 							elif STEP == 5 :
 
-								#TODO CONF
+								if checkbox_find_word.is_filled :
+									enable_shuffle_letter = True
+								if checkbox_bonus_cases.is_filled :
+									display_type_of_tile_on_hoovering = True
 
 								# Reset
 								for button in layers.buttons_on_screen :
