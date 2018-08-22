@@ -519,7 +519,7 @@ class UITextPrinter():
 			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
 			UIText( "Ensemble nous avons améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
 			UIText( "Merci de votre participation !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
-			UIText( "Un récapitulatif concernant l'ergonomie vous attends à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+8) )
+			UIText( "Un récapitulatif concernant l'ergonomie vous attends à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) )
 			]
 		elif step == 11 :
 			all_texts = [
@@ -799,6 +799,13 @@ class ProgressBar():
 		layers.progress_bar.draw(window)
 
 		text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+		if self.state in (0,1,2,3) :
+			text = UIText( "Etape : 1 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+		elif self.state in (4,5,6) :
+			text = UIText( "Etape : 2 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+		else :
+			text = UIText( "Etape : 3 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+
 		window.blit( text.font.render(text.text, 1, COLOR.GREY_LIGHT), (text.pos_x, text.pos_y) )
 
 	def fill(self):
