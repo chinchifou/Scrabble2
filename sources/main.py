@@ -472,44 +472,47 @@ class UITextPrinter():
 			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
 			UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.25) ),
-			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+5.75) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+7.25) ),
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+4.25) ),
+			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+5.75) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+7.25) ),
 			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.25) ),
-			UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11.75) )
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+10.25) ),
+			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+11.75) )
 			]
 		elif step == 5 :
 			all_texts = [
 			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
-			UIText( "Vous pouvez maintenant:", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+3) ),
-			UIText( "> Pouvoir mélanger mes lettres", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+4) ),
-			UIText( "> Afficher l'effet des cases bonus.", LINE_HEIGHT.NORMAL, True, (limit_left+2, limit_top+5) ),
-			UIText( "Essayons de nouveau.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+7) )
+			UIText( "Voici ma proposition, vous pouvez la modifier si vous le souhaitez.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
+			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4.5) ),
+			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.5) ),
+			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+6.75) ),
+			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
+			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+9.5) )
 			]
 		elif step == 7 :
 			all_texts = [
 			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+3.25) ),
-			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+4.75) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.25) ),
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+3.25) ),
+			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+4.75) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+6.25) ),
 			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.25) ),
-			UIText( "Connaître l'effet des cases bonus", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+10.75) ),
-			UIText( "Calculer mon score", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+12.25) )
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+9.25) ),
+			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+3, limit_top+10.75) )
 			]
 		elif step == 8 :
 			all_texts = [
 			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
-			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2) ),
-			UIText( "Voici ma proposition mais vous avez le choix d'ajouter ou de retirer des aides.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+3) ),
-			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+5) ),
-			UIText( "Pouvoir mélanger mes lettres.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+6.5) ),
-			UIText( "Afficher l'effet des cases bonus au survol.", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+8) ),
-			UIText( "Afficher le score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+9.5) ),
-			UIText( "Me proposer des mots", LINE_HEIGHT.NORMAL, False, (limit_left+2.5, limit_top+11) )
+			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+1.5) ),
+			UIText( "Voici ma proposition, vous pouvez la modifier si vous le souhaitez.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
+			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4.5) ),
+			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.5) ),
+			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+6.75) ),
+			UIText( "Me proposer des mots possibles", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+8) ),
+			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+9) ),
+			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+10.25) ),
+			UIText( "Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4.5, limit_top+11.5) )
 			]
 		elif step == 10 :			
 			all_texts = [
@@ -1653,26 +1656,34 @@ button_play = Button("play", 32/2.0 + 6, 7.5)
 
 
 # ------- CHECKBOXES --------
-checkbox_facile = Checkbox("checkbox", 3, 6 )
-checkbox_moyen = Checkbox("checkbox", 3, 7.5 )
-checkbox_difficile = Checkbox("checkbox", 3, 9 )
+# STEP 4
+checkbox_facile = Checkbox("checkbox", 3.5, 6 )
+checkbox_moyen = Checkbox("checkbox", 3.5, 7.5 )
+checkbox_difficile = Checkbox("checkbox", 3.5, 9 )
 
-checkbox_facile2 = Checkbox("checkbox", 3, 5 )
-checkbox_moyen2 = Checkbox("checkbox", 3, 6.5 )
-checkbox_difficile2 = Checkbox("checkbox", 3, 8 )
-
-checkbox_function_shuffle = Checkbox("checkbox", 3, 12 )
-checkbox_function_display_bonus = Checkbox("checkbox", 3, 13.5 )
+checkbox_function_shuffle = Checkbox("checkbox", 3.5, 12 )
+checkbox_function_display_bonus = Checkbox("checkbox", 3.5, 13.5 )
 #checkbox_function_score = Checkbox("checkbox", 3, 16 )
 
-checkbox_function_shuffle2 = Checkbox("checkbox", 3, 11 )
-checkbox_function_display_bonus2 = Checkbox("checkbox", 3, 12.50 )
-checkbox_function_score2 = Checkbox("checkbox", 3, 14 )
+# STEP 5
+checkbox_find_word = Checkbox("checkbox", 5, 8.5 )
+checkbox_bonus_cases = Checkbox("checkbox", 5, 11.25 )
 
-checkbox_find_word = Checkbox("checkbox", 3, 8.25 )
-checkbox_bonus_cases = Checkbox("checkbox", 3, 9.75 )
-checkbox_calculate_score = Checkbox("checkbox", 3, 11.25 )
-checkbox_suggest_word = Checkbox("checkbox", 3, 12.75 )
+# STEP 7
+checkbox_facile2 = Checkbox("checkbox", 3.5, 5 )
+checkbox_moyen2 = Checkbox("checkbox", 3.5, 6.5 )
+checkbox_difficile2 = Checkbox("checkbox", 3.5, 8 )
+
+checkbox_function_shuffle2 = Checkbox("checkbox", 3.5, 11 )
+checkbox_function_display_bonus2 = Checkbox("checkbox", 3.5, 12.50 )
+checkbox_function_score2 = Checkbox("checkbox", 3.5, 14 )
+
+#STEP 8
+checkbox_find_word2 = Checkbox("checkbox", 5, 8.5)
+checkbox_suggest_word2 = Checkbox("checkbox", 5, 9.75)
+
+checkbox_bonus_cases2 = Checkbox("checkbox", 5, 12 )
+checkbox_calculate_score2 = Checkbox("checkbox", 5, 13.25 )
 
 
 #create dark_filter
@@ -1701,6 +1712,8 @@ progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
 
 
 #----- first image -----
+
+
 
 if game_is_running :
 
@@ -1904,6 +1917,7 @@ while game_is_running:
 								button.is_highlighted = False
 								button.push()
 								need_refresh_buttons_on_screen = True
+								button.info()
 
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 					elif ( event_type == pygame.MOUSEBUTTONUP ) :
@@ -1917,9 +1931,11 @@ while game_is_running:
 
 							if STEP == 1 :
 
+								# ___ NEXT STEP ___
 								STEP = STEP + 1
 								progress_bar.fill()
 
+								# ___ DRAW WINDOW ___
 								window.blit(var.background_pop_up_empty, (0,0))
 
 								layers.buttons_on_screen.draw(window)
@@ -1931,9 +1947,7 @@ while game_is_running:
 
 							elif STEP == 4 :
 
-								STEP = STEP + 1
-								progress_bar.fill()
-
+								# ___ CHANGE CONF ___
 								if checkbox_function_shuffle.is_filled :
 									enable_shuffle_letter = True
 									layers.buttons_on_screen.add(button_shuffle)
@@ -1945,6 +1959,7 @@ while game_is_running:
 									if button.is_a_checkbox :
 										button.empty()
 
+								# ___ DRAW BOARD ___
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
@@ -1958,16 +1973,25 @@ while game_is_running:
 								var.current_background = window.copy()
 								layers.selected_letter.draw(window)
 
+								# ___ NEXT STEP ___
+								STEP = STEP + 1
+								progress_bar.fill()
+
+								# ___ DRAW WINDOW ___
 								layers.dark_filter.draw(window)
 								layers.pop_up_window.draw(window)
 
+								# ___ ADD BUTTONS 
 								layers.buttons_on_screen.empty()
 								layers.buttons_on_screen.add(button_ok)
+
+								layers.buttons_on_screen.add(checkbox_find_word)
+								layers.buttons_on_screen.add(checkbox_bonus_cases)
+
 								layers.buttons_on_screen.add(progress_bar.button_reinit)
 								layers.buttons_on_screen.draw(window)
 
 								progress_bar.draw()
-
 								ui_text.drawTextPopUp(STEP)
 								#TODO based on selected checkboxes
 
@@ -1984,8 +2008,8 @@ while game_is_running:
 									tmp_enable_shuffle = True
 								if checkbox_function_display_bonus2.is_filled or display_type_of_tile_on_hoovering :
 									tmp_display_pop_up = True
-								if checkbox_function_score2.is_filled :
-									tmp_display_score = True
+								#if checkbox_function_score2.is_filled :
+								#tmp_display_score = True
 
 								# Reset
 								for button in layers.buttons_on_screen :
@@ -2016,20 +2040,20 @@ while game_is_running:
 								layers.buttons_on_screen.add(button_ok)
 								layers.buttons_on_screen.add(progress_bar.button_reinit)
 
-								layers.buttons_on_screen.add(checkbox_find_word)
-								layers.buttons_on_screen.add(checkbox_bonus_cases)
-								layers.buttons_on_screen.add(checkbox_calculate_score)
-								layers.buttons_on_screen.add(checkbox_suggest_word)
+								layers.buttons_on_screen.add(checkbox_find_word2)
+								layers.buttons_on_screen.add(checkbox_bonus_cases2)
+								layers.buttons_on_screen.add(checkbox_calculate_score2)
+								layers.buttons_on_screen.add(checkbox_suggest_word2)
 
 								if tmp_enable_shuffle :
-									checkbox_find_word.fill()
-									checkbox_find_word.turnOffHighlighted()
+									checkbox_find_word2.fill()
+									checkbox_find_word2.turnOffHighlighted()
 								if tmp_display_pop_up :
-									checkbox_bonus_cases.fill()
-									checkbox_bonus_cases.turnOffHighlighted()
+									checkbox_bonus_cases2.fill()
+									checkbox_bonus_cases2.turnOffHighlighted()
 								if tmp_display_score :
-									checkbox_calculate_score.fill()
-									checkbox_calculate_score.turnOffHighlighted()
+									checkbox_calculate_score2.fill()
+									checkbox_calculate_score2.turnOffHighlighted()
 
 								layers.buttons_on_screen.draw(window)
 								
@@ -2045,17 +2069,17 @@ while game_is_running:
 
 								"""
 								# settings
-								if checkbox_find_word.is_filled :
+								if checkbox_find_word2.is_filled :
 									enable_shuffle_letter = True
-								if checkbox_bonus_cases.is_filled :
+								if checkbox_bonus_cases2.is_filled :
 									display_type_of_tile_on_hoovering = True
-								if checkbox_calculate_score.is_filled :
+								if checkbox_calculate_score2.is_filled :
 									display_new_score_in_real_time = True
 								"""
 								# settings
-								enable_shuffle_letter = checkbox_find_word.is_filled
-								display_type_of_tile_on_hoovering = checkbox_bonus_cases.is_filled
-								display_new_score_in_real_time = checkbox_calculate_score.is_filled
+								enable_shuffle_letter = checkbox_find_word2.is_filled
+								display_type_of_tile_on_hoovering = checkbox_bonus_cases2.is_filled
+								display_new_score_in_real_time = checkbox_calculate_score2.is_filled
 
 								# Reset
 								for button in layers.buttons_on_screen :
@@ -2199,49 +2223,26 @@ while game_is_running:
 
 
 							#STEP 2 / STEP 5
-							elif STEP == 2 or STEP == 5 :
+							elif STEP == 2 :
 
+								# letters on board
+								x, y = 1, 6
+								for letter in "UTILISATEUR" :
+									layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
+									var.current_board_state[y][x] = letter
+									x += 1
 
-								if STEP == 2 :
-									# letters on board
-									x, y = 1, 6
-									for letter in "UTILISATEUR" :
-										layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
-										var.current_board_state[y][x] = letter
-										x += 1
-
-
-								elif STEP == 5 :
-									# letters on board
-									x, y = 2, 4
-									for letter in "METHODES" :
-										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-										var.current_board_state[y][x] = letter
-										y += 1
-
-									# letters in hand
-									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
-									hand_state = []
-									
-									for tmp_letter in tmp_second_hand :
-
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										var.current_player.hand.add(letter)
-										hand_state.append(letter.id)
-										pos_x = pos_x+1
-
-									PLAYERS[0].hand_state = hand_state
-
-
+								# ___ NEXT STEP ___
 								STEP = STEP + 1
 								progress_bar.fill()	
 
+								# ___ ADD BUTTONS ___
 								layers.buttons_on_screen.remove(button_ok)
 								layers.buttons_on_screen.add(button_end_turn)
 								if enable_shuffle_letter :
 									layers.buttons_on_screen.add(button_shuffle)
 
+								# ___ DRAW BOARD ___
 								layers.background.draw(window)
 								layers.tiles.draw(window)
 								layers.hand_holder.draw(window)
@@ -2259,7 +2260,71 @@ while game_is_running:
 
 								pygame.display.update()
 								var.current_action = "SELECT_A_LETTER"
-								break
+
+
+							elif STEP == 5 :
+
+								#TODO CONF
+
+								# Reset
+								for button in layers.buttons_on_screen :
+									if button.is_a_checkbox :
+										button.empty()
+
+								# letters on board
+								x, y = 2, 4
+								for letter in "METHODES" :
+									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+									var.current_board_state[y][x] = letter
+									y += 1
+
+								# letters in hand
+								pos_x = (UI_LEFT_LIMIT)
+								pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+								hand_state = []
+								
+								for tmp_letter in tmp_second_hand :
+
+									letter = Letter(tmp_letter, pos_x, pos_y)
+									var.current_player.hand.add(letter)
+									hand_state.append(letter.id)
+									pos_x = pos_x+1
+
+								PLAYERS[0].hand_state = hand_state
+
+								# ___ NEXT STEP ___
+								STEP = STEP + 1
+								progress_bar.fill()	
+
+								# ___ ADD BUTTONS ___
+								layers.buttons_on_screen.remove(button_ok)	
+
+								layers.buttons_on_screen.remove(checkbox_find_word)
+								layers.buttons_on_screen.remove(checkbox_bonus_cases)
+
+								layers.buttons_on_screen.add(button_end_turn)
+								if enable_shuffle_letter :
+									layers.buttons_on_screen.add(button_shuffle)
+
+								# ___ DRAW BOARD ___
+								layers.background.draw(window)
+								layers.tiles.draw(window)
+								layers.hand_holder.draw(window)
+								layers.buttons_on_screen.draw(window)
+
+								var.background_no_letter = window.copy()
+
+								layers.letters_on_board.draw(window)
+								var.current_player.hand.draw(window)
+								var.current_background_no_text = window.copy()
+
+								progress_bar.draw()
+								ui_text.drawText()
+								var.current_background = window.copy()
+
+								pygame.display.update()
+								var.current_action = "SELECT_A_LETTER"
+								#break
 
 								"""
 								#------ CLOSE WINDOW -------
@@ -2695,7 +2760,7 @@ while game_is_running:
 
 									layers.buttons_on_screen.add(checkbox_function_shuffle2)
 									layers.buttons_on_screen.add(checkbox_function_display_bonus2)
-									layers.buttons_on_screen.add(checkbox_function_score2)
+									#layers.buttons_on_screen.add(checkbox_function_score2)
 
 
 									# ___ DRAW WINDOW ___
