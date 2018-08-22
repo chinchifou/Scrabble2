@@ -2015,17 +2015,21 @@ while game_is_running:
 
 								layers.buttons_on_screen.add(button_ok)
 								layers.buttons_on_screen.add(progress_bar.button_reinit)
+
 								layers.buttons_on_screen.add(checkbox_find_word)
 								layers.buttons_on_screen.add(checkbox_bonus_cases)
 								layers.buttons_on_screen.add(checkbox_calculate_score)
 								layers.buttons_on_screen.add(checkbox_suggest_word)
 
 								if tmp_enable_shuffle :
-									checkbox_find_word.fill() #TODO fix - turn off highlighted
+									checkbox_find_word.fill()
+									checkbox_find_word.turnOffHighlighted()
 								if tmp_display_pop_up :
 									checkbox_bonus_cases.fill()
+									checkbox_bonus_cases.turnOffHighlighted()
 								if tmp_display_score :
 									checkbox_calculate_score.fill()
+									checkbox_calculate_score.turnOffHighlighted()
 
 								layers.buttons_on_screen.draw(window)
 								
