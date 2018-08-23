@@ -526,7 +526,7 @@ class UITextPrinter():
 			all_texts = [
 			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
 			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.75) ),
-			UIText( "> Une science avec des méthodes pour améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
+			UIText( "> Une science avec des méthodes pour concevoir et améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
 			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.25) ),
 			UIText( "En fait, l'ergonomie c'est l'avenir !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_left+7.5) ),
 			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) ),
@@ -542,21 +542,49 @@ class UITextPrinter():
 			if STEP == 3 :
 				all_texts = [
 				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Vous auriez pu marquer 32 points avec le mot BESOIN.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				UIText( "Vous auriez pu marquer 16 points avec le mot BESOIN.", LINE_HEIGHT.NORMAL, False, (12, 10) )
 				]
 			if STEP == 6 :
 				all_texts = [
 				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Vous auriez pu marquer 32 points avec le mot SYSTEME.", LINE_HEIGHT.NORMAL, False, (12, 10) ),					]
+				UIText( "Vous auriez pu marquer 32 points avec le mot SCIENCES.", LINE_HEIGHT.NORMAL, False, (12, 10) )
+				]
 			if STEP == 9 :
 				all_texts = [
 				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Vous auriez pu marquer 32 points avec le mot AVENIR.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				UIText( "Vous auriez pu marquer 26 points avec le mot AVENIR.", LINE_HEIGHT.NORMAL, False, (12, 10) )
 				]
 		else :
 			all_texts = [
 			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
-			UIText( "Placer des lettres sur le plateau pour marquer des points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+			UIText( "Placer des lettres sur le plateau pour marquer des points.", LINE_HEIGHT.NORMAL, False, (12, 10) )
+			]
+
+		for text_it in all_texts :
+			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+
+
+	def drawPopUpScore2(self, word):
+		if len(word) > 0 :
+			if STEP == 3 :
+				all_texts = [
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
+				UIText( "Score maximal atteignable : 16 points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				]
+			if STEP == 6 :
+				all_texts = [
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
+				UIText( "Score maximal atteignable : 32 points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				]
+			if STEP == 9 :
+				all_texts = [
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
+				UIText( "Score maximal atteignable : 26 points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				]
+		else :
+			all_texts = [
+			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
+			UIText( "Placer des lettres sur le plateau pour marquer des points.", LINE_HEIGHT.NORMAL, False, (12, 10) )
 			]
 
 		for text_it in all_texts :
@@ -814,7 +842,7 @@ class ProgressBar():
 		self.button_reinit = Button("reinit", pos_x-1.25, pos_y-0.56)
 		#self.button_reinit.width, self.button_reinit.height = height, height
 		#self.button_reinit.resize()
-		layers.progress_bar.add(self.button_reinit)
+		#layers.progress_bar.add(self.button_reinit)
 
  		#diggerent states of the progress bar
 		self.state = 0
@@ -1680,6 +1708,7 @@ for letter in "ERGONOMIE" :
 
 # ------- CREATES BUTTONS --------
 button_ok = Button("ok", 32/2.0 - 1, 14.5 )
+#button_ok2 = Button("ok", 32/2.0 - 5, 14.5 )
 
 button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1.5)
 
@@ -2037,7 +2066,7 @@ while game_is_running:
 								if display_type_of_tile_on_hoovering :
 									checkbox_bonus_cases.fill()
 
-								layers.buttons_on_screen.add(progress_bar.button_reinit)
+								#layers.buttons_on_screen.add(progress_bar.button_reinit)
 								layers.buttons_on_screen.draw(window)
 
 								progress_bar.draw()
@@ -2087,7 +2116,7 @@ while game_is_running:
 								layers.pop_up_window.draw(window)
 
 								layers.buttons_on_screen.add(button_ok)
-								layers.buttons_on_screen.add(progress_bar.button_reinit)
+								#layers.buttons_on_screen.add(progress_bar.button_reinit)
 
 								layers.buttons_on_screen.add(checkbox_find_word2)
 								layers.buttons_on_screen.add(checkbox_bonus_cases2)
@@ -2139,7 +2168,7 @@ while game_is_running:
 								if enable_shuffle_letter :
 									layers.buttons_on_screen.add(button_shuffle)
 								layers.buttons_on_screen.add(button_end_turn)
-								layers.buttons_on_screen.add(progress_bar.button_reinit)
+								#layers.buttons_on_screen.add(progress_bar.button_reinit)
 
 								# letters
 								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2662,7 +2691,7 @@ while game_is_running:
 
 									progress_bar.fill()
 									layers.buttons_on_screen.add(button_ok)
-									layers.buttons_on_screen.add(progress_bar.button_reinit)
+									#layers.buttons_on_screen.add(progress_bar.button_reinit)
 
 									# ___ DRAW WINDOW ___
 									#draw new screen
@@ -2704,7 +2733,8 @@ while game_is_running:
 
 								layers.dark_filter.draw(window)
 								layers.pop_up_score.draw(window)
-								
+
+	
 								if len(words) > 0 :
 									ui_text.drawPopUpScore(str(words[0]))
 								else :
@@ -2712,7 +2742,9 @@ while game_is_running:
 								
 
 								pygame.display.update()
-								pygame.time.wait(4000)
+
+								pygame.time.wait(3000)
+
 
 								#display score
 								#logging.debug("New Player score : %s", str(var.current_player.score))
