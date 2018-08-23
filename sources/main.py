@@ -229,6 +229,7 @@ class Layer():
 
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
+		self.pop_up_score = GroupOfSprites()
 		self.progress_bar = GroupOfSprites()
 		self.mask_text = GroupOfSprites() 
 
@@ -531,6 +532,32 @@ class UITextPrinter():
 			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) ),
 			UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+12.25, limit_top+11) ),
 			]			
+
+		for text_it in all_texts :
+			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+
+
+	def drawPopUpScore(self, word):
+		if len(word) > 0 :
+			if STEP == 3 :
+				all_texts = [
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
+				UIText( "Vous auriez pu marquer 32 points avec le mot BESOIN.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				]
+			if STEP == 6 :
+				all_texts = [
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
+				UIText( "Vous auriez pu marquer 32 points avec le mot SYSTEME.", LINE_HEIGHT.NORMAL, False, (12, 10) ),					]
+			if STEP == 9 :
+				all_texts = [
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
+				UIText( "Vous auriez pu marquer 32 points avec le mot AVENIR.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				]
+		else :
+			all_texts = [
+			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
+			UIText( "Placer des lettres sur le plateau pour marquer des points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+			]
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
@@ -1707,6 +1734,12 @@ pop_up_window_surface.fill(COLOR.GREY_DEEP)
 pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
 layers.pop_up_window.add(pop_up_window)
 
+#create score window_pop_up
+pop_up_score_surface = pygame.Surface((16*var.tile_size, 4*var.tile_size))
+pop_up_score_surface.fill(COLOR.GREY_DEEP)				
+pop_up_score = UI_Surface('score_pop_up', 10, 7, pop_up_score_surface)
+layers.pop_up_score.add(pop_up_score)
+
 #create mask for text
 surf_mask_text = pygame.Surface((4*var.tile_size, 3*var.tile_size))
 surf_mask_text.fill(COLOR.GREY_DEEP)				
@@ -2661,10 +2694,25 @@ while game_is_running:
 								#calculate score
 								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
+								words = []
+
 								for association in var.last_words_and_scores :
 									var.current_player.score +=  association[1]
+									words.append(association[0])
 								
 								var.predicted_score = 0
+
+								layers.dark_filter.draw(window)
+								layers.pop_up_score.draw(window)
+								
+								if len(words) > 0 :
+									ui_text.drawPopUpScore(str(words[0]))
+								else :
+									ui_text.drawPopUpScore("")
+								
+
+								pygame.display.update()
+								pygame.time.wait(4000)
 
 								#display score
 								#logging.debug("New Player score : %s", str(var.current_player.score))
