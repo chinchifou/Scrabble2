@@ -248,22 +248,30 @@ class UIText():
 		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
 		self.font.set_bold(self.bold)
 
-		self.pos_x_tiles, self.pos_y_tiles = pos_in_tiles[0], pos_in_tiles[1]
-		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
+		self.pos_x, self.pos_y = pos_in_tiles[0], pos_in_tiles[1]
+		self.pos_x_pix, self.pos_y_pix = pixels(self.pos_x, self.pos_y)
 
-		self.bottom_tiles = self.pos_y_tiles + line_heigh
+		self.width, self.height = tiles_tup(self.font.size(self.text))
+		#logging.debug("text width : %i, text height : %i", self.width, self.height)
+		#logging.debug("text is : %s", self.text)
+
+		self.bottom_tiles = self.pos_y + line_heigh
 
 		UIText.all.append(self)
+		logging.debug("CREATE")
+		self.info()
 
 	def resize(self):
 		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
 		self.font.set_bold(self.bold)
 
-		self.pos_x, self.pos_y = pixels(self.pos_x_tiles, self.pos_y_tiles)
+		self.pos_x_pix, self.pos_y_pix = pixels(self.pos_x, self.pos_y)
+		logging.debug("RESIZE")
+		self.info()
 
-	def moveAtPixels(self, pos_x, pos_y):
-		self.pos_x, self.pos_y = pos_x, pos_y
-		self.pos_x_tiles, self.pos_y_tiles = tiles(self.pos_x, self.pos_y)
+	def moveAtPixels(self, pos_x_pix, pos_y_pix):
+		self.pos_x_pix, self.pos_y_pix = pos_x_pix, pos_y_pix
+		self.pos_x, self.pos_y = tiles(self.pos_x_pix, self.pos_y_pix)
 
 	def info(self):
 		logging.debug("UI Text")
@@ -271,8 +279,8 @@ class UIText():
 		logging.debug("Line heigh : %s", str(self.line_heigh))
 		logging.debug("Bold : %s", str(self.bold))
 		logging.debug("Font : %s", str(self.font.size))
-		logging.debug("Position in tiles : %s, %s", self.pos_x_tiles, self.pos_y_tiles)
-		logging.debug("Position in pixels : %s, %s", self.pos_x, self.pos_y)
+		logging.debug("Position in tiles : %s, %s", self.pos_x, self.pos_y)
+		logging.debug("Position in pixels : %s, %s", self.pos_x_pix, self.pos_y_pix)
 
 
 #class used to diaply text pop up to the user
@@ -285,9 +293,9 @@ class UserInterFacePopUp(UIText):
 
 	def drawAt(self, pixels_pos_x, pixels_pos_y):
 
-		self.moveAtPixels(pixels_pos_x, pixels_pos_y)	
+		self.moveAtPixels(pixels_pos_x, pixels_pos_y)
 		text = self.font.render(self.text, 1, self.text_color, self.background_color )
-		window.blit( text, (self.pos_x, self.pos_y) )
+		window.blit( text, (self.pos_x_pix, self.pos_y_pix) )
 
 
 #class storing userface interface text and displaying them
@@ -300,7 +308,7 @@ class UITextPrinter():
 
 		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1.2+1*UI_INTERLIGNE) )
 
-		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.pos_y_tiles+1) )
+		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.pos_y+1) )
 
 		if display_next_player_hand :
 			self.scores = UIText(ui_content['scores'][language_id], 1.0, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
@@ -350,14 +358,14 @@ class UITextPrinter():
 
 		#Current player hand
 		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY_LIGHT )
-		window.blit(text, (self.current_player_turn.pos_x, self.current_player_turn.pos_y))		
+		window.blit(text, (self.current_player_turn.pos_x_pix, self.current_player_turn.pos_y_pix))		
 
 		"""
 		#display next player hand
 		if display_next_player_hand :
 			#Next player hand header
 			text = self.next_player_hand_header.font.render( self.next_player_hand_header.text.replace('<NEXT_PLAYER>',var.current_player.next().name), 1, COLOR.GREY_LIGHT )
-			window.blit(text, (self.next_player_hand_header.pos_x, self.next_player_hand_header.pos_y))
+			window.blit(text, (self.next_player_hand_header.pos_x_pix, self.next_player_hand_header.pos_y_pix))
 
 			#Next player hand content
 			str_hand = ""
@@ -369,16 +377,16 @@ class UITextPrinter():
 					str_hand += str ( letter_to_display.name ) + "  " 
 
 			text = self.next_player_hand.font.render( str_hand , 1, COLOR.GREY_LIGHT )
-			window.blit(text, (self.next_player_hand.pos_x, self.next_player_hand.pos_y))
+			window.blit(text, (self.next_player_hand.pos_x_pix, self.next_player_hand.pos_y_pix))
 		"""
 
 		#Scores header
 		if display_new_score_in_real_time :
 			text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
-			window.blit(text, (self.scores.pos_x, self.scores.pos_y))		
+			window.blit(text, (self.scores.pos_x_pix, self.scores.pos_y_pix))		
 
 			#text = self.player_score.font.render( self.player_score.text.replace('<SCORE>', str(var.current_player.score) ), 1, COLOR.GREY_LIGHT )
-			#window.blit(text, (self.player_score.pos_x, self.player_score.pos_y))
+			#window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix))
 
 			#score of each player
 			pos_y_delta = 0
@@ -390,10 +398,10 @@ class UITextPrinter():
 					else :
 						text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, custom_color )
 					self.player_score.font.set_bold(0)
-					window.blit(text, (self.player_score.pos_x+(( pos_y_delta+0.2)*var.tile_size), self.player_score.pos_y+(( pos_y_delta+0.4)*var.tile_size) ) )
+					window.blit(text, (self.player_score.pos_x_pix+(( pos_y_delta+0.2)*var.tile_size), self.player_score.pos_y_pix+(( pos_y_delta+0.4)*var.tile_size) ) )
 				else :
 					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
-					window.blit(text, (self.player_score.pos_x, self.player_score.pos_y+(pos_y_delta*var.tile_size) ) )
+					window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+(pos_y_delta*var.tile_size) ) )
 				pos_y_delta += 0.8
 
 			"""
@@ -404,22 +412,22 @@ class UITextPrinter():
 
 				#header
 				text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
-				window.blit(text, (self.previous_turn_summary.pos_x, self.previous_turn_summary.pos_y))
+				window.blit(text, (self.previous_turn_summary.pos_x_pix, self.previous_turn_summary.pos_y_pix))
 
 				pos_y_delta = 0
 				for association in var.last_words_and_scores :
 					if association[0] == "!! SCRABBLE !!" :
 						text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
-						window.blit(text, (self.scrabble_obtained.pos_x, self.scrabble_obtained.pos_y+(pos_y_delta*var.tile_size)))
+						window.blit(text, (self.scrabble_obtained.pos_x_pix, self.scrabble_obtained.pos_y_pix+(pos_y_delta*var.tile_size)))
 					else :		
 						text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY_LIGHT )
-						window.blit(text, (self.word_and_points.pos_x, self.word_and_points.pos_y+(pos_y_delta*var.tile_size)))
+						window.blit(text, (self.word_and_points.pos_x_pix, self.word_and_points.pos_y_pix+(pos_y_delta*var.tile_size)))
 					pos_y_delta += 0.8
 
 			else :
 				#nothing played
 				text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
-				window.blit(text, (self.nothing_played.pos_x, self.nothing_played.pos_y) )
+				window.blit(text, (self.nothing_played.pos_x_pix, self.nothing_played.pos_y_pix) )
 
 		#remaining_letters
 		if False :
@@ -428,25 +436,25 @@ class UITextPrinter():
 				text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY_LIGHT )
 					
 				if len(var.last_words_and_scores) > 0 :
-					window.blit(text, (self.no_remaining_letter.pos_x, self.no_remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+					window.blit(text, (self.no_remaining_letter.pos_x_pix, self.no_remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
 				else :
-					window.blit(text, (self.no_remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+					window.blit(text, (self.no_remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 			elif len(var.bag_of_letters) == 1 :
 				text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY_LIGHT )
 					
 				if len(var.last_words_and_scores) > 0 :
-					window.blit(text, (self.remaining_letter.pos_x, self.remaining_letter.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+					window.blit(text, (self.remaining_letter.pos_x_pix, self.remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
 				else :
-					window.blit(text, (self.remaining_letter.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+					window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
 			else :
 				text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY_LIGHT )
 
 				if len(var.last_words_and_scores) > 0 :
-					window.blit(text, (self.remaining_letters.pos_x, self.remaining_letters.pos_y+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+					window.blit(text, (self.remaining_letters.pos_x_pix, self.remaining_letters.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
 				else :
-					window.blit(text, (self.remaining_letters.pos_x, self.nothing_played.pos_y+ (2*UI_INTERLIGNE)*var.tile_size ) )
+					window.blit(text, (self.remaining_letters.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
 			"""
 
 	def drawTextPopUp(self, step):
@@ -534,9 +542,9 @@ class UITextPrinter():
 			]			
 
 		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
 
-
+	"""
 	def drawPopUpScore(self, word):
 		if len(word) > 0 :
 			if STEP == 3 :
@@ -562,29 +570,43 @@ class UITextPrinter():
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+	"""
 
 
 	def drawPopUpScore2(self, word):
-		if len(word) > 0 :
-			if STEP == 3 :
-				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
-				]
-			if STEP == 6 :
-				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
-				]
-			if STEP == 9 :
-				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
-				]
-		else :
-			all_texts = [
-			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
-			]
 
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
+		if len(word) > 0 :
+			text = "Vous avez marqué "+str(var.current_player.score)+" points."
+			ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
+
+		else :
+			if ( len( layers.letters_just_played.sprites() ) > 0) :
+				text = "Vous n'avez pas marqué de points."
+				ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
+			else :
+				text = "Déposer des lettres sur le plateau pour marquer des points."
+				ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
+
+
+
+		layers.pop_up_score.sprites()[0].width = ui_text.width + 2
+		layers.pop_up_score.sprites()[0].height = ui_text.height + 1
+
+		#ui_text.pos_x = 16 - round(ui_text.width / 2)
+		#ui_text.pos_y = 16 - round(ui_text.height / 2)
+
+		layers.pop_up_score.sprites()[0].pos_x = ui_text.pos_x - 1
+		layers.pop_up_score.sprites()[0].pos_y = ui_text.pos_y - 0.5
+
+		layers.pop_up_score.sprites()[0].resize()
+
+		logging.debug("New pop up width : %i, height : %i", layers.pop_up_score.sprites()[0].width, layers.pop_up_score.sprites()[0].height)
+		logging.debug("New pop up pos x : %i, y : %i", layers.pop_up_score.sprites()[0].pos_x, layers.pop_up_score.sprites()[0].pos_y)
+
+		layers.dark_filter.draw(window)
+		layers.pop_up_score.draw(window)
+
+		window.blit( ui_text.font.render(text, 1, COLOR.WHITE), (ui_text.pos_x_pix, ui_text.pos_y_pix) )
 
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
@@ -603,6 +625,9 @@ class UITextPrinter():
 #----- convert bewten tiles numbers and pixels -----
 def tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(var.tile_size) ), round( value_in_pixels2/float(var.tile_size) ) )
+
+def tiles_tup(tuple):
+	return tiles(tuple[0], tuple[1])
 
 def in_reference_tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(REFERENCE_TILE_SIZE) ), round( value_in_pixels2/float(REFERENCE_TILE_SIZE) ) )
@@ -857,7 +882,7 @@ class ProgressBar():
 		else :
 			text = UIText( "Etape : 3 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
 
-		window.blit( text.font.render(text.text, 1, COLOR.GREY_LIGHT), (text.pos_x, text.pos_y) )
+		window.blit( text.font.render(text.text, 1, COLOR.GREY_LIGHT), (text.pos_x_pix, text.pos_y_pix) )
 
 	def fill(self):
 
@@ -1600,7 +1625,7 @@ tmp_third_hand = ['A','E','V','I','N','R']
 start_hand = GroupOfSprites()
 hand_state = []
 pos_x = (UI_LEFT_LIMIT)
-pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+pos_y = ui_text.current_player_turn.pos_y+1.5
 
 
 for tmp_letter in tmp_first_hand :
@@ -1630,7 +1655,7 @@ if enough_letters :
 		start_hand = GroupOfSprites()
 		hand_state = []
 		pos_x = (UI_LEFT_LIMIT)
-		pos_y = ui_text.current_player_turn.pos_y_tiles+1
+		pos_y = ui_text.current_player_turn.pos_y+1
 
 		for i in range(var.number_of_letters_per_hand) :
 			if len(var.bag_of_letters) > 0 :
@@ -1659,7 +1684,7 @@ else :
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
 #create hand_holder
-hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y_tiles+1.4, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, ui_text.current_player_turn.pos_y+1.4, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 
 #create tiles
 DELTA = 1.5
@@ -1706,7 +1731,7 @@ for letter in "ERGONOMIE" :
 button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 #button_ok2 = Button("ok", 32/2.0 - 5, 14.5 )
 
-button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y_tiles+1.5)
+button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y+1.5)
 
 button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
@@ -1748,7 +1773,8 @@ checkbox_calculate_score2 = Checkbox("checkbox", 5, 13.25 )
 #create dark_filter
 mask_surface = pygame.Surface((var.window_width, var.window_height))
 mask_surface.fill(COLOR.BLACK)
-mask_surface.set_alpha(180)
+#mask_surface.set_alpha(180)
+mask_surface.set_alpha(230)
 mask_surface = mask_surface.convert_alpha()
 dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface)
 layers.dark_filter.add(dark_filter)
@@ -1760,9 +1786,9 @@ pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
 layers.pop_up_window.add(pop_up_window)
 
 #create score window_pop_up
-pop_up_score_surface = pygame.Surface((16*var.tile_size, 4*var.tile_size))
+pop_up_score_surface = pygame.Surface((11*var.tile_size, 3.5*var.tile_size))
 pop_up_score_surface.fill(COLOR.GREY_DEEP)				
-pop_up_score = UI_Surface('score_pop_up', 10, 7, pop_up_score_surface)
+pop_up_score = UI_Surface('score_pop_up', 11, 7.25, pop_up_score_surface)
 layers.pop_up_score.add(pop_up_score)
 
 #create mask for text
@@ -1877,7 +1903,7 @@ while game_is_running:
 			var.current_player.score = 0
 
 			pos_x = (UI_LEFT_LIMIT)
-			pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+			pos_y = ui_text.current_player_turn.pos_y+1.5
 
 			hand_state = []
 			for tmp_letter in tmp_first_hand :
@@ -1988,7 +2014,6 @@ while game_is_running:
 								button.is_highlighted = False
 								button.push()
 								need_refresh_buttons_on_screen = True
-								button.info()
 
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 					elif ( event_type == pygame.MOUSEBUTTONUP ) :
@@ -2176,7 +2201,7 @@ while game_is_running:
 									x += 1
 
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+								pos_y = ui_text.current_player_turn.pos_y+1.5
 								hand_state = []
 								
 								for tmp_letter in tmp_third_hand :
@@ -2270,7 +2295,7 @@ while game_is_running:
 								var.current_player.score = 0
 
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+								pos_y = ui_text.current_player_turn.pos_y+1.5
 
 								hand_state = []
 								for tmp_letter in tmp_first_hand :
@@ -2358,7 +2383,7 @@ while game_is_running:
 
 								# letters in hand
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+								pos_y = ui_text.current_player_turn.pos_y+1.5
 								hand_state = []
 								
 								for tmp_letter in tmp_second_hand :
@@ -2727,9 +2752,6 @@ while game_is_running:
 								
 								var.predicted_score = 0
 
-								layers.dark_filter.draw(window)
-								layers.pop_up_score.draw(window)
-
 	
 								if len(words) > 0 :
 									ui_text.drawPopUpScore2(str(words[0]))
@@ -2739,7 +2761,8 @@ while game_is_running:
 
 								pygame.display.update()
 
-								pygame.time.wait(3000)
+								pygame.time.wait(10000)
+								#TODO
 
 
 								#display score
@@ -2912,7 +2935,7 @@ while game_is_running:
 									shuffle(var.current_player.hand_state)
 
 									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y_tiles+1.5
+									pos_y = ui_text.current_player_turn.pos_y+1.5
 
 									hand_state = []
 									for index in var.current_player.hand_state :
