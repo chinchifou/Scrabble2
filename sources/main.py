@@ -520,7 +520,7 @@ class UITextPrinter():
 			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
 			UIText( "Ensemble nous avons améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
 			UIText( "Merci de votre participation !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
-			UIText( "Un récapitulatif concernant l'ergonomie vous attends à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) )
+			UIText( "Un récapitulatif concernant l'ergonomie vous attend à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) )
 			]
 		elif step == 11 :
 			all_texts = [
@@ -568,23 +568,19 @@ class UITextPrinter():
 		if len(word) > 0 :
 			if STEP == 3 :
 				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Score maximal atteignable : 16 points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
 				]
 			if STEP == 6 :
 				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Score maximal atteignable : 32 points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
 				]
 			if STEP == 9 :
 				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Score maximal atteignable : 26 points.", LINE_HEIGHT.NORMAL, False, (12, 10) ),
+				UIText( "Vous avez marqué "+str(var.current_player.score)+" points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
 				]
 		else :
 			all_texts = [
-			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
-			UIText( "Placer des lettres sur le plateau pour marquer des points.", LINE_HEIGHT.NORMAL, False, (12, 10) )
+			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) )
 			]
 
 		for text_it in all_texts :
@@ -854,9 +850,9 @@ class ProgressBar():
 		layers.progress_bar.draw(window)
 
 		text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-		if self.state in (0,1,2,3) :
+		if self.state in (0,1,2,3,4,5) :
 			text = UIText( "Etape : 1 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-		elif self.state in (4,5,6) :
+		elif self.state in (6,7,8) :
 			text = UIText( "Etape : 2 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
 		else :
 			text = UIText( "Etape : 3 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
@@ -2736,9 +2732,9 @@ while game_is_running:
 
 	
 								if len(words) > 0 :
-									ui_text.drawPopUpScore(str(words[0]))
+									ui_text.drawPopUpScore2(str(words[0]))
 								else :
-									ui_text.drawPopUpScore("")
+									ui_text.drawPopUpScore2("")
 								
 
 								pygame.display.update()
