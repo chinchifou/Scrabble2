@@ -77,6 +77,12 @@ PLAYERS = []
 # Turn number
 STEP = 0
 
+global MUST_DIPSLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR
+# boolean to indicate wether to display pop_up or not
+MUST_DIPSLAY_POP_UP = False
+# number of frames before the pop_up disappear
+FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
+
 #Folders' paths
 path_log = path.abspath('../log/')
 if not path.exists(path_log):
@@ -238,8 +244,11 @@ class Layer():
 		self.dark_filter = GroupOfSprites()
 		self.pop_up_window = GroupOfSprites()
 		self.pop_up_score = GroupOfSprites()
+
 		self.progress_bar = GroupOfSprites()
-		self.mask_text = GroupOfSprites() 
+		self.mask_text = GroupOfSprites()
+
+		self.pop_up = GroupOfSprites()
 
 		self.all = GroupOfSprites()
 
@@ -615,34 +624,6 @@ class UITextPrinter():
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
 
 	"""
-	def drawPopUpScore(self, word):
-		if len(word) > 0 :
-			if STEP == 3 :
-				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Vous auriez pu marquer 16 points avec le mot BESOIN.", LINE_HEIGHT.NORMAL, False, (12, 10) )
-				]
-			if STEP == 6 :
-				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Vous auriez pu marquer 32 points avec le mot SCIENCES.", LINE_HEIGHT.NORMAL, False, (12, 10) )
-				]
-			if STEP == 9 :
-				all_texts = [
-				UIText( "Vous avez marqué "+str(var.current_player.score)+" points pour le mot "+word, LINE_HEIGHT.NORMAL, False, (12, 8) ),
-				UIText( "Vous auriez pu marquer 26 points avec le mot AVENIR.", LINE_HEIGHT.NORMAL, False, (12, 10) )
-				]
-		else :
-			all_texts = [
-			UIText( "Vous n'avez pas marqué de points.", LINE_HEIGHT.NORMAL, False, (12, 8) ),
-			UIText( "Placer des lettres sur le plateau pour marquer des points.", LINE_HEIGHT.NORMAL, False, (12, 10) )
-			]
-
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x, text_it.pos_y) )
-	"""
-
-
 	def drawPopUpScore2(self, word):
 
 		if len(word) > 0 :
@@ -676,7 +657,7 @@ class UITextPrinter():
 		layers.pop_up_score.draw(window)
 
 		window.blit( ui_text.font.render(text, 1, COLOR.WHITE), (ui_text.pos_x_pix, ui_text.pos_y_pix) )
-
+	"""
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
 		if tile.name == 'double_letter' :
@@ -687,6 +668,67 @@ class UITextPrinter():
 			self.double_word.drawAt(pixel_pos_x, pixel_pos_y)
 		elif tile.name == 'triple_word':
 			self.triple_word.drawAt(pixel_pos_x, pixel_pos_y)
+
+
+
+def createPopUp(ar_texts, in_the_centre=False, position=(12,9), interligne = 1.0):
+
+	pos_x, pos_y = position[0], position[1]
+	logging.debug("Pos x : %i, Pos y : %i", pos_x, pos_y)
+	left_margin, top_margin = interligne, interligne
+	pos_x_window, pos_y_window = pos_x - left_margin, pos_y - top_margin
+	logging.debug("Pos x window : %i, Pos y window: %i", pos_x_window, pos_y_window)
+
+	#Create UI text objects
+	ui_texts = []
+	for text in ar_texts :
+		ui_texts.append( UIText( text, LINE_HEIGHT.SUBTITLE, False, (pos_x, pos_y) ) )
+		pos_y += interligne
+
+	#Get size of the text to center it and create window accordingly
+	max_width, max_height = 0, 0
+	for ui_text in ui_texts :
+		max_width = max ( max_width, ui_text.width )
+		max_height = max ( max_height, ui_text.height )
+
+	logging.debug("max_width : %i, max_height : %i", max_width, max_height)
+
+	#Put the text in the center of the screen
+	if in_the_centre :
+
+		pos_x = 16 - round(max_width / 2.0)
+		pos_y = 8 - round(max_height / 2.0)
+		pos_x_window, pos_y_window = pos_x - left_margin, pos_y - top_margin
+
+		logging.debug("I want Pos x : %i, Pos y : %i", pos_x, pos_y)
+
+		tmp_pos_y = pos_y
+		for ui_text in ui_texts :
+			ui_text.pos_x, ui_text.pos_y = pos_x, pos_y
+			ui_text.pos_x_pix, ui_text.pos_y_pix = pixels(ui_text.pos_x, ui_text.pos_y)
+			tmp_pos_y += interligne
+
+	logging.debug("I get Pos x : %i, Pos y : %i", pos_x, pos_y)
+
+	#window
+	logging.debug("2 - Pos x window : %i, Pos y window: %i", pos_x_window, pos_y_window)
+	top_left_corner = pixels( pos_x_window, pos_y_window )
+	bottom_right_corner = pixels( pos_x_window+max_width+2*left_margin, pos_y_window+max_height+2*top_margin )
+
+	#create pop_up background surface
+	pop_up_surface = pygame.Surface( pixels(max_width+2*left_margin , max_height+2*interligne) )
+	pop_up_surface.fill(COLOR.GREY_DEEP)
+	pygame.draw.rect(pop_up_surface, COLOR.WHITE, pygame.Rect( (top_left_corner), (bottom_right_corner) ), 3)
+
+	#add text
+	tmp_top_margin = top_margin
+	for ui_text in ui_texts :
+		pop_up_surface.blit( ui_text.font.render(text, 1, COLOR.WHITE), pixels(left_margin, tmp_top_margin) )
+		tmp_top_margin + interligne
+
+	#create complete pop_up
+	return UI_Surface('pop_up', pos_x_window, pos_y_window, pop_up_surface)
+
 
 
 #~~~~~~ CONVERTION ~~~~~~
@@ -778,8 +820,27 @@ class ResizableSprite(pygame.sprite.Sprite):
 		logging.debug("pixel width : %s /  pixel height : %s", self.rect.width, self.rect.height)
 		logging.debug("")
 
+# ___ SUBCALSSES ___
+#----- UI Surface -----
+class UI_Surface(ResizableSprite):
+	def __init__(self, name, pos_x, pos_y, surface):
+		self.path = None
+		self.image = surface
 
-#----- Sprites -----
+		ResizableSprite.__init__(self, name, pos_x, pos_y)
+
+#----- UI Image -----
+class UI_Image(ResizableSprite):
+	def __init__(self, name, path, pos_x, pos_y, width, height):
+
+		self.path = path
+		self.name = name
+		self.width, self.height = width, height
+
+		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
+
+
+# ___ SPRITES ___ 
 
 #----- Board -----
 class Board(ResizableSprite):
@@ -808,35 +869,6 @@ class Hand_holder(ResizableSprite):
 			index_in_hand -= 1
 
 		return index_in_hand
-
-
-#----- UI Surface -----
-class UI_Surface(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y, surface):
-		self.path = None
-		self.image = surface
-
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
-
-
-#----- UI Image -----
-class UI_Image(ResizableSprite):
-	def __init__(self, name, path, pos_x, pos_y, width, height):
-
-		self.path = path
-		self.name = name
-		self.width, self.height = width, height
-
-		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
-
-
-#----- Board -----
-class Board(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y):
-		self.path = path_background
-		self.width, self.height = 32, 18
-		
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
 
 
 #----- Tiles -----
@@ -2074,7 +2106,7 @@ while game_is_running:
 			layers.selected_letter.draw(window)
 
 
-			if var.current_action == "POP_UP_DISPLAYED":
+			if var.current_action == "WINDOW_DISPLAYED":
 				layers.dark_filter.draw(window)
 				layers.pop_up_window.draw(window)
 				layers.background_pop_up_empty = window.copy()
@@ -2099,10 +2131,13 @@ while game_is_running:
 
 		# NORMAL EVENTS
 		else :
-
 			# //////// POP UP DISPLAYED ////////
+			if MUST_DIPSLAY_POP_UP :
+				if ( event_type == pygame.MOUSEBUTTONUP  and event.button == 1 ) :
+					FRAMES_BEFORE_POP_UP_DISAPPEAR = 0
 
-			if (var.current_action == "POP_UP_DISPLAYED") :
+			# //////// WINDOW DISPLAYED ////////
+			elif (var.current_action == "WINDOW_DISPLAYED") :
 
 				need_refresh_buttons_on_screen = False
 
@@ -2379,7 +2414,7 @@ while game_is_running:
 								enable_shuffle_letter = False
 								display_type_of_tile_on_hoovering = False
 								display_new_score_in_real_time = False
-								suggest_word = True
+								suggest_word = False
 
 								# Reset Board
 								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2864,7 +2899,7 @@ while game_is_running:
 
 									#UPDATE
 									pygame.display.update()
-									var.current_action = "POP_UP_DISPLAYED"
+									var.current_action = "WINDOW_DISPLAYED"
 
 
 							#------ RELEASE CLIC ON END TURN BUTTON -------
@@ -2875,33 +2910,50 @@ while game_is_running:
 								for line in var.current_board_state :
 									logging.debug(line)
 								"""
-
 								button_end_turn.release()
+								layers.buttons_on_screen.clear(window, var.background_empty)
+								layers.buttons_on_screen.draw(window)
 
 								#SCORES
 								#calculate score
 								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
 								words = []
-
 								for association in var.last_words_and_scores :
 									var.current_player.score +=  association[1]
 									words.append(association[0])
-								
-								var.predicted_score = 0
 
-	
-								if len(words) > 0 :
-									ui_text.drawPopUpScore2(str(words[0]))
+								move_on = False
+
+								#nothing played
+								if ( len( layers.letters_just_played.sprites() ) == 0) :
+									texts = ["Déposer vos lettres sur le plateau pour marquer des points."]
+								#played something
 								else :
-									ui_text.drawPopUpScore2("")
-								
+									if len(words) == 0 :
+										texts =[
+										"Coup non valide.", 
+										"Ecrivez votre mot verticalement ou horizontalement et sans espace."
+										]
+									else :
+										texts = ["Vous avez marqué "+str(var.current_player.score)+" points."]
+										move_on = True
 
+								#creeate pop up
+								layers.pop_up.add( createPopUp(texts, in_the_centre=True)  )
+
+								# snapshot of before pop_up
+								snapshot = window.copy()
+
+								#display pop_up
+								layers.dark_filter.draw(window)
+								layers.pop_up.draw(window)
 								pygame.display.update()
 
-								pygame.time.wait(1000)
-								#TODO
+								MUST_DIPSLAY_POP_UP = True
 
+								#prepare exit image (displayed when removing pop up)
+								window.blit(snapshot, (0,0))
 
 								#display score
 								#logging.debug("New Player score : %s", str(var.current_player.score))
@@ -2916,152 +2968,157 @@ while game_is_running:
 								for letter in layers.letters_just_played :
 									layers.letters_on_board.add(letter)
 								"""
-								# ___ RESET ___
-								#reset letters		
-								layers.letters_just_played.empty()
-								for letter in var.current_player.hand :
-									letter.kill()
-								layers.letters_on_board.empty()
 
-								#reset board state
-								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-								#reset score between turns
-								var.current_player.score = 0
-
-								# ___ RESET VISUAL ___
-								#reset screenshot background no letter (USELESS ?)
-								window.blit(var.background_no_letter, (0,0))
-								var.current_player.hand.clear(window, var.background_no_letter)
-								layers.letters_just_played.clear(window, var.background_no_letter)
-
-								layers.letters_on_board.draw(window)
-								var.current_player.hand.draw(window)
-								var.current_background_no_text = window.copy()
-								#progress_bar.draw()
-								var.current_background = window.copy()
-
-
-								if STEP == 3 :
-
-									# ___ DRAW BOARD ___
-									window.blit(var.background_no_letter, (0,0))
-									
-									var.current_player.hand.draw(window)
-
-									var.current_background_no_text = window.copy()
-									ui_text.drawText(STEP)
-									var.current_background = window.copy()
-
-									#NEW SCREEN
-									STEP = STEP + 1
-									progress_bar.fill()									
-
-									# ADD BUTTONS									
-									layers.buttons_on_screen.remove(button_end_turn)
-									layers.buttons_on_screen.add(button_ok)
-
-									layers.buttons_on_screen.add(checkbox_facile)
-									layers.buttons_on_screen.add(checkbox_moyen)
-									layers.buttons_on_screen.add(checkbox_difficile)
-
-									layers.buttons_on_screen.add(checkbox_function_shuffle)
-									layers.buttons_on_screen.add(checkbox_function_display_bonus)
-
-									# DRAW WINDOW
-									layers.dark_filter.draw(window)
-									layers.pop_up_window.draw(window)
-									layers.buttons_on_screen.draw(window)
-									
-									progress_bar.draw()
-									ui_text.drawTextPopUp(STEP)							
-
-
-								elif STEP == 6 :
+								if move_on:
 
 									# ___ RESET ___
-									#reset Board
+									#reset letters		
+									layers.letters_just_played.empty()
+									for letter in var.current_player.hand :
+										letter.kill()
 									layers.letters_on_board.empty()
+
+									#reset board state
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
-									#reset letters
-									for letter in var.current_player.hand :
-										letter.kill()
+									#reset score between turns
+									var.current_player.score = 0
 
-									# Reset buttons
-									for button in layers.buttons_on_screen :
-										if button.is_a_checkbox :
-											button.empty()
-									
-									# ___ DRAW BOARD ___
-									#screeshot background no letter (USELESS ?)
-									window.blit(var.background_no_letter, (0,0))
+									# ___ RESET VISUAL ___
+									#reset screenshot background no letter (USELESS ?)
+									#window.blit(var.background_no_letter, (0,0))
+									var.current_player.hand.clear(window, var.background_no_letter)
+									layers.letters_just_played.clear(window, var.background_no_letter)
+
+									layers.letters_on_board.draw(window)
 									var.current_player.hand.draw(window)
-
 									var.current_background_no_text = window.copy()
-									ui_text.drawText(STEP)
+									#progress_bar.draw()
 									var.current_background = window.copy()
 
 
-									# ___ NEXT STEP ___	
-									STEP = STEP + 1
-									progress_bar.fill()
+									if STEP == 3 :
 
-									# new buttons
-									layers.buttons_on_screen.remove(button_end_turn)
-									if enable_shuffle_letter :
-										layers.buttons_on_screen.remove(button_shuffle)	
+										# ___ DRAW BOARD ___
+										window.blit(var.background_no_letter, (0,0))
+										
+										var.current_player.hand.draw(window)
 
-									layers.buttons_on_screen.add(button_ok)
+										var.current_background_no_text = window.copy()
+										ui_text.drawText(STEP)
+										var.current_background = window.copy()
 
-									layers.buttons_on_screen.add(checkbox_facile2)
-									layers.buttons_on_screen.add(checkbox_moyen2)
-									layers.buttons_on_screen.add(checkbox_difficile2)
+										#NEW SCREEN
+										STEP = STEP + 1
+										progress_bar.fill()									
 
-									layers.buttons_on_screen.add(checkbox_function_shuffle2)
-									layers.buttons_on_screen.add(checkbox_function_display_bonus2)
-									#layers.buttons_on_screen.add(checkbox_function_score2)
+										# ADD BUTTONS									
+										layers.buttons_on_screen.remove(button_end_turn)
+										layers.buttons_on_screen.add(button_ok)
+
+										layers.buttons_on_screen.add(checkbox_facile)
+										layers.buttons_on_screen.add(checkbox_moyen)
+										layers.buttons_on_screen.add(checkbox_difficile)
+
+										layers.buttons_on_screen.add(checkbox_function_shuffle)
+										layers.buttons_on_screen.add(checkbox_function_display_bonus)
+
+										# DRAW WINDOW
+										layers.dark_filter.draw(window)
+										layers.pop_up_window.draw(window)
+										layers.buttons_on_screen.draw(window)
+										
+										progress_bar.draw()
+										ui_text.drawTextPopUp(STEP)							
 
 
-									# ___ DRAW WINDOW ___
-									#draw new screen
-									layers.dark_filter.draw(window)
-									layers.pop_up_window.draw(window)
-									layers.buttons_on_screen.draw(window)
+									elif STEP == 6 :
 
+										# ___ RESET ___
+										#reset Board
+										layers.letters_on_board.empty()
+										var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
+
+										#reset letters
+										for letter in var.current_player.hand :
+											letter.kill()
+
+										# Reset buttons
+										for button in layers.buttons_on_screen :
+											if button.is_a_checkbox :
+												button.empty()
+										
+										# ___ DRAW BOARD ___
+										#screeshot background no letter (USELESS ?)
+										window.blit(var.background_no_letter, (0,0))
+										var.current_player.hand.draw(window)
+
+										var.current_background_no_text = window.copy()
+										ui_text.drawText(STEP)
+										var.current_background = window.copy()
+
+
+										# ___ NEXT STEP ___	
+										STEP = STEP + 1
+										progress_bar.fill()
+
+										# new buttons
+										layers.buttons_on_screen.remove(button_end_turn)
+										if enable_shuffle_letter :
+											layers.buttons_on_screen.remove(button_shuffle)	
+
+										layers.buttons_on_screen.add(button_ok)
+
+										layers.buttons_on_screen.add(checkbox_facile2)
+										layers.buttons_on_screen.add(checkbox_moyen2)
+										layers.buttons_on_screen.add(checkbox_difficile2)
+
+										layers.buttons_on_screen.add(checkbox_function_shuffle2)
+										layers.buttons_on_screen.add(checkbox_function_display_bonus2)
+										#layers.buttons_on_screen.add(checkbox_function_score2)
+
+
+										# ___ DRAW WINDOW ___
+										#draw new screen
+										layers.dark_filter.draw(window)
+										layers.pop_up_window.draw(window)
+										layers.buttons_on_screen.draw(window)
+
+										
+										progress_bar.draw()
+										ui_text.drawTextPopUp(STEP)
+										
+
+									#LAST STEP
+									elif STEP == 9 :
+
+										# ___ RESET ___
+										#reset letters
+										for letter in var.current_player.hand :
+											letter.kill()
+
+										var.predicted_score = 0
+
+										# ___ NEXT STEP ___
+										STEP = STEP + 1
+										progress_bar.fill()
+
+										# new buttons
+										layers.buttons_on_screen.remove(button_end_turn)
+										if enable_shuffle_letter :
+											layers.buttons_on_screen.remove(button_shuffle)	
+
+										layers.buttons_on_screen.add(button_ok)
+
+										# ___ DRAW WINDOW ___
+										window.blit(var.background_pop_up_empty, (0,0))
+										layers.buttons_on_screen.draw(window)
+										progress_bar.draw()
+										ui_text.drawTextPopUp(STEP)
 									
-									progress_bar.draw()
-									ui_text.drawTextPopUp(STEP)
-									
-
-								#LAST STEP
-								elif STEP == 9 :
-
-									# ___ RESET ___
-									#reset letters
-									for letter in var.current_player.hand :
-										letter.kill()
-
-									# ___ NEXT STEP ___
-									STEP = STEP + 1
-									progress_bar.fill()
-
-									# new buttons
-									layers.buttons_on_screen.remove(button_end_turn)
-									if enable_shuffle_letter :
-										layers.buttons_on_screen.remove(button_shuffle)	
-
-									layers.buttons_on_screen.add(button_ok)
-
-									# ___ DRAW WINDOW ___
-									window.blit(var.background_pop_up_empty, (0,0))
-									layers.buttons_on_screen.draw(window)
-									progress_bar.draw()
-									ui_text.drawTextPopUp(STEP)
-								
-								pygame.display.update()
-								var.current_action = "POP_UP_DISPLAYED"
-								#break 
+									#pygame.display.update()
+									var.current_action = "WINDOW_DISPLAYED"
+									#break 
 
 
 							if enable_shuffle_letter :
@@ -3312,7 +3369,7 @@ while game_is_running:
 			cursor_pos_y = mouse_pos[1]
 
 			#------ SELECT A LETTER ------ 
-			if var.current_action == 'SELECT_A_LETTER' :
+			if var.current_action == 'SELECT_A_LETTER' and not MUST_DIPSLAY_POP_UP :
 
 				#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
 				buttons_changed = False
@@ -3408,6 +3465,15 @@ while game_is_running:
 
 	#display fps
 	#logging.debug('fps : %s', str(fps_clock.get_fps() ) )
+
+	if MUST_DIPSLAY_POP_UP :
+		if FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
+			FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
+		else :
+			MUST_DIPSLAY_POP_UP = False
+			FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
+			layers.pop_up.empty()
+			pygame.display.update()
 
 logging.info("")
 logging.info("Game has ended")
