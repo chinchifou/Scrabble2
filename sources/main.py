@@ -714,11 +714,16 @@ def createPopUp(ar_texts, in_the_centre=False, position=(12,9), interligne = 1.0
 	logging.debug("2 - Pos x window : %i, Pos y window: %i", pos_x_window, pos_y_window)
 	top_left_corner = pixels( pos_x_window, pos_y_window )
 	bottom_right_corner = pixels( pos_x_window+max_width+2*left_margin, pos_y_window+max_height+2*top_margin )
+	window_width = max_width+2*left_margin
+	window_height = max_height+2*interligne
+
+	#rect_top_left_corner = ( pos_x_window*var.tile_size+3, pos_y_window*var.tile_size+3 )
+	#rect_bottom_right_corner = ( (pos_x_window+max_width+2*left_margin)*var.tile_size-3, (pos_y_window+max_height+2*top_margin)*var.tile_size-3 )
 
 	#create pop_up background surface
-	pop_up_surface = pygame.Surface( pixels(max_width+2*left_margin , max_height+2*interligne) )
+	pop_up_surface = pygame.Surface( pixels(window_width , window_height) )
 	pop_up_surface.fill(COLOR.GREY_DEEP)
-	pygame.draw.rect(pop_up_surface, COLOR.WHITE, pygame.Rect( (top_left_corner), (bottom_right_corner) ), 3)
+	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), pixels(window_width, window_height) ), 3)
 
 	#add text
 	tmp_top_margin = top_margin
