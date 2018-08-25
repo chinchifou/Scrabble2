@@ -8,7 +8,7 @@ from os import path
 from os import makedirs
 
 from math import floor
-from random import randint, shuffle
+from random import randint, shuffle, choice
 
 import platform
 
@@ -42,6 +42,13 @@ class GroupOfSprites(pygame.sprite.RenderClear):
 		for l in self.sprites():
 			if l.id == value :
 				return l
+
+	def findByName(self, value):
+		result = []
+		for s in self.sprites():
+			if s.name == value :
+				result.append(s)
+		return result
 
 
 #~~~~~~ GLOBAL VARIBLES ~~~~~~
@@ -259,16 +266,20 @@ class UIText():
 		self.bottom_tiles = self.pos_y + line_heigh
 
 		UIText.all.append(self)
+		"""
 		logging.debug("CREATE")
 		self.info()
+		"""
 
 	def resize(self):
 		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
 		self.font.set_bold(self.bold)
 
 		self.pos_x_pix, self.pos_y_pix = pixels(self.pos_x, self.pos_y)
+		"""
 		logging.debug("RESIZE")
 		self.info()
+		"""
 
 	def moveAtPixels(self, pos_x_pix, pos_y_pix):
 		self.pos_x_pix, self.pos_y_pix = pos_x_pix, pos_y_pix
@@ -1666,9 +1677,13 @@ ui_text = UITextPrinter(ui_content)
 #tmp_second_hand = ['S','E','T','E','S','M','Y']
 #tmp_third_hand = ['U','A','S','L','I','T','I']
 
-tmp_first_hand = ['B','O','E','S','I','N']
-tmp_second_hand = ['S','C','E','I','N','E','C']
-tmp_third_hand = ['A','E','V','I','N','R']
+tmp_first_hand = ['O',0,'S','B',0,'E','N']
+
+tmp_second_hand = ['C','I',0,'C','N','E','S']
+tmp_second_hand2 = ['S','C',0,'I','N','C','E']
+
+tmp_third_hand = ['N','I','V',0,'A','R']
+tmp_third_hand2 = ['A','V','I',0,'N','R']
 
 
 start_hand = GroupOfSprites()
@@ -1678,13 +1693,13 @@ pos_y = ui_text.current_player_turn.pos_y+1.5
 
 
 for tmp_letter in tmp_first_hand :
-
-	letter = Letter(tmp_letter, pos_x, pos_y)
-	start_hand.add(letter)
-	hand_state.append(letter.id)
+	if tmp_letter != 0 :
+		letter = Letter(tmp_letter, pos_x, pos_y)
+		start_hand.add(letter)
+		hand_state.append(letter.id)
+	else :
+		hand_state.append(0)
 	pos_x = pos_x+1
-
-hand_state.append(0)
 
 
 #~~~~~~ CREATE PLAYER ~~~~~~
@@ -1753,20 +1768,20 @@ for row in range(0,TILES_PER_LINE) :
 
 
 # //////// Add letters on Board ///////////
-x, y = 2, 4
+x, y = 3, 5
 for letter in "METHODES" :
 	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	y += 1
 
-x, y = 1, 6
+x, y = 2, 7
 for letter in "UTILISATEUR" :
-	if (x, y) != (2,6) :
+	if (x, y) != (3,7) :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	x += 1
 
-x, y = 2, 10
+x, y = 3, 11
 for letter in "ERGONOMIE" :
-	if (x, y) != (2,10) :
+	if (x, y) != (3,11) :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	x += 1
 
@@ -1930,20 +1945,20 @@ while game_is_running:
 			for letter in var.current_player.hand :
 				letter.kill()
 
-			x, y = 2, 4
+			x, y = 3, 5
 			for letter in "METHODES" :
 				layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				y += 1
 
-			x, y = 1, 6
+			x, y = 2, 7
 			for letter in "UTILISATEUR" :
-				if (x, y) != (2,6) :
+				if (x, y) != (3,7) :
 					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				x += 1
 
-			x, y = 2, 10
+			x, y = 3, 11
 			for letter in "ERGONOMIE" :
-				if (x, y) != (2,10) :
+				if (x, y) != (3,11) :
 					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				x += 1
 
@@ -1958,24 +1973,44 @@ while game_is_running:
 
 			hand_state = []
 			for tmp_letter in tmp_first_hand :
-				letter = Letter(tmp_letter, pos_x, pos_y)
-				var.current_player.hand.add(letter)
-				hand_state.append(letter.id)
+				if tmp_letter != 0 :
+					letter = Letter(tmp_letter, pos_x, pos_y)
+					start_hand.add(letter)
+					hand_state.append(letter.id)
+				else :
+					hand_state.append(0)
 				pos_x = pos_x+1
-			hand_state.append(0)
-
 			PLAYERS[0].hand_state = hand_state
+
+
+			# ___ SNAPSHOT FOR LATER EASY REFRESH ___
+			layers.buttons_on_screen.add(button_end_turn)
 
 			layers.background.draw(window)
 			layers.tiles.draw(window)
+			layers.hand_holder.draw(window)
+			var.background_empty = window.copy()
+
 			layers.buttons_on_screen.draw(window)
 			var.background_no_letter = window.copy()
 
-			layers.letters_on_board.draw(window)
-			var.current_background_no_text = window.copy()
-			var.current_background = window.copy()
+			layers.dark_filter.draw(window)
+			layers.pop_up_window.draw(window)
+			layers.background_pop_up_empty = window.copy()
 
+
+			# ___ FIRST IMAGE ___
+			layers.buttons_on_screen.remove(button_end_turn)
+			layers.buttons_on_screen.add(button_play)
+
+			layers.background.draw(window)
+			layers.tiles.draw(window)
+
+			layers.buttons_on_screen.draw(window)
+
+			layers.letters_on_board.draw(window)
 			pygame.display.update()
+
 			var.current_action = "SELECT_A_LETTER"		
 			
 
@@ -2255,10 +2290,10 @@ while game_is_running:
 								progress_bar.fill()
 
 								# new letters
-								x, y = 2, 10
+								x, y = 3, 11
 								for letter in "ERGONOMIE" :
-									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									var.current_board_state[y][x] = letter
+									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
 
 								pos_x = (UI_LEFT_LIMIT)
@@ -2266,13 +2301,13 @@ while game_is_running:
 								hand_state = []
 								
 								for tmp_letter in tmp_third_hand :
-
-									letter = Letter(tmp_letter, pos_x, pos_y)
-									var.current_player.hand.add(letter)
-									hand_state.append(letter.id)
+									if tmp_letter != 0 :
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										start_hand.add(letter)
+										hand_state.append(letter.id)
+									else :
+										hand_state.append(0)
 									pos_x = pos_x+1
-
-								hand_state.append(0)
 
 								PLAYERS[0].hand_state = hand_state
 
@@ -2332,20 +2367,20 @@ while game_is_running:
 								for letter in var.current_player.hand :
 									letter.kill()
 
-								x, y = 2, 4
+								x, y = 3, 5
 								for letter in "METHODES" :
 									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									y += 1
 
-								x, y = 1, 6
+								x, y = 2, 7
 								for letter in "UTILISATEUR" :
-									if (x, y) != (2,6) :
+									if (x, y) != (3,7) :
 										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
 
-								x, y = 2, 10
+								x, y = 3, 11
 								for letter in "ERGONOMIE" :
-									if (x, y) != (2,10) :
+									if (x, y) != (3,11) :
 										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
 
@@ -2360,23 +2395,42 @@ while game_is_running:
 
 								hand_state = []
 								for tmp_letter in tmp_first_hand :
-									letter = Letter(tmp_letter, pos_x, pos_y)
-									var.current_player.hand.add(letter)
-									hand_state.append(letter.id)
+									if tmp_letter != 0 :
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										start_hand.add(letter)
+										hand_state.append(letter.id)
+									else :
+										hand_state.append(0)
 									pos_x = pos_x+1
-
-								hand_state.append(0)
 
 								PLAYERS[0].hand_state = hand_state
 
+								# ___ SNAPSHOT FOR LATER EASY REFRESH ___
+								layers.buttons_on_screen.add(button_end_turn)
+
 								layers.background.draw(window)
 								layers.tiles.draw(window)
+								layers.hand_holder.draw(window)
+								var.background_empty = window.copy()
+
 								layers.buttons_on_screen.draw(window)
 								var.background_no_letter = window.copy()
 
+								layers.dark_filter.draw(window)
+								layers.pop_up_window.draw(window)
+								layers.background_pop_up_empty = window.copy()
+
+								# ___ FIRST IMAGE ___
+								layers.buttons_on_screen.remove(button_end_turn)
+								layers.buttons_on_screen.add(button_play)
+
+								layers.background.draw(window)
+								layers.tiles.draw(window)
+
+								layers.buttons_on_screen.draw(window)
+
 								layers.letters_on_board.draw(window)
-								var.current_background_no_text = window.copy()
-								var.current_background = window.copy()
+								pygame.display.update()
 
 								pygame.display.update()
 								var.current_action = "SELECT_A_LETTER"															
@@ -2385,9 +2439,9 @@ while game_is_running:
 							elif STEP == 2 :
 
 								# letters on board
-								x, y = 1, 6
+								x, y = 2, 7
 								for letter in "UTILISATEUR" :
-									layers.letters_on_board.add( Letter(letter,DELTA+x, DELTA+y) )
+									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									var.current_board_state[y][x] = letter
 									x += 1
 
@@ -2432,7 +2486,7 @@ while game_is_running:
 										button.empty()
 
 								# letters on board
-								x, y = 2, 4
+								x, y = 3, 5
 								for letter in "METHODES" :
 									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									var.current_board_state[y][x] = letter
@@ -2444,10 +2498,12 @@ while game_is_running:
 								hand_state = []
 								
 								for tmp_letter in tmp_second_hand :
-
-									letter = Letter(tmp_letter, pos_x, pos_y)
-									var.current_player.hand.add(letter)
-									hand_state.append(letter.id)
+									if tmp_letter != 0 :
+										letter = Letter(tmp_letter, pos_x, pos_y)
+										start_hand.add(letter)
+										hand_state.append(letter.id)
+									else :
+										hand_state.append(0)
 									pos_x = pos_x+1
 
 								PLAYERS[0].hand_state = hand_state
@@ -2987,7 +3043,91 @@ while game_is_running:
 									button_shuffle.release()
 
 									# ___ SHUFFLE ___
+									give_help = choice( [True, True, True, False] )
+									more_help = choice( [True, False, False] )	
+
+									pos_x = (UI_LEFT_LIMIT)
+									pos_y = ui_text.current_player_turn.pos_y+1.5
+
 									shuffle(var.current_player.hand_state)
+
+									logging.debug("hand state : %a", var.current_player.hand_state)
+
+									if give_help :
+										logging.debug("litte help")
+
+										if STEP == 6 :
+											logging.debug("STEP 6")
+
+											letters_s = var.current_player.hand.findByName('S')
+											if letters_s != [] :
+												logging.debug("S in hand")
+												first_letter_s = letters_s[0]
+												s_index = var.current_player.hand_state.index(first_letter_s.id)
+												#reshuffle
+												var.current_player.hand_state[0], var.current_player.hand_state[s_index] = var.current_player.hand_state[s_index], var.current_player.hand_state[0]
+											
+											letters_e = var.current_player.hand.findByName('E')
+											if letters_e != [] :
+
+												logging.debug("E in hand")
+												first_letter_e = letters_e[0]
+												e_index = var.current_player.hand_state.index(first_letter_e.id)
+												#reshuffle
+												var.current_player.hand_state[6], var.current_player.hand_state[e_index] = var.current_player.hand_state[e_index], var.current_player.hand_state[6]
+
+											if more_help :
+												logging.debug("MORE HELP")
+
+												letters_c = var.current_player.hand.findByName('C')
+												if letters_e != [] :
+
+													logging.debug("C in hand")
+													first_letter_c = letters_c[0]
+													c_index = var.current_player.hand_state.index(first_letter_c.id)
+													#reshuffle
+													var.current_player.hand_state[6], var.current_player.hand_state[c_index] = var.current_player.hand_state[c_index], var.current_player.hand_state[6]
+
+
+
+										elif STEP == 9 :
+
+											logging.debug("STEP 9")
+
+											letters_a = var.current_player.hand.findByName('A')
+											if letters_a != [] :
+												logging.debug("A in hand")
+												first_letter_a = letters_a[0]
+												a_index = var.current_player.hand_state.index(first_letter_a.id)
+												#reshuffle
+												var.current_player.hand_state[0], var.current_player.hand_state[a_index] = var.current_player.hand_state[a_index], var.current_player.hand_state[0]
+											
+											letters_r = var.current_player.hand.findByName('R')
+											if letters_r != [] :
+
+												logging.debug("R in hand")
+												first_letter_r = letters_r[0]
+												r_index = var.current_player.hand_state.index(first_letter_r.id)
+												#reshuffle
+												var.current_player.hand_state[5], var.current_player.hand_state[r_index] = var.current_player.hand_state[r_index], var.current_player.hand_state[5]
+
+											if more_help :
+												logging.debug("MORE HELP")
+
+												letters_v = var.current_player.hand.findByName('V')
+												if letters_v != [] :
+
+													logging.debug("V in hand")
+													first_letter_v = letters_v[0]
+													v_index = var.current_player.hand_state.index(first_letter_v.id)
+													#reshuffle
+													var.current_player.hand_state[1], var.current_player.hand_state[v_index] = var.current_player.hand_state[v_index], var.current_player.hand_state[1]
+
+									else :
+										logging.debug("___ No HELP ___")
+
+
+									logging.debug("NEW hand state : %a", var.current_player.hand_state)
 
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = ui_text.current_player_turn.pos_y+1.5
