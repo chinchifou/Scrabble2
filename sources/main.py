@@ -362,44 +362,53 @@ class UITextPrinter():
 		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
 		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
 
+		# ___ UI TEXT init ___
+		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, DELTA) )
+
+		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.header.bottom_tiles + 1*UI_INTERLIGNE) )
+
+		self.score_header = UIText("Score prévisionnel :", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, layers.hand_holder.sprites()[0].pos_y + 1.2 + UI_INTERLIGNE) )
+		self.score = UIText("99", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT + self.score_header.width, self.score_header.pos_y-0.05) )
+
+		self.texts_suggest_word =[
+		UIText("Mots suggérés : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.score.bottom_tiles + 1 + UI_INTERLIGNE) ),
+		UIText("NAVIR[E] - RAVIN[E] - AV[E]NIR", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT + 0.5, self.score.bottom_tiles + 1 + 2.5*UI_INTERLIGNE) )
+		]
+
 
 	#Custom UI text
 	def drawText(self, step):
 
 		mapping = {
-		3 : "17",
-		6 : "32",
+		3 : "16",
+		6 : "34",
 		9: "26"
 		}
 
-		# ___ UI TEXT init ___
-		header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, DELTA) )
-
-		max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, header.bottom_tiles + 1*UI_INTERLIGNE) )
-
-		score_header = UIText("Score prévisionnel", LINE_HEIGHT.SUBTITLE, True, ( UI_LEFT_LIMIT, layers.hand_holder.sprites()[0].pos_y+1.2+UI_INTERLIGNE) )
-		score = UIText("", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT+1,  score_header.bottom_tiles+0.3) )
-
 		# ___ DISPLAY ON SCREEN ___
 		#Current player hand
-		text = header.font.render( header.text, 1, COLOR.WHITE )
-		window.blit(text, (header.pos_x_pix, header.pos_y_pix))
+		text = self.header.font.render( self.header.text, 1, COLOR.WHITE )
+		window.blit(text, (self.header.pos_x_pix, self.header.pos_y_pix))
 
-		text = max_score.font.render( max_score.text + mapping[step], 1, COLOR.WHITE )
-		window.blit(text, (max_score.pos_x_pix, max_score.pos_y_pix))
+		text = self.max_score.font.render( self.max_score.text + mapping[step], 1, COLOR.WHITE )
+		window.blit(text, (self.max_score.pos_x_pix, self.max_score.pos_y_pix))
 
 		#Scores header
 		if display_new_score_in_real_time :	
-			text = score_header.font.render(score_header.text, 1, COLOR.WHITE )
-			window.blit(text, (score_header.pos_x_pix, score_header.pos_y_pix))
+			text = self.score_header.font.render(self.score_header.text, 1, COLOR.WHITE )
+			window.blit(text, (self.score_header.pos_x_pix, self.score_header.pos_y_pix))
 
 			if var.predicted_score > 0 :
-				score.font.set_bold(1)
-				text = score.font.render(str(var.predicted_score), 1, COLOR.BLUE_SUPER_LIGHT )
-				score.font.set_bold(0)
+				self.score.font.set_bold(1)
+				text = self.score.font.render(str(var.predicted_score), 1, COLOR.BLUE_LIGHT )
+				self.score.font.set_bold(0)
 			else :
-				text = score.font.render(str(var.predicted_score), 1, COLOR.WHITE )
-			window.blit(text, (score.pos_x_pix, score.pos_y_pix) )
+				text = self.score.font.render(str(var.predicted_score), 1, COLOR.WHITE )
+			window.blit(text, (self.score.pos_x_pix, self.score.pos_y_pix) )
+
+		if suggest_word :
+			for text_it in self.texts_suggest_word :
+				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
 
 	"""
 	#Draw UI text
@@ -1446,6 +1455,9 @@ players_names = config_reader.players
 display_type_of_tile_on_hoovering = game_settings['display_type_of_tile_on_hoovering']
 display_new_score_in_real_time = game_settings['display_new_score_in_real_time']
 
+#dirty
+suggest_word = False
+
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
 	var.bag_of_letters = rules.letters_english
@@ -1849,10 +1861,11 @@ pop_up_score = UI_Surface('score_pop_up', 11, 7.25, pop_up_score_surface)
 layers.pop_up_score.add(pop_up_score)
 
 #create mask for text
-surf_mask_text = pygame.Surface((4*var.tile_size, 3*var.tile_size))
+surf_mask_text = pygame.Surface( (ui_text.score.width*var.tile_size, ui_text.score.height*var.tile_size) )
+logging.debug("Mask surface width : %i, height : %i", round(ui_text.score.width*2*var.tile_size), round(ui_text.score.height*var.tile_size) )
 surf_mask_text.fill(COLOR.GREY_DEEP)				
-mask_text = UI_Surface('mask_text', 19, 6, surf_mask_text)
-layers.mask_text.add(mask_text)
+mask_text_score = UI_Surface('mask_text_score', ui_text.score.pos_x, ui_text.score.pos_y, surf_mask_text)
+layers.mask_text.add(mask_text_score)
 
 #create avatar
 #ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
@@ -1930,6 +1943,7 @@ while game_is_running:
 			enable_shuffle_letter = False
 			display_type_of_tile_on_hoovering = False
 			display_new_score_in_real_time = False
+			suggest_word = False
 
 			# Reset Board
 			var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2197,6 +2211,7 @@ while game_is_running:
 									tmp_display_pop_up = True
 								#if checkbox_function_score2.is_filled :
 								tmp_display_score = True
+								tmp_suggest_word = True
 
 								# Reset
 								for button in layers.buttons_on_screen :
@@ -2244,6 +2259,9 @@ while game_is_running:
 								if tmp_display_score :
 									checkbox_calculate_score2.fill()
 									checkbox_calculate_score2.turnOffHighlighted()
+								if tmp_suggest_word :
+									checkbox_suggest_word2.fill()
+									checkbox_suggest_word2.turnOffHighlighted()
 
 								layers.buttons_on_screen.draw(window)
 								progress_bar.draw()
@@ -2266,10 +2284,10 @@ while game_is_running:
 								display_type_of_tile_on_hoovering = checkbox_bonus_cases2.is_filled
 
 								display_new_score_in_real_time = checkbox_calculate_score2.is_filled
+								suggest_word = checkbox_suggest_word2.is_filled
 
 
 								# ___ Reset ___
-
 								#buttons
 								for button in layers.buttons_on_screen :
 									if button.is_a_checkbox :
@@ -2352,6 +2370,7 @@ while game_is_running:
 								enable_shuffle_letter = False
 								display_type_of_tile_on_hoovering = False
 								display_new_score_in_real_time = False
+								suggest_word = True
 
 								# Reset Board
 								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
