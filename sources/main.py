@@ -639,20 +639,19 @@ class UITextPrinter():
 				ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
 
 
+		ui_text.pos_x = 16 - round(ui_text.width / 2.0)
+		ui_text.pos_y = 8 - round(ui_text.height / 2.0)
+		ui_text.pos_x_pix, ui_text.pos_y_pix = pixels(ui_text.pos_x, ui_text.pos_y)
 
-		layers.pop_up_score.sprites()[0].width = ui_text.width + 2
-		layers.pop_up_score.sprites()[0].height = ui_text.height + 1
-
-		#ui_text.pos_x = 16 - round(ui_text.width / 2)
-		#ui_text.pos_y = 16 - round(ui_text.height / 2)
 
 		layers.pop_up_score.sprites()[0].pos_x = ui_text.pos_x - 1
 		layers.pop_up_score.sprites()[0].pos_y = ui_text.pos_y - 0.5
 
+		layers.pop_up_score.sprites()[0].width = ui_text.width + 2
+		layers.pop_up_score.sprites()[0].height = ui_text.height + 1
+
 		layers.pop_up_score.sprites()[0].resize()
 
-		logging.debug("New pop up width : %i, height : %i", layers.pop_up_score.sprites()[0].width, layers.pop_up_score.sprites()[0].height)
-		logging.debug("New pop up pos x : %i, y : %i", layers.pop_up_score.sprites()[0].pos_x, layers.pop_up_score.sprites()[0].pos_y)
 
 		layers.dark_filter.draw(window)
 		layers.pop_up_score.draw(window)
@@ -3051,17 +3050,19 @@ while game_is_running:
 
 									shuffle(var.current_player.hand_state)
 
-									logging.debug("hand state : %a", var.current_player.hand_state)
+									#TODO create function
+
+									#logging.debug("hand state : %a", var.current_player.hand_state)
 
 									if give_help :
-										logging.debug("litte help")
+										#logging.debug("litte help")
 
 										if STEP == 6 :
-											logging.debug("STEP 6")
+											#logging.debug("STEP 6")
 
 											letters_s = var.current_player.hand.findByName('S')
 											if letters_s != [] :
-												logging.debug("S in hand")
+												#logging.debug("S in hand")
 												first_letter_s = letters_s[0]
 												s_index = var.current_player.hand_state.index(first_letter_s.id)
 												#reshuffle
@@ -3070,19 +3071,19 @@ while game_is_running:
 											letters_e = var.current_player.hand.findByName('E')
 											if letters_e != [] :
 
-												logging.debug("E in hand")
+												#logging.debug("E in hand")
 												first_letter_e = letters_e[0]
 												e_index = var.current_player.hand_state.index(first_letter_e.id)
 												#reshuffle
 												var.current_player.hand_state[6], var.current_player.hand_state[e_index] = var.current_player.hand_state[e_index], var.current_player.hand_state[6]
 
 											if more_help :
-												logging.debug("MORE HELP")
+												#logging.debug("MORE HELP")
 
 												letters_c = var.current_player.hand.findByName('C')
 												if letters_e != [] :
 
-													logging.debug("C in hand")
+													#logging.debug("C in hand")
 													first_letter_c = letters_c[0]
 													c_index = var.current_player.hand_state.index(first_letter_c.id)
 													#reshuffle
@@ -3092,11 +3093,11 @@ while game_is_running:
 
 										elif STEP == 9 :
 
-											logging.debug("STEP 9")
+											#logging.debug("STEP 9")
 
 											letters_a = var.current_player.hand.findByName('A')
 											if letters_a != [] :
-												logging.debug("A in hand")
+												#logging.debug("A in hand")
 												first_letter_a = letters_a[0]
 												a_index = var.current_player.hand_state.index(first_letter_a.id)
 												#reshuffle
@@ -3105,29 +3106,26 @@ while game_is_running:
 											letters_r = var.current_player.hand.findByName('R')
 											if letters_r != [] :
 
-												logging.debug("R in hand")
+												#logging.debug("R in hand")
 												first_letter_r = letters_r[0]
 												r_index = var.current_player.hand_state.index(first_letter_r.id)
 												#reshuffle
 												var.current_player.hand_state[5], var.current_player.hand_state[r_index] = var.current_player.hand_state[r_index], var.current_player.hand_state[5]
 
 											if more_help :
-												logging.debug("MORE HELP")
+												#logging.debug("MORE HELP")
 
 												letters_v = var.current_player.hand.findByName('V')
 												if letters_v != [] :
 
-													logging.debug("V in hand")
+													#logging.debug("V in hand")
 													first_letter_v = letters_v[0]
 													v_index = var.current_player.hand_state.index(first_letter_v.id)
 													#reshuffle
 													var.current_player.hand_state[1], var.current_player.hand_state[v_index] = var.current_player.hand_state[v_index], var.current_player.hand_state[1]
 
-									else :
-										logging.debug("___ No HELP ___")
 
-
-									logging.debug("NEW hand state : %a", var.current_player.hand_state)
+									#logging.debug("NEW hand state : %a", var.current_player.hand_state)
 
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = ui_text.current_player_turn.pos_y+1.5
