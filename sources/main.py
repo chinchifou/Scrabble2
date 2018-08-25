@@ -1768,20 +1768,20 @@ for row in range(0,TILES_PER_LINE) :
 
 
 # //////// Add letters on Board ///////////
-x, y = 3, 5
+x, y = 4, 2
 for letter in "METHODES" :
 	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	y += 1
 
-x, y = 2, 7
+x, y = 3, 4
 for letter in "UTILISATEUR" :
-	if (x, y) != (3,7) :
+	if (x, y) != (4,4) :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	x += 1
 
-x, y = 3, 11
+x, y = 4, 8
 for letter in "ERGONOMIE" :
-	if (x, y) != (3,11) :
+	if (x, y) != (4,8) :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	x += 1
 
@@ -1945,20 +1945,20 @@ while game_is_running:
 			for letter in var.current_player.hand :
 				letter.kill()
 
-			x, y = 3, 5
+			x, y = 4, 2
 			for letter in "METHODES" :
 				layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				y += 1
 
-			x, y = 2, 7
+			x, y = 3, 4
 			for letter in "UTILISATEUR" :
-				if (x, y) != (3,7) :
+				if (x, y) != (4,4) :
 					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				x += 1
 
-			x, y = 3, 11
+			x, y = 4, 8
 			for letter in "ERGONOMIE" :
-				if (x, y) != (3,11) :
+				if (x, y) != (4,8) :
 					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				x += 1
 
@@ -2290,7 +2290,7 @@ while game_is_running:
 								progress_bar.fill()
 
 								# new letters
-								x, y = 3, 11
+								x, y = 4, 8
 								for letter in "ERGONOMIE" :
 									var.current_board_state[y][x] = letter
 									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
@@ -2367,20 +2367,20 @@ while game_is_running:
 								for letter in var.current_player.hand :
 									letter.kill()
 
-								x, y = 3, 5
+								x, y = 4, 2
 								for letter in "METHODES" :
 									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									y += 1
 
-								x, y = 2, 7
+								x, y = 3, 4
 								for letter in "UTILISATEUR" :
-									if (x, y) != (3,7) :
+									if (x, y) != (4,4) :
 										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
 
-								x, y = 3, 11
+								x, y = 4, 8
 								for letter in "ERGONOMIE" :
-									if (x, y) != (3,11) :
+									if (x, y) != (4,8) :
 										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
 
@@ -2439,7 +2439,7 @@ while game_is_running:
 							elif STEP == 2 :
 
 								# letters on board
-								x, y = 2, 7
+								x, y = 3, 4
 								for letter in "UTILISATEUR" :
 									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									var.current_board_state[y][x] = letter
@@ -2486,7 +2486,7 @@ while game_is_running:
 										button.empty()
 
 								# letters on board
-								x, y = 3, 5
+								x, y = 4, 2
 								for letter in "METHODES" :
 									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									var.current_board_state[y][x] = letter
