@@ -723,7 +723,7 @@ def createPopUp(ar_texts, in_the_centre=False, position=(12,9), interligne = 1.0
 	#create pop_up background surface
 	pop_up_surface = pygame.Surface( pixels(window_width , window_height) )
 	pop_up_surface.fill(COLOR.GREY_DEEP)
-	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), pixels(window_width, window_height) ), 3)
+	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), int_pixels(window_width, window_height) ), 3)
 
 	#add text
 	tmp_top_margin = top_margin
@@ -1896,7 +1896,18 @@ layers.dark_filter.add(dark_filter)
 
 #create window_pop_up
 pop_up_window_surface = pygame.Surface((28*var.tile_size, 14*var.tile_size))
-pop_up_window_surface.fill(COLOR.GREY_DEEP)				
+pop_up_window_surface.fill(COLOR.GREY_DEEP)
+pygame.draw.rect( pop_up_window_surface, COLOR.GREY_LIGHT, pygame.Rect((0, 0), int_pixels(28, 14)), 3 )
+buble_points = [
+pixels(0.5, 0.5),
+pixels(21.5, 0.5),
+pixels(21.5, 8.6),
+pixels(22.5, 9.25),
+pixels(21.5, 9.1),
+pixels(21.5, 12),
+pixels(0.5, 12)
+]	
+pygame.draw.aalines( pop_up_window_surface, COLOR.GREY_LIGHT, True, buble_points, 1 )			
 pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
 layers.pop_up_window.add(pop_up_window)
 
