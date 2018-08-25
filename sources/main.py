@@ -71,11 +71,18 @@ UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
 
-global PLAYERS, STEP
+global PLAYERS, STEP, MAPING_STEP_MAX_SCORE
 #all players
 PLAYERS = []
 # Turn number
 STEP = 0
+#for a step give the corresponding max number of points
+MAPING_STEP_MAX_SCORE = {
+3 : 16,
+6 : 34,
+9: 26
+}
+
 
 global MUST_DIPSLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR
 # boolean to indicate wether to display pop_up or not
@@ -391,12 +398,6 @@ class UITextPrinter():
 
 		hand_holder = layers.hand_holder.sprites()[0]
 
-		mapping = {
-		3 : "16",
-		6 : "34",
-		9: "26"
-		}
-
 		# ___ DISPLAY ON SCREEN ___
 
 		#Header
@@ -405,7 +406,7 @@ class UITextPrinter():
 
 		pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5)*var.tile_size) )
 
-		text = self.max_score.font.render( self.max_score.text + mapping[step], 1, COLOR.WHITE )
+		text = self.max_score.font.render( self.max_score.text + str(MAPING_STEP_MAX_SCORE[step]), 1, COLOR.WHITE )
 		window.blit(text, (self.max_score.pos_x_pix, self.max_score.pos_y_pix))
 
 		#Scores header
@@ -2936,7 +2937,7 @@ while game_is_running:
 
 								words = []
 								for association in var.last_words_and_scores :
-									var.current_player.score +=  association[1]
+									var.current_player.score += association[1]
 									words.append(association[0])
 
 								move_on = False
@@ -2952,7 +2953,12 @@ while game_is_running:
 										"Ecrivez votre mot verticalement ou horizontalement et sans espace."
 										]
 									else :
-										texts = ["Vous avez marqué "+str(var.current_player.score)+" points."]
+										if var.current_player.score == MAPING_STEP_MAX_SCORE[STEP] :
+											texts = ["Félicitations ! Vous avez marqué le score maximal."]
+										elif var.current_player.score > MAPING_STEP_MAX_SCORE[STEP] :
+											texts = ["Wow ... Mieux que prévu. Félicitations pour vos "+str(var.current_player.score)+" points !"]
+										else :
+											texts = ["Vous avez marqué "+str(var.current_player.score)+" points."]
 										move_on = True
 
 								#creeate pop up
