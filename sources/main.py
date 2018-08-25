@@ -315,8 +315,6 @@ class UITextPrinter():
 
 	def __init__(self, ui_content):
 
-		self.current_player_turn = UIText("", 0.0, False, ( UI_LEFT_LIMIT, 3*UI_INTERLIGNE) )
-
 		"""		
 		#UI text init
 		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], 1.0, False, ( UI_LEFT_LIMIT, 3*UI_INTERLIGNE) )
@@ -362,22 +360,27 @@ class UITextPrinter():
 		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
 		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
 
+		hand_holder = layers.hand_holder.sprites()[0]
+
 		# ___ UI TEXT init ___
-		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, DELTA) )
+		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, hand_holder.pos_y - 1.0) )
 
-		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.header.bottom_tiles + 1*UI_INTERLIGNE) )
+		
+		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1) )	
 
-		self.score_header = UIText("Score prévisionnel :", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, layers.hand_holder.sprites()[0].pos_y + 1.2 + UI_INTERLIGNE) )
+		self.score_header = UIText("Score prévisionnel :", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.max_score.bottom_tiles + 0.75) )
 		self.score = UIText("99", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT + self.score_header.width, self.score_header.pos_y-0.05) )
 
 		self.texts_suggest_word =[
-		UIText("Mots suggérés : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.score.bottom_tiles + 1 + UI_INTERLIGNE) ),
-		UIText("NAVIR[E] - RAVIN[E] - AV[E]NIR", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT + 0.5, self.score.bottom_tiles + 1 + 2.5*UI_INTERLIGNE) )
+		UIText("Mots suggérés : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.score.bottom_tiles + 1.5) ),
+		UIText("NAVIR[E] - RAVIN[E] - AV[E]NIR", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT + 0.5, self.score.bottom_tiles + 1.5 + 1.25) )
 		]
 
 
 	#Custom UI text
 	def drawText(self, step):
+
+		hand_holder = layers.hand_holder.sprites()[0]
 
 		mapping = {
 		3 : "16",
@@ -386,9 +389,12 @@ class UITextPrinter():
 		}
 
 		# ___ DISPLAY ON SCREEN ___
-		#Current player hand
+
+		#Header
 		text = self.header.font.render( self.header.text, 1, COLOR.WHITE )
 		window.blit(text, (self.header.pos_x_pix, self.header.pos_y_pix))
+
+		pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5)*var.tile_size) )
 
 		text = self.max_score.font.render( self.max_score.text + mapping[step], 1, COLOR.WHITE )
 		window.blit(text, (self.max_score.pos_x_pix, self.max_score.pos_y_pix))
@@ -406,9 +412,13 @@ class UITextPrinter():
 				text = self.score.font.render(str(var.predicted_score), 1, COLOR.WHITE )
 			window.blit(text, (self.score.pos_x_pix, self.score.pos_y_pix) )
 
+			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size ) )
+
 		if suggest_word :
 			for text_it in self.texts_suggest_word :
 				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
+
+
 
 	"""
 	#Draw UI text
@@ -1659,7 +1669,7 @@ window = resizeWindow(var.window_width, var.window_height, cfg_fullscreen, cfg_r
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
 #create hand_holder
-hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, 3*UI_INTERLIGNE+1.4, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, 1.5*UI_INTERLIGNE+1.4, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 
 
 #User interface language
@@ -1700,8 +1710,7 @@ tmp_third_hand2 = ['A','V','I',0,'N','R']
 start_hand = GroupOfSprites()
 hand_state = []
 pos_x = (UI_LEFT_LIMIT)
-pos_y = ui_text.current_player_turn.pos_y+1.5
-
+pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
 for tmp_letter in tmp_first_hand :
 	if tmp_letter != 0 :
@@ -1800,7 +1809,7 @@ for letter in "ERGONOMIE" :
 button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 #button_ok2 = Button("ok", 32/2.0 - 5, 14.5 )
 
-button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, ui_text.current_player_turn.pos_y+1.5)
+button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1)
 
 button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
@@ -1982,7 +1991,7 @@ while game_is_running:
 			var.current_player.score = 0
 
 			pos_x = (UI_LEFT_LIMIT)
-			pos_y = ui_text.current_player_turn.pos_y+1.5
+			pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
 			hand_state = []
 			for tmp_letter in tmp_first_hand :
@@ -2314,7 +2323,7 @@ while game_is_running:
 									x += 1
 
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y+1.5
+								pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 								hand_state = []
 								
 								for tmp_letter in tmp_third_hand :
@@ -2409,7 +2418,7 @@ while game_is_running:
 								var.current_player.score = 0
 
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y+1.5
+								pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
 								hand_state = []
 								for tmp_letter in tmp_first_hand :
@@ -2512,7 +2521,7 @@ while game_is_running:
 
 								# letters in hand
 								pos_x = (UI_LEFT_LIMIT)
-								pos_y = ui_text.current_player_turn.pos_y+1.5
+								pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 								hand_state = []
 								
 								for tmp_letter in tmp_second_hand :
@@ -3065,7 +3074,7 @@ while game_is_running:
 									more_help = choice( [True, False, False] )	
 
 									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y+1.5
+									pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
 									shuffle(var.current_player.hand_state)
 
@@ -3147,7 +3156,7 @@ while game_is_running:
 									#logging.debug("NEW hand state : %a", var.current_player.hand_state)
 
 									pos_x = (UI_LEFT_LIMIT)
-									pos_y = ui_text.current_player_turn.pos_y+1.5
+									pos_y = pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
 									hand_state = []
 									for index in var.current_player.hand_state :
