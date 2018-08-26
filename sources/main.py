@@ -264,47 +264,40 @@ layers = Layer()
 #class used to create interface text
 class UIText():
 	all = []
-	def __init__(self, text, line_heigh, bold, pos_in_tiles):
+	def __init__(self, text, line_height, bold, pos_in_tiles):
 		self.text = text
-		self.line_heigh = line_heigh
+		self.line_height = line_height
 		self.bold = int(bold)	
 
-		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
+		self.font = pygame.font.SysFont("Calibri", floor(self.line_height*var.tile_size))
 		self.font.set_bold(self.bold)
 
 		self.pos_x, self.pos_y = pos_in_tiles[0], pos_in_tiles[1]
 		self.pos_x_pix, self.pos_y_pix = pixels(self.pos_x, self.pos_y)
 
 		self.width, self.height = tiles_tup(self.font.size(self.text))
-		#logging.debug("text width : %i, text height : %i", self.width, self.height)
-		#logging.debug("text is : %s", self.text)
-
-		self.bottom_tiles = self.pos_y + line_heigh
+		self.bottom_tiles = self.pos_y + self.line_height
 
 		UIText.all.append(self)
-		"""
-		logging.debug("CREATE")
-		self.info()
-		"""
+
 
 	def resize(self):
-		self.font = pygame.font.SysFont("Calibri", floor(self.line_heigh*var.tile_size))
-		self.font.set_bold(self.bold)
+		self.font = pygame.font.SysFont("Calibri", floor(self.line_height*var.tile_size))
 
-		self.pos_x_pix, self.pos_y_pix = pixels(self.pos_x, self.pos_y)
-		"""
-		logging.debug("RESIZE")
-		self.info()
-		"""
+		self.font.set_bold(self.bold)
+		self.width, self.height = tiles_tup(self.font.size(self.text))
+		self.bottom_tiles = self.pos_y + self.line_height
+
 
 	def moveAtPixels(self, pos_x_pix, pos_y_pix):
 		self.pos_x_pix, self.pos_y_pix = pos_x_pix, pos_y_pix
-		self.pos_x, self.pos_y = tiles(self.pos_x_pix, self.pos_y_pix)
+		self.pos_x, self.pos_y = tiles(self.pos_x_pix, self.pos_y_pix, to_round=True)
+
 
 	def info(self):
 		logging.debug("UI Text")
 		logging.debug("Text : %s", self.text)
-		logging.debug("Line heigh : %s", str(self.line_heigh))
+		logging.debug("Line heigh : %s", str(self.line_height))
 		logging.debug("Bold : %s", str(self.bold))
 		logging.debug("Font : %s", str(self.font.size))
 		logging.debug("Position in tiles : %s, %s", self.pos_x, self.pos_y)
@@ -672,94 +665,127 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, in_the_centre=False, position=(12,9), interligne = 1.0):
+def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin=1.0, interligne=0.5, time = 4000):
 
-	pos_x, pos_y = position[0], position[1]
-	logging.debug("Pos x : %i, Pos y : %i", pos_x, pos_y)
-	left_margin, top_margin = interligne, interligne
-	pos_x_window, pos_y_window = pos_x - left_margin, pos_y - top_margin
-	logging.debug("Pos x window : %i, Pos y window: %i", pos_x_window, pos_y_window)
+	perf_clock = pygame.time.Clock()
+	start = perf_clock.tick()
+
+	#Init
+	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time / 20.0)
+
+	nb_lignes = len(ar_texts)
+	my_line_height = LINE_HEIGHT
+
+	left_margin, top_margin = margin, margin
+	window_pos_x, window_pos_y = position[0], position[1]
+
+	to_move_in_the_center = ( position == (0,0) )
 
 	#Create UI text objects
 	ui_texts = []
+	tmp_pos_y = window_pos_y + top_margin
 	for text in ar_texts :
-		ui_texts.append( UIText( text, LINE_HEIGHT.SUBTITLE, False, (pos_x, pos_y) ) )
-		pos_y += interligne
+		ui_texts.append( UIText( text, my_line_height, False, (pos_x, tmp_pos_y) ) )
+		tmp_pos_y += my_line_height + interligne
 
 	#Get size of the text to center it and create window accordingly
 	max_width, max_height = 0, 0
 	for ui_text in ui_texts :
-		max_width = max ( max_width, ui_text.width )
-		max_height = max ( max_height, ui_text.height )
+		max_width, max_height = max (max_width, ui_text.width), max (max_height, ui_text.height)
 
-	logging.debug("max_width : %i, max_height : %i", max_width, max_height)
 
-	#Put the text in the center of the screen
-	if in_the_centre :
+	#prevent text from going out of the bounds
+	while ( round (max_width+2*left_margin ) > bounds[0] or round ( 2*top_margin + max_height*nb_lignes + interligne*(nb_lignes-1) ) > bounds[1] ) :
 
-		pos_x = 16 - round(max_width / 2.0)
-		pos_y = 8 - round(max_height / 2.0)
-		pos_x_window, pos_y_window = pos_x - left_margin, pos_y - top_margin
+		ratio = max ( round (max_width+2*left_margin ) / bounds[0] , round ( 2*top_margin + max_height*nb_lignes + interligne*(nb_lignes-1) ) / bounds[1] )
 
-		logging.debug("I want Pos x : %i, Pos y : %i", pos_x, pos_y)
+		if ratio > 1.5 :
+			my_line_height = (my_line_height/round(ratio))
+		elif ratio > 1.1 :
+			my_line_height = (my_line_height/round(ratio,1))
+		else :
+			my_line_height = my_line_height - 0.1
 
-		tmp_pos_y = pos_y
 		for ui_text in ui_texts :
-			ui_text.pos_x, ui_text.pos_y = pos_x, pos_y
+			ui_text.line_height = my_line_height
+			ui_text.resize()
+
+		tmp_max_width, tmp_max_height = 0, 0	
+		for ui_text in ui_texts :	
+			tmp_max_width, tmp_max_height = max (tmp_max_width, ui_text.width), max (tmp_max_height, ui_text.height)
+
+		max_width, max_height = tmp_max_width, tmp_max_height
+
+
+	#Wndow width and height (rounded for for better design)
+	window_width = round ( max_width+2*left_margin )
+	window_height = round ( 2*top_margin + max_height*nb_lignes + interligne*(nb_lignes-1) )
+
+
+	#Move to the center of the center of the screen
+	if to_move_in_the_center :
+
+		window_pos_x = (32 - window_width) / 2.0 
+		window_pos_y = (18 - window_height) / 2.0
+
+		#Update text position
+		tmp_pos_y = window_pos_y + top_margin
+		for ui_text in ui_texts :
+			ui_text.pos_x, ui_text.pos_y = pos_x, tmp_pos_y
 			ui_text.pos_x_pix, ui_text.pos_y_pix = pixels(ui_text.pos_x, ui_text.pos_y)
-			tmp_pos_y += interligne
-
-	logging.debug("I get Pos x : %i, Pos y : %i", pos_x, pos_y)
-
-	#window
-	logging.debug("2 - Pos x window : %i, Pos y window: %i", pos_x_window, pos_y_window)
-	top_left_corner = pixels( pos_x_window, pos_y_window )
-	bottom_right_corner = pixels( pos_x_window+max_width+2*left_margin, pos_y_window+max_height+2*top_margin )
-	window_width = max_width+2*left_margin
-	window_height = max_height+2*interligne
-
-	#rect_top_left_corner = ( pos_x_window*var.tile_size+3, pos_y_window*var.tile_size+3 )
-	#rect_bottom_right_corner = ( (pos_x_window+max_width+2*left_margin)*var.tile_size-3, (pos_y_window+max_height+2*top_margin)*var.tile_size-3 )
+			tmp_pos_y += my_line_height + interligne
 
 	#create pop_up background surface
 	pop_up_surface = pygame.Surface( pixels(window_width , window_height) )
 	pop_up_surface.fill(COLOR.GREY_DEEP)
-	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), int_pixels(window_width, window_height) ), 3)
+	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), pixels(window_width, window_height, to_round=True) ), 3)
 
 	#add text
-	tmp_top_margin = top_margin
+	tmp_pos_y = top_margin
 	for ui_text in ui_texts :
-		pop_up_surface.blit( ui_text.font.render(text, 1, COLOR.WHITE), pixels(left_margin, tmp_top_margin) )
-		tmp_top_margin + interligne
+		pop_up_surface.blit( ui_text.font.render(ui_text.text, 1, COLOR.WHITE), pixels(left_margin, tmp_pos_y) )
+		tmp_pos_y = tmp_pos_y + my_line_height + interligne
+
+
+	end = perf_clock.tick()
+	logging.debug("time : %f", end-start)
 
 	#create complete pop_up
-	return UI_Surface('pop_up', pos_x_window, pos_y_window, pop_up_surface)
+	return UI_Surface('pop_up', window_pos_x, window_pos_y, pop_up_surface)
 
 
 
 #~~~~~~ CONVERTION ~~~~~~
 
 #----- convert bewten tiles numbers and pixels -----
-def tiles(value_in_pixels1, value_in_pixels2) :
-	return ( round( value_in_pixels1/float(var.tile_size) ), round( value_in_pixels2/float(var.tile_size) ) )
+def tiles(value_in_pixels1, value_in_pixels2, to_round=False) :
+	if to_round :
+		return ( int(round( value_in_pixels1/float(var.tile_size) )), int(round( value_in_pixels2/float(var.tile_size) )) )
+	else :
+		return ( value_in_pixels1/float(var.tile_size), value_in_pixels2/float(var.tile_size) )
 
-def tiles_tup(tuple):
-	return tiles(tuple[0], tuple[1])
+def tiles_tup(tuple, to_round=False):
+	return tiles(tuple[0], tuple[1], to_round=to_round)
 
 def in_reference_tiles(value_in_pixels1, value_in_pixels2) :
 	return ( round( value_in_pixels1/float(REFERENCE_TILE_SIZE) ), round( value_in_pixels2/float(REFERENCE_TILE_SIZE) ) )
 
-def tiles1(value_in_pixels) :
-	return ( round( value_in_pixels/float(var.tile_size) ) )
+def tiles1(value_in_pixels, to_round=False) :
+	if to_round :
+		return int(round( value_in_pixels/float(var.tile_size) ))
+	else :
+		return value_in_pixels/float(var.tile_size)
 
-def pixels(value1_in_tiles, value2_in_tiles) :
-	return ( (value1_in_tiles*var.tile_size), (value2_in_tiles*var.tile_size) )
+
+def pixels(value1_in_tiles, value2_in_tiles, to_round=False) :
+	if to_round :
+		return ( int(round(value1_in_tiles*var.tile_size)), int(round(value2_in_tiles*var.tile_size)) )
+	else :
+		return ( (value1_in_tiles*var.tile_size), (value2_in_tiles*var.tile_size) )
 
 def solo_pixels(value_in_tiles) :
 	return ( (value_in_tiles*var.tile_size) )
 
-def int_pixels(value1_in_tiles, value2_in_tiles) :
-	return ( round(value1_in_tiles*var.tile_size), round(value2_in_tiles*var.tile_size) )
 
 
 #~~~~~~ GAME CLASSES ~~~~~~
@@ -796,7 +822,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
 
 		#resize image
-		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height ) )
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height, to_round=True ) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
@@ -811,7 +837,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 				self.image = loadImage(path.join(self.path, self.name+'.png'))
 
 		#resize image
-		self.image = pygame.transform.smoothscale(self.image, int_pixels(self.width, self.height) )
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height, to_round=True) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 
@@ -951,7 +977,7 @@ class Letter(ResizableSprite):
 	#move a letter at a given position expressed in pixels
 	def moveAtPixels(self, pos_x, pos_y) :
 		self.rect.x, self.rect.y = pos_x, pos_y
-		self.pos_x, self.pos_y  = tiles(pos_x, pos_y)
+		self.pos_x, self.pos_y  = tiles(pos_x, pos_y, to_round=True)
 
 
 ##----- Progress Bar -----
@@ -1898,7 +1924,7 @@ layers.dark_filter.add(dark_filter)
 #create window_pop_up
 pop_up_window_surface = pygame.Surface((28*var.tile_size, 14*var.tile_size))
 pop_up_window_surface.fill(COLOR.GREY_DEEP)
-pygame.draw.rect( pop_up_window_surface, COLOR.GREY_LIGHT, pygame.Rect((0, 0), int_pixels(28, 14)), 3 )
+pygame.draw.rect( pop_up_window_surface, COLOR.GREY_LIGHT, pygame.Rect((0, 0), pixels(28, 14, to_round=False)), 3 )
 buble_points = [
 pixels(0.5, 0.5),
 pixels(21.5, 0.5),
@@ -2612,9 +2638,47 @@ while game_is_running:
 								progress_bar.draw()
 								ui_text.drawText(STEP)
 
+								var.current_action = "SELECT_A_LETTER"
+
+
+								texts = [
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points."
+								]
+								texts = [
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",								
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",								
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",								
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",								
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",								
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",								
+								"Utiliser le bouton 'Mélanger' pour trouver plus",
+								"  facilement un mot qui rapporte des points.",
+								]
+
+								#creeate pop up
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = 3.0, time=10000)  )
+
+								# snapshot of before pop_up
+								snapshot = window.copy()
+
+								#display pop_up
+								layers.dark_filter.draw(window)
+								layers.pop_up.draw(window)
 								pygame.display.update()
 
-								var.current_action = "SELECT_A_LETTER"
+								MUST_DIPSLAY_POP_UP = True
+
+								#prepare exit image (displayed when removing pop up)
+								window.blit(snapshot, (0,0))
+
+
 								#break
 
 								"""
@@ -2948,10 +3012,7 @@ while game_is_running:
 								#played something
 								else :
 									if len(words) == 0 :
-										texts =[
-										"Coup non valide.", 
-										"Ecrivez votre mot verticalement ou horizontalement et sans espace."
-										]
+										texts =["Ecrivez votre mot verticalement ou horizontalement et sans espace."]
 									else :
 										if var.current_player.score == MAPING_STEP_MAX_SCORE[STEP] :
 											texts = ["Félicitations ! Vous avez marqué le score maximal."]
@@ -2962,7 +3023,7 @@ while game_is_running:
 										move_on = True
 
 								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, in_the_centre=True)  )
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=2.0)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
