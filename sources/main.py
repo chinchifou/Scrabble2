@@ -377,7 +377,7 @@ class UITextPrinter():
 		
 		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1) )	
 
-		self.score_header = UIText("Score prévisionnel :", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.max_score.bottom_tiles + 0.75) )
+		self.score_header = UIText("Score prévisionnel : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.max_score.bottom_tiles + 0.75) )
 		self.score = UIText("99", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT + self.score_header.width, self.score_header.pos_y-0.05) )
 
 		self.texts_suggest_word =[
@@ -554,9 +554,12 @@ class UITextPrinter():
 			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
 			UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+4.25) ),
-			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+5.75) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+7.25) ),
+
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+0.75, limit_top+7.25) ),			
+			UIText( "Normal", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+4+0.6, limit_top+7.25) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+8+0.5, limit_top+7.25) ),
+
+
 			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
 			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.25) ),
 			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+11.75) )
@@ -576,9 +579,11 @@ class UITextPrinter():
 			all_texts = [
 			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
 			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+3.25) ),
-			UIText( "Moyennement difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+4.75) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+6.25) ),
+
+			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+0.75, limit_top+7.25) ),			
+			UIText( "Normal", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+4+0.6, limit_top+7.25) ),
+			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+8+0.5, limit_top+7.25) ),
+
 			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
 			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+9.25) ),
 			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.75) )
@@ -780,7 +785,7 @@ def pixels(value1_in_tiles, value2_in_tiles, to_round=False) :
 	if to_round :
 		return ( int(round(value1_in_tiles*var.tile_size)), int(round(value2_in_tiles*var.tile_size)) )
 	else :
-		return ( (value1_in_tiles*var.tile_size), (value2_in_tiles*var.tile_size) )
+		return ( int(value1_in_tiles*var.tile_size), int(value2_in_tiles*var.tile_size) )
 
 def solo_pixels(value_in_tiles) :
 	return ( (value_in_tiles*var.tile_size) )
@@ -919,6 +924,7 @@ class Button(ResizableSprite):
 		self.is_highlighted = False
 		self.is_pushed = False
 		self.is_a_checkbox = is_a_checkbox
+		self.is_an_emoticom = is_an_emoticom
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
 
@@ -961,18 +967,22 @@ class Checkbox(Button):
 
 class Emoticom(Button):
 	def __init__(self, name, pos_x, pos_y):
-		self.width, self.height = 3, 3
+		self.width, self.height = 2.5, 2.5
 		self.name = "selected_"+ name
 		Button.__init__(self, self.name, pos_x, pos_y, is_an_emoticom=True)
 		self.is_selected = True
 
 	def select(self):
 		self.name = self.name.replace("un", "")
+		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
 		self.is_selected = True
 		#self.turnOnHighlighted()	
 
 	def unselect(self):
 		self.name = 'un'+self.name
+		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
 		self.is_selected = False
 		#self.turnOnHighlighted()
 
@@ -1959,7 +1969,7 @@ pixels(21.5, 9.1),
 pixels(21.5, 12),
 pixels(0.5, 12)
 ]	
-pygame.draw.aalines( pop_up_window_surface, COLOR.GREY_LIGHT, True, buble_points, 1 )			
+#pygame.draw.aalines( pop_up_window_surface, COLOR.GREY_LIGHT, True, buble_points, 1 )			
 pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
 layers.pop_up_window.add(pop_up_window)
 
@@ -2230,10 +2240,65 @@ while game_is_running:
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 					elif ( event_type == pygame.MOUSEBUTTONUP ) :
 
+						#~~~~~~~~~~~ EMOTICOMS ~~~~~~~~~~~ 
+						if ( (happy.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (happy.is_pushed) ):
+							happy.release()
+
+							if happy.is_selected :
+								if neutral.is_selected :
+									neutral.unselect()
+								if sad.is_selected :
+									sad.unselect()
+								need_refresh_buttons_on_screen = True
+							else :
+								happy.select()
+								if neutral.is_selected :
+									neutral.unselect()
+								if sad.is_selected :
+									sad.unselect()
+								need_refresh_buttons_on_screen = True
+
+						if ( (neutral.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (neutral.is_pushed) ):
+							neutral.release()
+
+							if neutral.is_selected :
+								if happy.is_selected :
+									happy.unselect()
+								if sad.is_selected :
+									sad.unselect()
+								need_refresh_buttons_on_screen = True
+							else :
+								neutral.select()
+								if happy.is_selected :
+									happy.unselect()
+								if sad.is_selected :
+									sad.unselect()
+								need_refresh_buttons_on_screen = True
+
+
+						if ( (sad.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (sad.is_pushed) ):
+							sad.release()
+
+							if sad.is_selected :
+								if neutral.is_selected :
+									neutral.unselect()
+								if happy.is_selected :
+									happy.unselect()
+								need_refresh_buttons_on_screen = True
+							else :
+								sad.select()
+								if neutral.is_selected :
+									neutral.unselect()
+								if happy.is_selected :
+									happy.unselect()
+								need_refresh_buttons_on_screen = True
+
 						#~~~~~~~~~~~ BUTTON OK ~~~~~~~~~~~
 						if ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
 
 							button_ok.release()
+							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
+							layers.buttons_on_screen.draw(window)
 							#pygame.mouse.set_cursor(*arrow)
 							#TODO to imrpove if the cursor is still on the button
 
@@ -2255,130 +2320,188 @@ while game_is_running:
 
 							elif STEP == 4 :
 
-								# ___ CHANGE CONF ___
-								if checkbox_function_shuffle.is_filled :
-									enable_shuffle_letter = True
-									layers.buttons_on_screen.add(button_shuffle)
-								if checkbox_function_display_bonus.is_filled :
-									display_type_of_tile_on_hoovering = True
+								move_on = True
+								nb_selected = 0
+								for emo in all_emoticoms :
+									if emo.is_selected :
+										nb_selected += 1
+								if nb_selected > 1 :
+									move_on = False
 
-								# Reset checkboxes
-								for button in layers.buttons_on_screen :
-									if button.is_a_checkbox :
-										button.empty()
+									#creeate pop up
+									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
-								# ___ DRAW BOARD ___
-								"""
-								layers.background.draw(window)
-								layers.tiles.draw(window)
-								layers.hand_holder.draw(window)
-								layers.buttons_on_screen.draw(window)
-								var.background_no_letter = window.copy()
-								layers.letters_on_board.draw(window)
-								layers.letters_just_played.draw(window)
-								var.current_player.hand.draw(window)
-								var.current_background_no_text = window.copy()
-								ui_text.drawText(STEP)
-								var.current_background = window.copy()
-								layers.selected_letter.draw(window)
-								"""
+									# snapshot of before pop_up
+									snapshot = window.copy()
 
-								# ___ NEXT STEP ___
-								STEP = STEP + 1
-								progress_bar.fill()
+									#display pop_up
+									layers.dark_filter.draw(window)
+									layers.pop_up.draw(window)
+									pygame.display.update()
+
+									MUST_DIPSLAY_POP_UP = True
+
+									#prepare exit image (displayed when removing pop up)
+									window.blit(snapshot, (0,0))
 
 
-								# ___ ADD BUTTONS 
-								layers.buttons_on_screen.empty()
-								layers.buttons_on_screen.add(button_ok)
+								if move_on :
 
-								layers.buttons_on_screen.add(checkbox_find_word)
-								checkbox_find_word.fill()
-								layers.buttons_on_screen.add(checkbox_bonus_cases)
-								if display_type_of_tile_on_hoovering :
-									checkbox_bonus_cases.fill()
+									# ___ CHANGE CONF ___
+									if checkbox_function_shuffle.is_filled :
+										enable_shuffle_letter = True
+										layers.buttons_on_screen.add(button_shuffle)
+									if checkbox_function_display_bonus.is_filled :
+										display_type_of_tile_on_hoovering = True
 
-								# ___ DRAW WINDOW ___
-								window.blit(var.background_pop_up_empty, (0,0))
+									# Reset checkboxes
+									for button in layers.buttons_on_screen :
+										if button.is_a_checkbox :
+											button.empty()
+										if button.is_an_emoticom :
+											button.select()
 
-								layers.buttons_on_screen.draw(window)
-								progress_bar.draw()
-								ui_text.drawTextPopUp(STEP)
+									# ___ DRAW BOARD ___
+									"""
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons_on_screen.draw(window)
+									var.background_no_letter = window.copy()
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									ui_text.drawText(STEP)
+									var.current_background = window.copy()
+									layers.selected_letter.draw(window)
+									"""
 
-								pygame.display.update()
-								#TODO based on selected checkboxes
+									# ___ NEXT STEP ___
+									STEP = STEP + 1
+									progress_bar.fill()
+
+
+									# ___ ADD BUTTONS 
+									layers.buttons_on_screen.empty()
+									layers.buttons_on_screen.add(button_ok)
+
+									layers.buttons_on_screen.add(checkbox_find_word)
+									checkbox_find_word.fill()
+									layers.buttons_on_screen.add(checkbox_bonus_cases)
+									if display_type_of_tile_on_hoovering :
+										checkbox_bonus_cases.fill()
+
+									# ___ DRAW WINDOW ___
+									window.blit(var.background_pop_up_empty, (0,0))
+
+									layers.buttons_on_screen.draw(window)
+									progress_bar.draw()
+									ui_text.drawTextPopUp(STEP)
+
+									pygame.display.update()
+									#TODO based on selected checkboxes
 
 
 							elif STEP == 7 :
 
-								STEP = STEP + 1
-								progress_bar.fill()
+								move_on = True
+								nb_selected = 0
+								for emo in all_emoticoms :
+									if emo.is_selected :
+										nb_selected += 1
+								if nb_selected > 1 :
+									move_on = False
 
-								# Keep track of choice
-								tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
+									#creeate pop up
+									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
-								if checkbox_function_shuffle2.is_filled or enable_shuffle_letter :
-									tmp_enable_shuffle = True
-								if checkbox_function_display_bonus2.is_filled or display_type_of_tile_on_hoovering :
-									tmp_display_pop_up = True
-								#if checkbox_function_score2.is_filled :
-								tmp_display_score = True
-								tmp_suggest_word = True
+									# snapshot of before pop_up
+									snapshot = window.copy()
 
-								# Reset
-								for button in layers.buttons_on_screen :
-									if button.is_a_checkbox :
-										button.empty()
-								layers.buttons_on_screen.empty()
+									#display pop_up
+									layers.dark_filter.draw(window)
+									layers.pop_up.draw(window)
+									pygame.display.update()
 
-								"""
-								layers.background.draw(window)
-								layers.tiles.draw(window)
-								layers.hand_holder.draw(window)
-								layers.buttons_on_screen.draw(window)
-								var.background_no_letter = window.copy()
+									MUST_DIPSLAY_POP_UP = True
 
-								layers.letters_on_board.draw(window)
-								layers.letters_just_played.draw(window)
-								var.current_player.hand.draw(window)
-								var.current_background_no_text = window.copy()
-								
-								progress_bar.draw()
-								ui_text.drawText(STEP)
-								var.current_background = window.copy()
-								layers.selected_letter.draw(window)
-								"""
+									#prepare exit image (displayed when removing pop up)
+									window.blit(snapshot, (0,0))
 
-								window.blit(var.background_pop_up_empty, (0,0))
+								if move_on :
 
-								layers.dark_filter.draw(window)
-								layers.pop_up_window.draw(window)
+									STEP = STEP + 1
+									progress_bar.fill()
 
-								layers.buttons_on_screen.add(button_ok)
-								#layers.buttons_on_screen.add(progress_bar.button_reinit)
+									# Keep track of choice
+									tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
 
-								layers.buttons_on_screen.add(checkbox_find_word2)
-								layers.buttons_on_screen.add(checkbox_bonus_cases2)
-								layers.buttons_on_screen.add(checkbox_calculate_score2)
-								layers.buttons_on_screen.add(checkbox_suggest_word2)
+									if checkbox_function_shuffle2.is_filled or enable_shuffle_letter :
+										tmp_enable_shuffle = True
+									if checkbox_function_display_bonus2.is_filled or display_type_of_tile_on_hoovering :
+										tmp_display_pop_up = True
+									#if checkbox_function_score2.is_filled :
+									tmp_display_score = True
+									tmp_suggest_word = True
 
-								if tmp_enable_shuffle :
-									checkbox_find_word2.fill()
-									checkbox_find_word2.turnOffHighlighted()
-								if tmp_display_pop_up :
-									checkbox_bonus_cases2.fill()
-									checkbox_bonus_cases2.turnOffHighlighted()
-								if tmp_display_score :
-									checkbox_calculate_score2.fill()
-									checkbox_calculate_score2.turnOffHighlighted()
-								if tmp_suggest_word :
-									checkbox_suggest_word2.fill()
-									checkbox_suggest_word2.turnOffHighlighted()
+									# Reset
+									for button in layers.buttons_on_screen :
+										if button.is_a_checkbox :
+											button.empty()
+										if button.is_an_emoticom :
+											button.select()
 
-								layers.buttons_on_screen.draw(window)
-								progress_bar.draw()
-								ui_text.drawTextPopUp(STEP)
-								
+									layers.buttons_on_screen.empty()
+
+									"""
+									layers.background.draw(window)
+									layers.tiles.draw(window)
+									layers.hand_holder.draw(window)
+									layers.buttons_on_screen.draw(window)
+									var.background_no_letter = window.copy()
+
+									layers.letters_on_board.draw(window)
+									layers.letters_just_played.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background_no_text = window.copy()
+									
+									progress_bar.draw()
+									ui_text.drawText(STEP)
+									var.current_background = window.copy()
+									layers.selected_letter.draw(window)
+									"""
+
+									window.blit(var.background_pop_up_empty, (0,0))
+
+									layers.dark_filter.draw(window)
+									layers.pop_up_window.draw(window)
+
+									layers.buttons_on_screen.add(button_ok)
+									#layers.buttons_on_screen.add(progress_bar.button_reinit)
+
+									layers.buttons_on_screen.add(checkbox_find_word2)
+									layers.buttons_on_screen.add(checkbox_bonus_cases2)
+									layers.buttons_on_screen.add(checkbox_calculate_score2)
+									layers.buttons_on_screen.add(checkbox_suggest_word2)
+
+									if tmp_enable_shuffle :
+										checkbox_find_word2.fill()
+										checkbox_find_word2.turnOffHighlighted()
+									if tmp_display_pop_up :
+										checkbox_bonus_cases2.fill()
+										checkbox_bonus_cases2.turnOffHighlighted()
+									if tmp_display_score :
+										checkbox_calculate_score2.fill()
+										checkbox_calculate_score2.turnOffHighlighted()
+									if tmp_suggest_word :
+										checkbox_suggest_word2.fill()
+										checkbox_suggest_word2.turnOffHighlighted()
+
+									layers.buttons_on_screen.draw(window)
+									progress_bar.draw()
+									ui_text.drawTextPopUp(STEP)
+									
 
 							elif STEP == 8 :
 
@@ -2705,38 +2828,39 @@ while game_is_running:
 									pygame.event.post( pygame.event.Event(pygame.VIDEORESIZE, {'size' :[var.window_width,var.window_height]} ) )
 								"""
 
+						if not MUST_DIPSLAY_POP_UP :
 
-						#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
-						for button in layers.buttons_on_screen :
-							if button.is_a_checkbox :
-								if ( (button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
-									if button.is_filled :
-										button.release()
-										button.empty()
-										button.turnOnHighlighted()
-									else :								
-										button.release()
-										button.fill()
-										button.turnOnHighlighted()
+							#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
+							for button in layers.buttons_on_screen :
+								if button.is_a_checkbox :
+									if ( (button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
+										if button.is_filled :
+											button.release()
+											button.empty()
+											button.turnOnHighlighted()
+										else :								
+											button.release()
+											button.fill()
+											button.turnOnHighlighted()
 
-									need_refresh_buttons_on_screen = True
-									
+										need_refresh_buttons_on_screen = True
+										
 
-						#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------
-						
-						for button in layers.buttons_on_screen :
+							#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------
+							
+							for button in layers.buttons_on_screen :
 
-							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
-								button.turnOnHighlighted()
-								need_refresh_buttons_on_screen = True
-
-							if button.is_pushed :
-								button.release() #release all pushed buttons
-								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 									button.turnOnHighlighted()
-								else :
-									button.turnOffHighlighted()
-								need_refresh_buttons_on_screen = True
+									need_refresh_buttons_on_screen = True
+
+								if button.is_pushed :
+									button.release() #release all pushed buttons
+									if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+										button.turnOnHighlighted()
+									else :
+										button.turnOffHighlighted()
+									need_refresh_buttons_on_screen = True
 
 				if need_refresh_buttons_on_screen :
 					layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
@@ -2981,7 +3105,7 @@ while game_is_running:
 									layers.dark_filter.draw(window)
 									layers.pop_up_window.draw(window)
 									layers.buttons_on_screen.draw(window)
-									var.background_pop_up_empty = window.copy()	
+									var.background_pop_up_empty = window.copy()
 
 									progress_bar.draw()
 									ui_text.drawTextPopUp(STEP)
@@ -3107,9 +3231,12 @@ while game_is_running:
 										layers.buttons_on_screen.remove(button_end_turn)
 										layers.buttons_on_screen.add(button_ok)
 
-										layers.buttons_on_screen.add(checkbox_facile)
-										layers.buttons_on_screen.add(checkbox_moyen)
-										layers.buttons_on_screen.add(checkbox_difficile)
+										#layers.buttons_on_screen.add(checkbox_facile)
+										#layers.buttons_on_screen.add(checkbox_moyen)
+										#layers.buttons_on_screen.add(checkbox_difficile)
+
+										for emoticom in all_emoticoms :
+											layers.buttons_on_screen.add(emoticom)
 
 										layers.buttons_on_screen.add(checkbox_function_shuffle)
 										layers.buttons_on_screen.add(checkbox_function_display_bonus)
@@ -3160,14 +3287,16 @@ while game_is_running:
 
 										layers.buttons_on_screen.add(button_ok)
 
-										layers.buttons_on_screen.add(checkbox_facile2)
-										layers.buttons_on_screen.add(checkbox_moyen2)
-										layers.buttons_on_screen.add(checkbox_difficile2)
+										#layers.buttons_on_screen.add(checkbox_facile2)
+										#layers.buttons_on_screen.add(checkbox_moyen2)
+										#layers.buttons_on_screen.add(checkbox_difficile2)
+
+										for emo in all_emoticoms :
+											layers.buttons_on_screen.add(emo)
 
 										layers.buttons_on_screen.add(checkbox_function_shuffle2)
 										layers.buttons_on_screen.add(checkbox_function_display_bonus2)
 										#layers.buttons_on_screen.add(checkbox_function_score2)
-
 
 										# ___ DRAW WINDOW ___
 										#draw new screen
@@ -3493,7 +3622,7 @@ while game_is_running:
 
 			#------ INFO ABOUT HOVERED TILE ------
 			#TODO improve logic for better performance
-			if display_type_of_tile_on_hoovering :
+			if display_type_of_tile_on_hoovering and not MUST_DIPSLAY_POP_UP :
 				if var.current_action == 'SELECT_A_LETTER' or var.current_action == 'PLAY_A_LETTER':
 					cursor_on_a_special_tile = False
 
