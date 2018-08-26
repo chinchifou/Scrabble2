@@ -1742,6 +1742,7 @@ arrow_strings = ( #sized 24x24
 arrow=((24,24),(0,0))+pygame.cursors.compile(arrow_strings,"X",".")
 
 hand_strings = ( #sized 24x24
+  "                        ",
   "     XX                 ",
   "    X..X                ",
   "    X..X                ",
@@ -1765,11 +1766,67 @@ hand_strings = ( #sized 24x24
   "     X........X         ",
   "     XXXXXXXXXX         ",
   "                        ",
-  "                        ",
 )
 hand=((24,24),(5,0))+pygame.cursors.compile(hand_strings,"X",".")
 
+hand_strings = ( #sized 24x24
+  "         XX             ",
+  "      XXX..XXX          ",
+  "     X..X..X..X         ",
+  "     X..X..X..X         ",
+  "     X..X..X..X         ",
+  "     X..X..X..XX        ",
+  "     X..X..X..X.X       ",
+  "     X..X..X..X..X      ",
+  "     X..X..X..X..X      ",
+  "     X..X..X..X..X      ",
+  " XXX X..X..X..X..X      ",
+  " X..XX........X..X      ",
+  " X...X...........X      ",
+  "  X..X...........X      ",
+  "   X.X...........X      ",
+  "   X.............X      ",
+  "    X............X      ",
+  "    X...........X       ",
+  "     X..........X       ",
+  "     X..........X       ",
+  "      X........X        ",
+  "      X........X        ",
+  "      XXXXXXXXXX        ",
+  "                        ",
+)
+open_hand=((24,24),(5,0))+pygame.cursors.compile(hand_strings,"X",".")
+
+hand_strings = ( #sized 24x24
+  "                        ",
+  "                        ",
+  "                        ",
+  "                        ",
+  "        XXXXXX          ",
+  "     XXXX..X..XX        ",
+  "     X..X..X..X.X       ",
+  "     X..X..X..X..X      ",
+  "     X..X..X..X..X      ",
+  "     X..X..X..X..X      ",
+  "    XX..X..X..X..X      ",
+  "   X.X........X..X      ",
+  "   X.X...........X      ",
+  "   X.X...........X      ",
+  "   X.X...........X      ",
+  "   X.............X      ",
+  "    X............X      ",
+  "    X...........X       ",
+  "     X..........X       ",
+  "     X..........X       ",
+  "      X........X        ",
+  "      X........X        ",
+  "      XXXXXXXXXX        ",
+  "                        ",
+)
+close_hand=((24,24),(5,0))+pygame.cursors.compile(hand_strings,"X",".")
+
 hand_clic_strings = ( #sized 24x24
+  "                        ",
   "                        ",
   "                        ",
   "                        ",
@@ -1793,11 +1850,10 @@ hand_clic_strings = ( #sized 24x24
   "     X........X         ",
   "     XXXXXXXXXX         ",
   "                        ",
-  "                        ",
 )
 hand_clic=((24,24),(5,0))+pygame.cursors.compile(hand_clic_strings,"X",".")
 
-pygame.mouse.set_cursor(*arrow)
+pygame.mouse.set_cursor(*close_hand)
 
 
 
@@ -2388,8 +2444,10 @@ while game_is_running:
 							button_ok.release()
 							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
 							layers.buttons_on_screen.draw(window)
-							#pygame.mouse.set_cursor(*arrow)
-							#TODO to imrpove if the cursor is still on the button
+
+							if STEP in (2,5,6) :
+								pygame.mouse.set_cursor(*arrow)
+
 
 							if STEP == 1 :
 
@@ -2970,9 +3028,11 @@ while game_is_running:
 					for button in layers.buttons_on_screen :
 						if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 							button.turnOnHighlighted()
+							pygame.mouse.set_cursor(*hand)
 							buttons_changed = True
 						elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
 							button.turnOffHighlighted()
+							pygame.mouse.set_cursor(*arrow)
 							buttons_changed = True
 
 					if buttons_changed :
@@ -3156,7 +3216,8 @@ while game_is_running:
 
 							#------ RELEASE CLIC ON PLAY BUTTON -------
 							if ( (button_play.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
-
+		
+								pygame.mouse.set_cursor(*arrow)
 								button_play.release()
 
 								if STEP == 0 :
@@ -3206,6 +3267,9 @@ while game_is_running:
 
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
+
+								if STEP in (3,6,9) :
+									pygame.mouse.set_cursor(*arrow)
 
 								"""
 								logging.debug("End of turn board state : ")
@@ -3686,11 +3750,11 @@ while game_is_running:
 				for button in layers.buttons_on_screen :
 					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 						button.turnOnHighlighted()
-						#pygame.mouse.set_cursor(*hand)
+						pygame.mouse.set_cursor(*hand)
 						buttons_changed = True
 					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
 						button.turnOffHighlighted()
-						#pygame.mouse.set_cursor(*arrow)
+						pygame.mouse.set_cursor(*arrow)
 						buttons_changed = True
 
 				if buttons_changed :
