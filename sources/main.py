@@ -267,6 +267,7 @@ class UIText():
 	def __init__(self, text, line_height, bold, pos_in_tiles):
 		self.text = text
 		self.line_height = line_height
+
 		self.bold = int(bold)	
 
 		self.font = pygame.font.SysFont("Calibri", floor(self.line_height*var.tile_size))
@@ -665,90 +666,90 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin=1.0, interligne=0.5, time = 4000):
+def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 4000):
 
-	perf_clock = pygame.time.Clock()
-	start = perf_clock.tick()
-
-	#Init
+	# ___ Init ___
 	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time / 20.0)
 
 	nb_lignes = len(ar_texts)
 	my_line_height = LINE_HEIGHT
 
-	left_margin, top_margin = margin, margin
+	interligne = interligne_ratio * my_line_height
+
+	left_margin, top_margin = my_line_height*margin_ratio[0], my_line_height*margin_ratio[1]
 	window_pos_x, window_pos_y = position[0], position[1]
 
 	to_move_in_the_center = ( position == (0,0) )
 
-	#Create UI text objects
-	ui_texts = []
-	tmp_pos_y = window_pos_y + top_margin
+
+	# ___ Prevent to go out of the boudary ___
+	max_nb_letters = 0
+	longest_word = ""
 	for text in ar_texts :
-		ui_texts.append( UIText( text, my_line_height, False, (pos_x, tmp_pos_y) ) )
-		tmp_pos_y += my_line_height + interligne
+		if len(text) > max_nb_letters :
+			max_nb_letters = len(text)
+			longest_word = text
 
-	#Get size of the text to center it and create window accordingly
-	max_width, max_height = 0, 0
-	for ui_text in ui_texts :
-		max_width, max_height = max (max_width, ui_text.width), max (max_height, ui_text.height)
-
-
-	#prevent text from going out of the bounds
-	while ( round (max_width+2*left_margin ) > bounds[0] or round ( 2*top_margin + max_height*nb_lignes + interligne*(nb_lignes-1) ) > bounds[1] ) :
-
-		ratio = max ( round (max_width+2*left_margin ) / bounds[0] , round ( 2*top_margin + max_height*nb_lignes + interligne*(nb_lignes-1) ) / bounds[1] )
-
-		if ratio > 1.5 :
-			my_line_height = (my_line_height/round(ratio))
-		elif ratio > 1.1 :
-			my_line_height = (my_line_height/round(ratio,1))
-		else :
-			my_line_height = my_line_height - 0.1
-
-		for ui_text in ui_texts :
-			ui_text.line_height = my_line_height
-			ui_text.resize()
-
-		tmp_max_width, tmp_max_height = 0, 0	
-		for ui_text in ui_texts :	
-			tmp_max_width, tmp_max_height = max (tmp_max_width, ui_text.width), max (tmp_max_height, ui_text.height)
-
-		max_width, max_height = tmp_max_width, tmp_max_height
+	test_font = pygame.font.SysFont("Calibri", floor(my_line_height*var.tile_size))
+	initial_max_width = test_font.size(text)[0] / var.tile_size
 
 
-	#Wndow width and height (rounded for for better design)
-	window_width = round ( max_width+2*left_margin )
-	window_height = round ( 2*top_margin + max_height*nb_lignes + interligne*(nb_lignes-1) )
+	initial_total_height = my_line_height*nb_lignes + interligne*(nb_lignes - 1) 
+
+	correction_ratio_width, correction_ratio_height = 1.0, 1.0
+
+	if 2*left_margin + initial_max_width > bounds[0] :
+		correction_ratio_width = bounds[0] / ( 2*left_margin + initial_max_width )
+
+	if ( 2*top_margin + initial_total_height ) > bounds[1] :
+		correction_ratio_height = bounds[1] / ( 2*top_margin + initial_total_height )
+
+	correction_ratio = min( correction_ratio_width, correction_ratio_height )
+
+	if correction_ratio < 1.0 :
+		my_line_height = my_line_height * correction_ratio
+		interligne = interligne_ratio * my_line_height
+		left_margin, top_margin = my_line_height*margin_ratio[0], my_line_height*margin_ratio[1]
+
+	new_total_height = 2*top_margin + my_line_height*nb_lignes + interligne*(nb_lignes - 1)
+
+	test_font = pygame.font.SysFont("Calibri", floor(my_line_height*var.tile_size)) 
+	new_max_width = test_font.size(longest_word)[0] / var.tile_size
 
 
-	#Move to the center of the center of the screen
+	# ___ Window width and height ___ (rounded for for better design)
+	#TODO to improve
+	window_width =  ( 2*left_margin + new_max_width )
+	window_height =  ( new_total_height )
+
+
+	# ___ Move to the center of the center of the screen ___
 	if to_move_in_the_center :
 
 		window_pos_x = (32 - window_width) / 2.0 
 		window_pos_y = (18 - window_height) / 2.0
 
-		#Update text position
-		tmp_pos_y = window_pos_y + top_margin
-		for ui_text in ui_texts :
-			ui_text.pos_x, ui_text.pos_y = pos_x, tmp_pos_y
-			ui_text.pos_x_pix, ui_text.pos_y_pix = pixels(ui_text.pos_x, ui_text.pos_y)
-			tmp_pos_y += my_line_height + interligne
 
-	#create pop_up background surface
+	# ___ create pop_up background surface ___
 	pop_up_surface = pygame.Surface( pixels(window_width , window_height) )
 	pop_up_surface.fill(COLOR.GREY_DEEP)
-	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), pixels(window_width, window_height, to_round=True) ), 3)
+	pygame.draw.rect(pop_up_surface, COLOR.GREY_LIGHT, pygame.Rect( (0,0), pixels(window_width, window_height) ), 3)
 
-	#add text
+
+	# ___ Create UI text objects ___
+	ui_texts = []
+	tmp_pos_x, tmp_pos_y = window_pos_x + left_margin, window_pos_y + top_margin
+	for text in ar_texts :
+		ui_texts.append( UIText( text, my_line_height, False, (tmp_pos_x, tmp_pos_y) ) )
+		tmp_pos_y += my_line_height + interligne
+
+
+	# ___ add text ___
 	tmp_pos_y = top_margin
 	for ui_text in ui_texts :
 		pop_up_surface.blit( ui_text.font.render(ui_text.text, 1, COLOR.WHITE), pixels(left_margin, tmp_pos_y) )
 		tmp_pos_y = tmp_pos_y + my_line_height + interligne
 
-
-	end = perf_clock.tick()
-	logging.debug("time : %f", end-start)
 
 	#create complete pop_up
 	return UI_Surface('pop_up', window_pos_x, window_pos_y, pop_up_surface)
@@ -2640,30 +2641,13 @@ while game_is_running:
 
 								var.current_action = "SELECT_A_LETTER"
 
-
 								texts = [
 								"Utiliser le bouton 'Mélanger' pour trouver plus",
 								"  facilement un mot qui rapporte des points."
 								]
-								texts = [
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",								
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",								
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",								
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",								
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",								
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",								
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points.",
-								]
 
 								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = 3.0, time=10000)  )
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=10000)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
@@ -3023,7 +3007,7 @@ while game_is_running:
 										move_on = True
 
 								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=2.0)  )
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
