@@ -537,9 +537,9 @@ class UITextPrinter():
 
 		if step == 1 :
 			all_texts = [
-			UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-			UIText( "Je suis votre ergonome virtuelle.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
-			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
+			UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
+			UIText( "Je suis votre ergonome virtuelle.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4) ),
+			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+6) )
 			]
 			"""
 			buble_points = [
@@ -553,31 +553,31 @@ class UITextPrinter():
 			]
 			"""
 			buble_points = [
-			pixels(2.5, 2.5),
-			pixels(23.5, 2.5),
+			pixels(2.5, 3.5),
+			pixels(23.5, 3.5),
 			pixels(23.5, 7.5),
 			pixels(24.5, 10.25),
 			pixels(23.5, 8.5),
-			pixels(23.5, 9),
-			pixels(2.5, 9)
+			pixels(23.5, 9.5),
+			pixels(2.5, 9.5)
 			]		
 
 		elif step == 2 :
 			all_texts = [
-			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
-			UIText( "Marquer le plus de points possibles en plaçant un mot", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+2.5) ),
-			UIText( "sur le plateau.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+3.5) ),
-			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5.5) ),
-			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+7) )
+			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
+			UIText( "Marquer le plus de points possibles en plaçant un mot", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+3.5) ),
+			UIText( "sur le plateau.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+4.5) ),
+			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+6.5) ),
+			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+8) )
 			]
 			buble_points = [
-			pixels(2.5, 2.5),
-			pixels(23.5, 2.5),
+			pixels(2.5, 3.5),
+			pixels(23.5, 3.5),
 			pixels(23.5, 8.5),
 			pixels(24.5, 10.25),
 			pixels(23.5, 9.1),
-			pixels(23.5, 10.5),
-			pixels(2.5, 10.5)
+			pixels(23.5, 11.5),
+			pixels(2.5, 11.5)
 			]
 
 		elif step == 4 :
