@@ -916,6 +916,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
 			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
 
+		self.center = (pos_x + self.width/2, pos_y + self.height / 2)
+		self.center_pix = pixels(self.center[0], self.center[1])
+
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height, to_round=True ) )
 		#set area to be displayed
@@ -923,6 +926,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 
 	def resize(self):
+
+		self.center_pix = pixels(self.center[0], self.center[1])
+		#TODO to use for better collide detection
 
 		#reload image
 		if self.path != None :
