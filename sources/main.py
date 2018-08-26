@@ -83,6 +83,9 @@ MAPING_STEP_MAX_SCORE = {
 9: 26
 }
 
+global CURSOR_IS_OPEN_HAND
+CURSOR_IS_OPEN_HAND = False
+
 
 global MUST_DIPSLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR
 # boolean to indicate wether to display pop_up or not
@@ -1853,7 +1856,7 @@ hand_clic_strings = ( #sized 24x24
 )
 hand_clic=((24,24),(5,0))+pygame.cursors.compile(hand_clic_strings,"X",".")
 
-pygame.mouse.set_cursor(*close_hand)
+pygame.mouse.set_cursor(*arrow)
 
 
 
@@ -3063,6 +3066,8 @@ while game_is_running:
 
 								if letter_from_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 
+									pygame.mouse.set_cursor(*close_hand)
+
 									var.delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
 									layers.selected_letter.add(letter_from_hand)
 									
@@ -3079,6 +3084,7 @@ while game_is_running:
 									layers.selected_letter.draw(window)
 									pygame.display.update()
 
+									pygame.mouse.set_cursor(*close_hand)
 									var.current_action = "PLAY_A_LETTER"
 
 
@@ -3086,6 +3092,8 @@ while game_is_running:
 							for letter_from_board in layers.letters_just_played :
 
 								if letter_from_board.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+
+									pygame.mouse.set_cursor(*close_hand)
 
 									var.delta_pos_on_tile = ( cursor_pos_x - letter_from_board.rect.x , cursor_pos_y - letter_from_board.rect.y)
 
@@ -3105,6 +3113,7 @@ while game_is_running:
 									layers.selected_letter.draw(window)
 									pygame.display.update()
 
+									pygame.mouse.set_cursor(*close_hand)
 									var.current_action = "PLAY_A_LETTER"
 							
 
@@ -3160,6 +3169,9 @@ while game_is_running:
 
 											pygame.display.update()
 
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
+
 											var.current_action = "SELECT_A_LETTER"
 
 
@@ -3195,6 +3207,9 @@ while game_is_running:
 											var.current_background = window.copy()
 
 											pygame.display.update()
+
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
 
 											var.current_action = "SELECT_A_LETTER"
 
@@ -3679,6 +3694,9 @@ while game_is_running:
 
 											pygame.display.update()
 
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
+
 											var.current_action = "SELECT_A_LETTER"
 
 
@@ -3730,6 +3748,9 @@ while game_is_running:
 
 											pygame.display.update()
 
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
+
 											var.current_action = "SELECT_A_LETTER"
 
 
@@ -3761,6 +3782,23 @@ while game_is_running:
 					layers.buttons_on_screen.clear(window, var.background_empty)
 					layers.buttons_on_screen.draw(window)
 					pygame.display.update()
+
+				collide = False
+				for letter in layers.letters_just_played.sprites() :
+					if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+						collide = True
+						pygame.mouse.set_cursor(*open_hand)
+						CURSOR_IS_OPEN_HAND = True		
+				for letter in var.current_player.hand :
+					if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+						collide = True
+						pygame.mouse.set_cursor(*open_hand)
+						CURSOR_IS_OPEN_HAND = True
+
+				#TODO
+				if CURSOR_IS_OPEN_HAND == True and collide == False:
+					pygame.mouse.set_cursor(*arrow)
+					CURSOR_IS_OPEN_HAND = False
 
 
 			#------ MOVE SELECTED LETTER ------ 
@@ -3835,6 +3873,8 @@ while game_is_running:
 
 						ui_text.id_tile_pop_up = 0
 						ui_text.pop_up_displayed = False
+
+
 
 	#display fps
 	#logging.debug('fps : %s', str(fps_clock.get_fps() ) )
