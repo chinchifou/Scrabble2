@@ -541,6 +541,27 @@ class UITextPrinter():
 			UIText( "Je suis votre ergonome virtuelle.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+3) ),
 			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5) )
 			]
+			"""
+			buble_points = [
+			pixels(2.5, 2.5),
+			pixels(23.5, 2.5),
+			pixels(23.5, 10.5),
+			pixels(24.5, 11.25), <-Mouse
+			pixels(23.5, 11.1),
+			pixels(23.5, 14),
+			pixels(2.5, 14)
+			]
+			"""
+			buble_points = [
+			pixels(2.5, 2.5),
+			pixels(23.5, 2.5),
+			pixels(23.5, 7.5),
+			pixels(24.5, 10.25),
+			pixels(23.5, 8.5),
+			pixels(23.5, 9),
+			pixels(2.5, 9)
+			]		
+
 		elif step == 2 :
 			all_texts = [
 			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+1) ),
@@ -549,6 +570,16 @@ class UITextPrinter():
 			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+5.5) ),
 			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+7) )
 			]
+			buble_points = [
+			pixels(2.5, 2.5),
+			pixels(23.5, 2.5),
+			pixels(23.5, 8.5),
+			pixels(24.5, 10.25),
+			pixels(23.5, 9.1),
+			pixels(23.5, 10.5),
+			pixels(2.5, 10.5)
+			]
+
 		elif step == 4 :
 			all_texts = [
 			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
@@ -560,9 +591,18 @@ class UITextPrinter():
 			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+8+0.5, limit_top+7.25) ),
 
 
-			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+9) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.25) ),
-			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+11.75) )
+			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8.25) ),
+			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+9.75) ),
+			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+11.25) )
+			]
+			buble_points = [
+			pixels(2.25, 2.25),
+			pixels(23.5, 2.25),
+			pixels(23.5, 8.5),
+			pixels(24.5, 10.25),
+			pixels(23.5, 9.1),
+			pixels(23.5, 14.3),
+			pixels(2.25, 14.3)
 			]
 		elif step == 5 :
 			all_texts = [
@@ -574,6 +614,15 @@ class UITextPrinter():
 			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+6.75) ),
 			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
 			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+9.5) )
+			]
+			buble_points = [
+			pixels(2.5, 2.25),
+			pixels(23.5, 2.25),
+			pixels(23.5, 8.5),
+			pixels(24.5, 10.25),
+			pixels(23.5, 9.1),
+			pixels(23.5, 12.5),
+			pixels(2.5, 12.5)
 			]
 		elif step == 7 :
 			all_texts = [
@@ -588,6 +637,15 @@ class UITextPrinter():
 			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+9.25) ),
 			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.75) )
 			]
+			buble_points = [
+			pixels(2.25, 2.25),
+			pixels(23.5, 2.25),
+			pixels(23.5, 8.5),
+			pixels(24.5, 10.25),
+			pixels(23.5, 9.1),
+			pixels(23.5, 14),
+			pixels(2.25, 14)
+			]
 		elif step == 8 :
 			all_texts = [
 			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
@@ -600,6 +658,15 @@ class UITextPrinter():
 			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+10.25) ),
 			UIText( "Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+11.5) )
 			]
+			buble_points = [
+			pixels(2.5, 2.25),
+			pixels(23.5, 2.25),
+			pixels(23.5, 8.5),
+			pixels(24.5, 10.25),
+			pixels(23.5, 9.1),
+			pixels(23.5, 14.3),
+			pixels(2.5, 14.3)
+			]
 		elif step == 10 :			
 			all_texts = [
 			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
@@ -607,19 +674,40 @@ class UITextPrinter():
 			UIText( "Merci de votre participation !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
 			UIText( "Un récapitulatif concernant l'ergonomie vous attend à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) )
 			]
+			buble_points = [
+			pixels(2.5, 5.5),
+			pixels(23.5, 5.5),
+			pixels(23.5, 10.5),
+			pixels(24.5, 11.25),
+			pixels(23.5, 11.1),
+			pixels(23.5, 12),
+			pixels(2.5, 12)
+			]
 		elif step == 11 :
+			custom_height = 0.65
 			all_texts = [
-			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+1) ),
-			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+2.75) ),
-			UIText( "> Une science avec des méthodes pour concevoir et améliorer le logiciel", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+4) ),
-			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", LINE_HEIGHT.SUBTITLE, False, (limit_left+2, limit_top+5.25) ),
-			UIText( "En fait, l'ergonomie c'est l'avenir !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_left+7.5) ),
-			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) ),
-			UIText( "A bientôt !", LINE_HEIGHT.SUBTITLE, True, (limit_left+12.25, limit_top+11) ),
-			]			
+			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", custom_height, False, (limit_left+1, limit_top+1) ),
+			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", custom_height, False, (limit_left+2, limit_top+2.75) ),
+			UIText( "> Une science avec des méthodes pour concevoir et améliorer le logiciel", custom_height, False, (limit_left+2, limit_top+4) ),
+			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", custom_height, False, (limit_left+2, limit_top+5.25) ),
+			UIText( "En fait, l'ergonomie c'est l'avenir !", custom_height, False, (limit_left+1, limit_left+7.5) ),
+			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", custom_height, False, (limit_left+1, limit_top+9) ),
+			UIText( "A bientôt !", custom_height, True, (limit_left+12.25, limit_top+11) ),
+			]
+			buble_points = [
+			pixels(2.5, 2.5),
+			pixels(23.5, 2.5),
+			pixels(23.5, 10.5),
+			pixels(24.5, 11.25),
+			pixels(23.5, 11.1),
+			pixels(23.5, 14),
+			pixels(2.5, 14)
+			]		
 
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
+
+		pygame.draw.aalines( window, COLOR.GREY_LIGHT, True, buble_points, 1 )	
 
 	"""
 	def drawPopUpScore2(self, word):
@@ -1910,12 +1998,13 @@ button_play = Button("play", 32/2.0 + 6, 7.5)
 
 # ------- CHECKBOXES --------
 # STEP 4
+"""
 checkbox_facile = Checkbox("checkbox", 3.5, 6 )
 checkbox_moyen = Checkbox("checkbox", 3.5, 7.5 )
 checkbox_difficile = Checkbox("checkbox", 3.5, 9 )
-
-checkbox_function_shuffle = Checkbox("checkbox", 3.5, 12 )
-checkbox_function_display_bonus = Checkbox("checkbox", 3.5, 13.5 )
+"""
+checkbox_function_shuffle = Checkbox("checkbox", 3.5, 11.5 )
+checkbox_function_display_bonus = Checkbox("checkbox", 3.5, 13 )
 #checkbox_function_score = Checkbox("checkbox", 3, 16 )
 
 # STEP 5
@@ -2329,7 +2418,7 @@ while game_is_running:
 									move_on = False
 
 									#creeate pop up
-									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
