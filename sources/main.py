@@ -374,7 +374,6 @@ class UITextPrinter():
 
 		# ___ UI TEXT init ___
 		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, hand_holder.pos_y - 1.0) )
-
 		
 		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1) )	
 
@@ -393,7 +392,6 @@ class UITextPrinter():
 		hand_holder = layers.hand_holder.sprites()[0]
 
 		# ___ DISPLAY ON SCREEN ___
-
 		#Header
 		text = self.header.font.render( self.header.text, 1, COLOR.WHITE )
 		window.blit(text, (self.header.pos_x_pix, self.header.pos_y_pix))
@@ -915,14 +913,14 @@ class Tile(ResizableSprite):
 
 #----- Buttons -----
 class Button(ResizableSprite):
-	def __init__(self, name, pos_x, pos_y, is_a_checkbox=False):
+	def __init__(self, name, pos_x, pos_y, is_a_checkbox=False, is_an_emoticom=False):
 
 		self.path = path_buttons
 		self.is_highlighted = False
 		self.is_pushed = False
 		self.is_a_checkbox = is_a_checkbox
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
 
 	def turnOnHighlighted(self):
 		self.image = loadImage(path.join(self.path, self.name+'_highlighted.png'))
@@ -959,6 +957,24 @@ class Checkbox(Button):
 		self.name = self.name.replace("filled_", "")
 		self.is_filled = False
 		self.turnOnHighlighted()
+
+
+class Emoticom(Button):
+	def __init__(self, name, pos_x, pos_y):
+		self.width, self.height = 3, 3
+		self.name = "selected_"+ name
+		Button.__init__(self, self.name, pos_x, pos_y, is_an_emoticom=True)
+		self.is_selected = True
+
+	def select(self):
+		self.name = self.name.replace("un", "")
+		self.is_selected = True
+		#self.turnOnHighlighted()	
+
+	def unselect(self):
+		self.name = 'un'+self.name
+		self.is_selected = False
+		#self.turnOnHighlighted()
 
 
 #----- Letter -----
@@ -1911,6 +1927,14 @@ checkbox_suggest_word2 = Checkbox("checkbox", 5, 9)
 
 checkbox_bonus_cases2 = Checkbox("checkbox", 5, 12 )
 checkbox_calculate_score2 = Checkbox("checkbox", 5, 13.25 )
+
+
+# ------- EMOTICOM --------
+happy = Emoticom("happy", 5, 6.5)
+neutral = Emoticom("neutral", 9, 6.5)
+sad = Emoticom("sad", 13, 6.5)
+
+all_emoticoms = [happy, neutral, sad]
 
 
 #create dark_filter
