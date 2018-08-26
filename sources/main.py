@@ -367,11 +367,11 @@ class UITextPrinter():
 		self.id_tile_pop_up = 0
 		self.pop_up_displayed = False
 
-		self.double_letter = UserInterFacePopUp( ui_content['double_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
-		self.triple_letter = UserInterFacePopUp( ui_content['triple_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
+		self.double_letter = UserInterFacePopUp( ui_content['double_letter'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
+		self.triple_letter = UserInterFacePopUp( ui_content['triple_letter'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
 
-		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
-		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
+		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
+		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
 
 		hand_holder = layers.hand_holder.sprites()[0]
 
