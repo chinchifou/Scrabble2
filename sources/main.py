@@ -2950,7 +2950,7 @@ while game_is_running:
 								]
 
 								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=10000)  )
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=11000)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
@@ -3521,7 +3521,7 @@ while game_is_running:
 									button_shuffle.release()
 
 									# ___ SHUFFLE ___
-									give_help = choice( [True, True, True, False] )
+									give_help = choice( [True, True, True, True] )
 									more_help = choice( [True, False, False] )	
 
 									pos_x = (UI_LEFT_LIMIT)
