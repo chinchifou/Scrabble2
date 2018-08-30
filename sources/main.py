@@ -609,18 +609,17 @@ class UITextPrinter():
 			]
 		elif step == 5 :
 			all_texts = [
-			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
-			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
-			UIText( "Voici ma proposition, vous pouvez la modifier si vous le souhaitez.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
+			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1.5) ),
+			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+2.5) ),
 			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4.5) ),
 			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.5) ),
-			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+6.75) ),
+			UIText( "> Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+6.75) ),
 			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
-			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+9.5) )
+			UIText( "> Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+9.5) )
 			]
 			buble_points = [
-			pixels(2.5, 2.25),
-			pixels(23.5, 2.25),
+			pixels(2.5, 3.25),
+			pixels(23.5, 3.25),
 			pixels(23.5, 8.5),
 			pixels(24.5, 10.25),
 			pixels(23.5, 9.1),
@@ -629,8 +628,8 @@ class UITextPrinter():
 			]
 		elif step == 7 :
 			all_texts = [
-			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+0.5) ),
-			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+2) ),
+			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1.5) ),
+			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
 
 			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+0.75, limit_top+7.25) ),			
 			UIText( "Normal", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+4+0.6, limit_top+7.25) ),
@@ -641,8 +640,8 @@ class UITextPrinter():
 			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.75) )
 			]
 			buble_points = [
-			pixels(2.25, 2.25),
-			pixels(23.5, 2.25),
+			pixels(2.25, 3.25),
+			pixels(23.5, 3.25),
 			pixels(23.5, 8.5),
 			pixels(24.5, 10.25),
 			pixels(23.5, 9.1),
@@ -650,6 +649,7 @@ class UITextPrinter():
 			pixels(2.25, 14)
 			]
 		elif step == 8 :
+			"""
 			all_texts = [
 			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
 			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+1.5) ),
@@ -661,14 +661,24 @@ class UITextPrinter():
 			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+10.25) ),
 			UIText( "Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+11.5) )
 			]
+			"""
+			all_texts = [
+			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1.5) ),
+			UIText( "Voici une dernière version dans laquelle j'ai apporté de nouvelles améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
+			UIText( "Nouvelles améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
+			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.25) ),
+			UIText( "> Me proposer des mots possibles", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+6.75) ),
+			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
+			UIText( "> Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+9.75) )
+			]
 			buble_points = [
-			pixels(2.5, 2.25),
-			pixels(23.5, 2.25),
+			pixels(2.5, 3.25),
+			pixels(23.5, 3.25),
 			pixels(23.5, 8.5),
 			pixels(24.5, 10.25),
 			pixels(23.5, 9.1),
-			pixels(23.5, 14.3),
-			pixels(2.5, 14.3)
+			pixels(23.5, 13.3),
+			pixels(2.5, 13.3)
 			]
 		elif step == 10 :			
 			all_texts = [
@@ -2248,6 +2258,12 @@ while game_is_running:
 					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				x += 1
 
+			# ___ CHECKBOXES ___
+			checkbox_find_word.empty()
+			checkbox_bonus_cases.empty()
+			checkbox_function_shuffle2.empty()
+			checkbox_function_display_bonus2.empty()
+
 			layers.buttons_on_screen.empty()
 			layers.buttons_on_screen.add(button_play)
 
@@ -2542,11 +2558,11 @@ while game_is_running:
 									layers.buttons_on_screen.empty()
 									layers.buttons_on_screen.add(button_ok)
 
-									layers.buttons_on_screen.add(checkbox_find_word)
+									#layers.buttons_on_screen.add(checkbox_find_word)
 									checkbox_find_word.fill()
-									layers.buttons_on_screen.add(checkbox_bonus_cases)
-									if display_type_of_tile_on_hoovering :
-										checkbox_bonus_cases.fill()
+									#layers.buttons_on_screen.add(checkbox_bonus_cases)
+									#if display_type_of_tile_on_hoovering :
+									checkbox_bonus_cases.fill()
 
 									# ___ DRAW WINDOW ___
 									window.blit(var.background_pop_up_empty, (0,0))
@@ -2601,6 +2617,8 @@ while game_is_running:
 									tmp_display_score = True
 									tmp_suggest_word = True
 
+									#TODO NO CHECKBOX
+
 									# Reset
 									for button in layers.buttons_on_screen :
 										if button.is_a_checkbox :
@@ -2636,10 +2654,10 @@ while game_is_running:
 									layers.buttons_on_screen.add(button_ok)
 									#layers.buttons_on_screen.add(progress_bar.button_reinit)
 
-									layers.buttons_on_screen.add(checkbox_find_word2)
-									layers.buttons_on_screen.add(checkbox_bonus_cases2)
-									layers.buttons_on_screen.add(checkbox_calculate_score2)
-									layers.buttons_on_screen.add(checkbox_suggest_word2)
+									#layers.buttons_on_screen.add(checkbox_find_word2)
+									#layers.buttons_on_screen.add(checkbox_bonus_cases2)
+									#layers.buttons_on_screen.add(checkbox_calculate_score2)
+									#layers.buttons_on_screen.add(checkbox_suggest_word2)
 
 									if tmp_enable_shuffle :
 										checkbox_find_word2.fill()
@@ -2792,6 +2810,12 @@ while game_is_running:
 									if (x, y) != (4,8) :
 										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 									x += 1
+
+								# ___ CHECKBOXES ___
+								checkbox_find_word.empty()
+								checkbox_bonus_cases.empty()
+								checkbox_function_shuffle2.empty()
+								checkbox_function_display_bonus2.empty()
 
 								layers.buttons_on_screen.empty()
 								layers.buttons_on_screen.add(button_play)
