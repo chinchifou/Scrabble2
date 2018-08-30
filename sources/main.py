@@ -683,8 +683,8 @@ class UITextPrinter():
 			pixels(23.5, 10.5),
 			pixels(24.5, 11.25),
 			pixels(23.5, 11.1),
-			pixels(23.5, 12),
-			pixels(2.5, 12)
+			pixels(23.5, 12.25),
+			pixels(2.5, 12.25)
 			]
 		elif step == 11 :
 			custom_height = 0.65
