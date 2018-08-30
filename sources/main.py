@@ -93,25 +93,6 @@ MUST_DIPSLAY_POP_UP = False
 # number of frames before the pop_up disappear
 FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 
-#Folders' paths
-path_log = path.abspath('../log/')
-if not path.exists(path_log):
-	makedirs(path_log)
-
-path_icon = path.abspath('../materials/images/icon/')
-path_background = path.abspath('../materials/images/background/')
-
-path_buttons = path.abspath('../materials/images/assets/buttons/primary/') #changed later on
-path_buttons_french = path.abspath('../materials/images/assets/buttons/primary/french/')
-path_buttons_english = path.abspath('../materials/images/assets/buttons/primary/english/')
-path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/')
-
-path_letters = path.abspath('../materials/images/assets/letters/') #changed later on
-path_letters_french = path.abspath('../materials/images/assets/letters/french/')
-path_letters_english = path.abspath('../materials/images/assets/letters/english/')
-
-path_tiles = path.abspath('../materials/images/assets/tiles/')
-path_music = path.abspath('../materials/sounds/')
 
 
 #----- Changing a runtime -----
@@ -147,6 +128,30 @@ class GameVariable():
 		self.points_for_scrabble = 50
 
 var = GameVariable()
+
+class AllPaths():
+	def __init__(self):
+
+		self.path_log = path.abspath('../log/')
+		if not path.exists(self.path_log):
+			makedirs(self.path_log)
+
+		self.path_icon = path.abspath('../materials/images/icon/')
+		self.path_background = path.abspath('../materials/images/background/')
+
+		self.path_buttons = path.abspath('../materials/images/assets/buttons/primary/') #changed later on
+		self.path_buttons_french = path.abspath('../materials/images/assets/buttons/primary/french/')
+		self.path_buttons_english = path.abspath('../materials/images/assets/buttons/primary/english/')
+		self.path_buttons_menu = path.abspath('../materials/images/assets/buttons/side_menu/')
+
+		self.path_letters = path.abspath('../materials/images/assets/letters/') #changed later on
+		self.path_letters_french = path.abspath('../materials/images/assets/letters/french/')
+		self.path_letters_english = path.abspath('../materials/images/assets/letters/english/')
+
+		self.path_tiles = path.abspath('../materials/images/assets/tiles/')
+		self.path_music = path.abspath('../materials/sounds/')
+
+PATHS = AllPaths()
 
 #class used to print error messages in console and log file
 class ErrorPrinter():
@@ -217,8 +222,8 @@ COLOR = ColorPannel()
 #class used to store sounds
 class Sounds():
 	def __init__(self):
-		self.victory = pygame.mixer.Sound(path.join(path_music, 'tf2_achievement_unlocked_sound.ogg'))
-		self.scrabble = pygame.mixer.Sound(path.join(path_music, 'victory_fanfare.ogg'))
+		self.victory = pygame.mixer.Sound(path.join(PATHS.path_music, 'tf2_achievement_unlocked_sound.ogg'))
+		self.scrabble = pygame.mixer.Sound(path.join(PATHS.path_music, 'victory_fanfare.ogg'))
 
 #class used to store line heigh used in the game
 class LineHeights():
@@ -904,7 +909,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 	nb_created_instances = 0
 
 	#received coordinates are expresed in tiles
-	def __init__(self, name, pos_x, pos_y, transparent=False):
+	def __init__(self, name, pos_x, pos_y, tmp_path, transparent=False):
 
 		#super class constructor
 		pygame.sprite.Sprite.__init__(self, self.containers) #self.containers need to have a default container
@@ -913,14 +918,19 @@ class ResizableSprite(pygame.sprite.Sprite):
 		ResizableSprite.nb_created_instances += 1
 		self.id = ResizableSprite.nb_created_instances
 
-		self.name, self.pos_x, self.pos_y, self.transparent = name, pos_x, pos_y, transparent
+		self.name, self.pos_x, self.pos_y, self.path, self.transparent = name, pos_x, pos_y, tmp_path, transparent
 
 		#load image
 		if self.path != None :
 			if self.transparent :
 				self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
 			else :
+				logging.debug("Path used : %s", self.path)
+				logging.debug("Name used : %s", self.name)
+				logging.debug("Request : %s", path.join(self.path, self.name+'.png'))
+
 				self.image = loadImage(path.join(self.path, self.name+'.png'))
+				#TODO debug
 
 		#auto detect width and height
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
@@ -967,20 +977,19 @@ class ResizableSprite(pygame.sprite.Sprite):
 #----- UI Surface -----
 class UI_Surface(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y, surface):
-		self.path = None
+
 		self.image = surface
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, None)
 
 #----- UI Image -----
 class UI_Image(ResizableSprite):
-	def __init__(self, name, path, pos_x, pos_y, width, height):
+	def __init__(self, name, tmp_path, pos_x, pos_y, width, height):
 
-		self.path = path
 		self.name = name
 		self.width, self.height = width, height
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, tmp_path, transparent=True)
 
 
 # ___ SPRITES ___ 
@@ -989,21 +998,19 @@ class UI_Image(ResizableSprite):
 class Board(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 
-		self.path = path_background
 		self.width, self.height = 32, 18
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_background)
 
 
 #----- Hand holder -----
 class Hand_holder(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y, max_nb_letters):
 
-		self.path = path_background
 		self.width, self.height = 0.2 + var.number_of_letters_per_hand, 1.2
 		self.max_nb_letters = max_nb_letters
 		
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_background)
 
 	def indexAtPos(self, cursor_pos_x):
 
@@ -1018,22 +1025,19 @@ class Hand_holder(ResizableSprite):
 class Tile(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 
-		self.path = path_tiles
-
-		ResizableSprite.__init__(self, name, pos_x, pos_y)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_tiles)
 
 
 #----- Buttons -----
 class Button(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y, is_a_checkbox=False, is_an_emoticom=False):
 
-		self.path = path_buttons
 		self.is_highlighted = False
 		self.is_pushed = False
 		self.is_a_checkbox = is_a_checkbox
 		self.is_an_emoticom = is_an_emoticom
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_buttons, transparent=True)
 
 	def turnOnHighlighted(self):
 		self.image = loadImage(path.join(self.path, self.name+'_highlighted.png'))
@@ -1098,10 +1102,9 @@ class Emoticom(Button):
 class Letter(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y):
 
-		self.path = path_letters
 		self.points = POINTS_FOR[name]
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y, transparent=True)		
+		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_letters, transparent=True)		
 
 	#move a letter at a given position expressed in tiles
 	def moveAtTile(self, pos_x, pos_y) :
@@ -1119,11 +1122,11 @@ class ProgressBar():
 	def __init__(self, pos_x, pos_y, width, height, nb_state):
 
 		#create progress bar
-		self.progress_bar_bck = UI_Image('progress_bar_background', path_background, pos_x, pos_y, width, height)
+		self.progress_bar_bck = UI_Image('progress_bar_background', PATHS.path_background, pos_x, pos_y, width, height)
 		layers.progress_bar.add(self.progress_bar_bck)
 
 		#filling of the progress bar
-		self.progress_bar_filling = UI_Image('progress_bar_tile', path_background, pos_x, pos_y, 0, height)
+		self.progress_bar_filling = UI_Image('progress_bar_tile', PATHS.path_background, pos_x, pos_y, 0, height)
 		layers.progress_bar.add(self.progress_bar_filling)
 
 		#reinit progress bar
@@ -1621,9 +1624,9 @@ def incrementPredictedScore():
 
 #----- Init logger -----
 
-path_log_file = path.join(path_log,'scrabble.log')
+log_file = path.join(PATHS.path_log,'scrabble.log')
 # levels : NOTSET < DEBUG < INFO < WARNING < ERROR < CRITICAL
-logging.basicConfig(filename=path_log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
+logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
 
@@ -1670,11 +1673,11 @@ suggest_word = False
 if LETTERS_LANGUAGE == 'english' :
 	var.bag_of_letters = rules.letters_english
 	POINTS_FOR = rules.points_english
-	path_letters = path_letters_english
+	PATHS.path_letters = PATHS.path_letters_english
 elif LETTERS_LANGUAGE == 'french':
 	var.bag_of_letters = rules.letters_french
 	POINTS_FOR = rules.points_french
-	path_letters = path_letters_french
+	PATHS.path_letters = PATHS.path_letters_french
 
 #Data validation
 forced = ""
@@ -1897,7 +1900,7 @@ logging.debug("")
 #----- Window init -----
 
 #Add icon to the window
-icon_image = pygame.image.load(path.join(path_icon,'Scrabble_launcher.ico'))
+icon_image = pygame.image.load(path.join(PATHS.path_icon,'Scrabble_launcher.ico'))
 icon = pygame.transform.scale(icon_image, (32, 32))
 pygame.display.set_icon(icon)
 pygame.display.set_caption('Scrabble')
@@ -1929,13 +1932,13 @@ hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, 1.5*UI_INTERLIGNE+
 #User interface language
 if UI_LANGUAGE == 'english' :
 	language_id = 0
-	path_buttons = path_buttons_english
+	PATHS.path_buttons = PATHS.path_buttons_english
 elif UI_LANGUAGE == 'french' :
 	language_id = 1
-	path_buttons = path_buttons_french
+	PATHS.path_buttons = PATHS.path_buttons_french
 else :
 	language_id = 0
-	path_buttons = path_buttons_english
+	PATHS.path_buttons = PATHS.path_buttons_english
 
 #User interface content
 ui_content = config_reader.h_ui_params
@@ -2151,9 +2154,9 @@ mask_text_score = UI_Surface('mask_text_score', ui_text.score.pos_x, ui_text.sco
 layers.mask_text.add(mask_text_score)
 
 #create avatar
-#ui_avatar = UI_Image('ergonome', path_background, 22, 2.84, 6, 6) #Screen 32*18
-#ui_avatar = UI_Image('ergonome', path_background, 24, 3.84, 5, 5) #Screen 32*18
-ui_avatar = UI_Image('ergonome', path_background, 24, 9, 5, 5) #Screen 32*18
+#ui_avatar = UI_Image('ergonome', PATHS.path_background, 22, 2.84, 6, 6) #Screen 32*18
+#ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 3.84, 5, 5) #Screen 32*18
+ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5) #Screen 32*18
 
 layers.pop_up_window.add(ui_avatar)
 
