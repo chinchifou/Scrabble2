@@ -702,6 +702,7 @@ class UITextPrinter():
 			pixels(2.5, 12.25)
 			]
 		elif step == 11 :
+			"""
 			custom_height = 0.65
 			all_texts = [
 			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", custom_height, False, (limit_left+1, limit_top+1) ),
@@ -712,6 +713,8 @@ class UITextPrinter():
 			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", custom_height, False, (limit_left+1, limit_top+9) ),
 			UIText( "A bientôt !", custom_height, True, (limit_left+12.25, limit_top+11) ),
 			]
+			"""
+			all_texts=[]
 			buble_points = [
 			pixels(2.5, 2.5),
 			pixels(23.5, 2.5),
@@ -721,10 +724,10 @@ class UITextPrinter():
 			pixels(23.5, 14),
 			pixels(2.5, 14)
 			]		
-
+			
 		for text_it in all_texts :
 			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
-
+		
 		pygame.draw.aalines( window, COLOR.GREY_LIGHT, True, buble_points, 1 )	
 
 	"""
@@ -925,10 +928,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 			if self.transparent :
 				self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
 			else :
-				logging.debug("Path used : %s", self.path)
-				logging.debug("Name used : %s", self.name)
-				logging.debug("Request : %s", path.join(self.path, self.name+'.png'))
-
 				self.image = loadImage(path.join(self.path, self.name+'.png'))
 				#TODO debug
 
@@ -984,10 +983,15 @@ class UI_Surface(ResizableSprite):
 
 #----- UI Image -----
 class UI_Image(ResizableSprite):
-	def __init__(self, name, tmp_path, pos_x, pos_y, width, height):
+	def __init__(self, name, tmp_path, pos_x, pos_y, width=None, height=None):
+
+		if ( width==None and height==None ) :
+			self.image = loadImage(path.join(tmp_path, name+'.png'))
+			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
+		else :
+			self.width, self.height = width, height			
 
 		self.name = name
-		self.width, self.height = width, height
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y, tmp_path, transparent=True)
 
@@ -2157,8 +2161,12 @@ layers.mask_text.add(mask_text_score)
 #ui_avatar = UI_Image('ergonome', PATHS.path_background, 22, 2.84, 6, 6) #Screen 32*18
 #ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 3.84, 5, 5) #Screen 32*18
 ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5) #Screen 32*18
-
 layers.pop_up_window.add(ui_avatar)
+
+
+#last screen
+last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.5)
+
 
 #create progress bar
 progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
@@ -2770,6 +2778,11 @@ while game_is_running:
 
 								layers.buttons_on_screen.draw(window)
 								progress_bar.draw()
+								
+								layers.pop_up.empty()
+								layers.pop_up.add(last_screen)
+								layers.pop_up.draw(window)
+
 								ui_text.drawTextPopUp(STEP)
 
 
@@ -2822,6 +2835,7 @@ while game_is_running:
 
 								layers.buttons_on_screen.empty()
 								layers.buttons_on_screen.add(button_play)
+								layers.pop_up.empty()
 
 								# Reset player
 								var.current_player.score = 0
@@ -2866,8 +2880,6 @@ while game_is_running:
 								layers.buttons_on_screen.draw(window)
 
 								layers.letters_on_board.draw(window)
-								pygame.display.update()
-
 								pygame.display.update()
 								var.current_action = "SELECT_A_LETTER"															
 
