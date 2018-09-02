@@ -1148,15 +1148,24 @@ class ProgressBar():
 
 		layers.progress_bar.draw(window)
 
-		text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
+		#text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
 		if self.state in (0,1,2,3,4,5) :
 			text = UIText( "Etape : 1 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
 		elif self.state in (6,7,8) :
 			text = UIText( "Etape : 2 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
 		else :
-			text = UIText( "Etape : 3 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-
+			text = UIText( "Etape : 3 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )	
 		window.blit( text.font.render(text.text, 1, COLOR.GREY_LIGHT), (text.pos_x_pix, text.pos_y_pix) )
+
+		if self.state == 3 :		
+			text2 = UIText( "V : 1.0", LINE_HEIGHT.PROGRESS_BAR, False, (30, 17) )
+		elif self.state == 6 :
+			text2 = UIText( "V : 2.0", LINE_HEIGHT.PROGRESS_BAR, False, (30, 17) )
+		elif self.state == 9 :
+			text2 = UIText( "V : 3.0", LINE_HEIGHT.PROGRESS_BAR, False, (30, 17) )
+
+		if self.state in (3,6,9) :
+			window.blit( text2.font.render(text2.text, 1, COLOR.GREY_LIGHT), (text2.pos_x_pix, text2.pos_y_pix) )
 
 	def fill(self):
 
@@ -2094,13 +2103,13 @@ checkbox_find_word = Checkbox("checkbox", 5, 8.5 )
 checkbox_bonus_cases = Checkbox("checkbox", 5, 11.25 )
 
 # STEP 7
-checkbox_facile2 = Checkbox("checkbox", 3.5, 5 )
-checkbox_moyen2 = Checkbox("checkbox", 3.5, 6.5 )
-checkbox_difficile2 = Checkbox("checkbox", 3.5, 8 )
+#checkbox_facile2 = Checkbox("checkbox", 3.5, 5 )
+#checkbox_moyen2 = Checkbox("checkbox", 3.5, 6.5 )
+#checkbox_difficile2 = Checkbox("checkbox", 3.5, 8 )
 
 checkbox_function_shuffle2 = Checkbox("checkbox", 3.5, 11 )
 checkbox_function_display_bonus2 = Checkbox("checkbox", 3.5, 12.50 )
-checkbox_function_score2 = Checkbox("checkbox", 3.5, 14 )
+#checkbox_function_score2 = Checkbox("checkbox", 3.5, 14 )
 
 #STEP 8
 checkbox_find_word2 = Checkbox("checkbox", 5, 7.5)
@@ -2165,7 +2174,7 @@ layers.pop_up_window.add(ui_avatar)
 
 
 #last screen
-last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.5)
+last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
 
 
 #create progress bar
@@ -2269,11 +2278,19 @@ while game_is_running:
 					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 				x += 1
 
+
 			# ___ CHECKBOXES ___
+			checkbox_function_shuffle.empty()
+			checkbox_function_display_bonus.empty()
 			checkbox_find_word.empty()
 			checkbox_bonus_cases.empty()
 			checkbox_function_shuffle2.empty()
 			checkbox_function_display_bonus2.empty()
+			checkbox_find_word2.empty()
+			checkbox_suggest_word2.empty()
+			checkbox_bonus_cases2.empty()
+			checkbox_calculate_score2.empty()
+
 
 			layers.buttons_on_screen.empty()
 			layers.buttons_on_screen.add(button_play)
@@ -2537,12 +2554,6 @@ while game_is_running:
 									if checkbox_function_display_bonus.is_filled :
 										display_type_of_tile_on_hoovering = True
 
-									# Reset checkboxes
-									for button in layers.buttons_on_screen :
-										if button.is_a_checkbox :
-											button.empty()
-										if button.is_an_emoticom :
-											button.select()
 
 									# ___ DRAW BOARD ___
 									"""
@@ -2560,12 +2571,20 @@ while game_is_running:
 									layers.selected_letter.draw(window)
 									"""
 
+									# ___ RESET ALL BUTTONS ___
+									for button in layers.buttons_on_screen :
+										if button.is_a_checkbox :
+											button.empty()
+										if button.is_an_emoticom :
+											button.select()
+										else :
+											button.turnOffHighlighted()
+
 									# ___ NEXT STEP ___
 									STEP = STEP + 1
 									progress_bar.fill()
 
-
-									# ___ ADD BUTTONS 
+									# ___ ADD BUTTONS ___
 									layers.buttons_on_screen.empty()
 									layers.buttons_on_screen.add(button_ok)
 
@@ -2630,12 +2649,14 @@ while game_is_running:
 
 									#TODO NO CHECKBOX
 
-									# Reset
+									# ___ RESET ALL BUTTONS ___
 									for button in layers.buttons_on_screen :
 										if button.is_a_checkbox :
 											button.empty()
 										if button.is_an_emoticom :
 											button.select()
+										else :
+											button.turnOffHighlighted()
 
 									layers.buttons_on_screen.empty()
 
@@ -2706,12 +2727,14 @@ while game_is_running:
 								display_new_score_in_real_time = checkbox_calculate_score2.is_filled
 								suggest_word = checkbox_suggest_word2.is_filled
 
-
-								# ___ Reset ___
-								#buttons
+								# ___ RESET ALL BUTTONS ___
 								for button in layers.buttons_on_screen :
 									if button.is_a_checkbox :
 										button.empty()
+									if button.is_an_emoticom :
+										button.select()
+									else :
+										button.turnOffHighlighted()
 
 								layers.buttons_on_screen.empty()
 								if enable_shuffle_letter :
@@ -2828,10 +2851,17 @@ while game_is_running:
 									x += 1
 
 								# ___ CHECKBOXES ___
+								checkbox_function_shuffle.empty()
+								checkbox_function_display_bonus.empty()
 								checkbox_find_word.empty()
 								checkbox_bonus_cases.empty()
 								checkbox_function_shuffle2.empty()
 								checkbox_function_display_bonus2.empty()
+								checkbox_find_word2.empty()
+								checkbox_suggest_word2.empty()
+								checkbox_bonus_cases2.empty()
+								checkbox_calculate_score2.empty()
+
 
 								layers.buttons_on_screen.empty()
 								layers.buttons_on_screen.add(button_play)
@@ -3474,10 +3504,14 @@ while game_is_running:
 										for letter in var.current_player.hand :
 											letter.kill()
 
-										# Reset buttons
+										# ___ RESET ALL BUTTONS ___
 										for button in layers.buttons_on_screen :
 											if button.is_a_checkbox :
 												button.empty()
+											if button.is_an_emoticom :
+												button.select()
+											else :
+												button.turnOffHighlighted()
 										
 										# ___ DRAW BOARD ___
 										#screeshot background no letter (USELESS ?)
