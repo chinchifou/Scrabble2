@@ -2058,6 +2058,7 @@ for row in range(0,TILES_PER_LINE) :
 
 
 # //////// Add letters on Board ///////////
+
 x, y = 4, 2
 for letter in "METHODES" :
 	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
@@ -2074,7 +2075,30 @@ for letter in "ERGONOMIE" :
 	if (x, y) != (4,8) :
 		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
 	x += 1
+"""
+x, y = 2, 1
+for letter in "CONTEXTE" :
+	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+	y += 1
 
+x, y = 1, 4
+for letter in "UTILISATEUR" :
+	if (x, y) != (2,4) :
+		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+	x += 1
+
+x, y = 7, 3
+for letter in "MAQUETTAGE" :
+	if (x, y) != (7,4) :
+		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+	y += 1
+
+x, y = 2, 10
+for letter in "EVALUATIONS" :
+	if (x, y) != (7,10) :
+		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
+	x += 1
+"""
 # ------- CREATES BUTTONS --------
 button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 #button_ok2 = Button("ok", 32/2.0 - 5, 14.5 )
