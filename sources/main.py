@@ -121,7 +121,7 @@ class GameVariable():
 		self.background_empty = []
 		self.background_no_letter = []
 		self.current_background = []
-		self.background_empty = []
+
 		self.background_pop_up_empty = []
 		self.current_background_no_text = []
 
@@ -978,6 +978,8 @@ class UI_Surface(ResizableSprite):
 	def __init__(self, name, pos_x, pos_y, surface):
 
 		self.image = surface
+
+		self.width, self.height = tiles(self.image.get_width(), self.image.get_height())
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y, None)
 
@@ -2411,11 +2413,8 @@ layers.pop_up_window.add(ui_avatar)
 #last screen
 last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
 
-
 #create progress bar
 progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
-
-
 
 # ___ SNAPSHOT FOR LATER EASY REFRESH ___
 layers.buttons_on_screen.add(button_end_turn)
