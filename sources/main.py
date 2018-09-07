@@ -271,7 +271,9 @@ layers = Layer()
 
 #class used to create interface text
 class UIText():
+
 	all = []
+
 	def __init__(self, text, line_height, bold, pos_in_tiles):
 		self.text = text
 		self.line_height = line_height
@@ -296,6 +298,8 @@ class UIText():
 		self.font.set_bold(self.bold)
 		self.width, self.height = tiles_tup(self.font.size(self.text))
 		self.bottom_tiles = self.pos_y + self.line_height
+
+		self.pos_x_pix, self.pos_y_pix = pixels(self.pos_x, self.pos_y)
 
 
 	def moveAtPixels(self, pos_x_pix, pos_y_pix):
@@ -2408,7 +2412,6 @@ layers.mask_text.add(mask_text_score)
 #ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 3.84, 5, 5) #Screen 32*18
 ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5) #Screen 32*18
 layers.pop_up_window.add(ui_avatar)
-
 
 #last screen
 last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
