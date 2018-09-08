@@ -3832,7 +3832,7 @@ while game_is_running:
 
 									# ___ SHUFFLE ___
 									give_help = choice( [True, True, True, True] )
-									more_help = choice( [True, False, False] )	
+									more_help = choice( [True, True, False] )	
 
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
@@ -3870,7 +3870,7 @@ while game_is_running:
 												#logging.debug("MORE HELP")
 
 												letters_c = var.current_player.hand.findByName('C')
-												if letters_e != [] :
+												if letters_c != [] :
 
 													#logging.debug("C in hand")
 													first_letter_c = letters_c[0]
@@ -3931,25 +3931,27 @@ while game_is_running:
 									var.current_player.hand.draw(window)	
 									pygame.display.update()
 
-
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
-							for button in layers.buttons_on_screen :
-								if button.is_pushed :
-									button.release() #release all pushed buttons
-									if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-										button.turnOnHighlighted()
-									else :
-										button.turnOffHighlighted()
+							else :
+								pygame.mouse.set_cursor(*arrow)	
+								
+								for button in layers.buttons_on_screen :
+									if button.is_pushed :
+										button.release() #release all pushed buttons
+										if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+											button.turnOnHighlighted()
+										else :
+											button.turnOffHighlighted()
 
-									layers.buttons_on_screen.clear(window, var.background_empty)
-									layers.buttons_on_screen.draw(window)
-									
-									#TO DO - prevent artefact see line 1287 ?
-									layers.selected_letter.clear(window, var.current_background)
-									var.current_background = window.copy()
-									layers.selected_letter.draw(window)
-									
-									pygame.display.update()
+										layers.buttons_on_screen.clear(window, var.background_empty)
+										layers.buttons_on_screen.draw(window)
+										
+										#TO DO - prevent artefact see line 1287 ?
+										layers.selected_letter.clear(window, var.current_background)
+										var.current_background = window.copy()
+										layers.selected_letter.draw(window)
+										
+										pygame.display.update()
 
 
 						#------ PLAY A SELECTED LETTER-------
