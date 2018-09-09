@@ -947,9 +947,11 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 		#mask for collision
-		if self.name != "hand_holder" :
-			if self.transparent :
-				self.mask = pygame.mask.from_surface(self.image)
+		if self.transparent :
+			self.mask = pygame.mask.from_surface(self.image)
+		else :
+			self.mask = pygame.mask.from_surface(self.image)
+			self.mask.fill()
 
 
 	def resize(self):
@@ -969,9 +971,11 @@ class ResizableSprite(pygame.sprite.Sprite):
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 		#mask for collision
-		if self.name != "hand_holder" :
-			if self.transparent :
-				self.mask = pygame.mask.from_surface(self.image)
+		if self.transparent :
+			self.mask = pygame.mask.from_surface(self.image)
+		else :
+			self.mask = pygame.mask.from_surface(self.image)
+			self.mask.fill()
 
 
 	#move a Sprite at a given position expressed in tiles
@@ -988,8 +992,10 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 	def collide(self, x_pix, y_pix) :
 
+		self.info()
+
 		collide = False
-		if self.rect.collidepoint(x_pix, y_pix) == True :
+		if self.rect.collidepoint(x_pix, y_pix) :
 			if self.really_collide(x_pix, y_pix) :
 				collide = True
 
@@ -1000,6 +1006,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 		x_pix_offset = x_pix - self.rect.left
 		y_pix_offset = y_pix - self.rect.top
+
+		logging.debug("x_pix_offset : %i / y_pix_offset : %i", x_pix_offset, y_pix_offset)
+		logging.debug("mask get at : %i", self.mask.get_at( (x_pix_offset, y_pix_offset) ))
 
 		return bool( self.mask.get_at( (x_pix_offset, y_pix_offset) ) )
 
@@ -1012,6 +1021,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 		logging.debug("pixel position is : %s, %s", self.rect.x, self.rect.y)
 		logging.debug("width : %s / height : %s", self.width, self.height)
 		logging.debug("pixel width : %s /  pixel height : %s", self.rect.width, self.rect.height)
+		logging.debug("mask width : %s /  mask height : %s", self.mask.get_size()[0], self.mask.get_size()[1])
 		logging.debug("")
 
 
@@ -3439,7 +3449,7 @@ while game_is_running:
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if hand_holder.collide(cursor_pos_x, cursor_pos_y) :
 
 										index_in_hand = hand_holder.indexAtPos(cursor_pos_x)
 
@@ -3913,7 +3923,7 @@ while game_is_running:
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if hand_holder.collide(cursor_pos_x, cursor_pos_y) :
 
 										index_in_hand = hand_holder.indexAtPos(cursor_pos_x)
 
