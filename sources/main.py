@@ -927,6 +927,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.id = ResizableSprite.nb_created_instances
 
 		self.name, self.pos_x, self.pos_y, self.path, self.transparent = name, pos_x, pos_y, tmp_path, transparent
+		self.masks = {}
 
 		#load image
 		if self.path != None :
@@ -948,16 +949,13 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 		#mask for collision
 		if self.transparent :
-			self.mask = pygame.mask.from_surface(self.image)
-		else :
-			self.mask = pygame.mask.from_surface(self.image)
-			self.mask.fill()
+			self.mask = self.getMask(self.name+'.png')
 
 
 	def resize(self):
 
 		#self.center_pix = pixels(self.center[0], self.center[1])
-		#TODO to use for better collide detection
+		#TODO to use for better collide detection	
 
 		#reload image
 		if self.path != None :
@@ -972,10 +970,9 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
 		#mask for collision
 		if self.transparent :
-			self.mask = pygame.mask.from_surface(self.image)
-		else :
-			self.mask = pygame.mask.from_surface(self.image)
-			self.mask.fill()
+			self.masks = {}
+			self.mask = self.getMask(self.name+'.png')
+
 
 
 	#move a Sprite at a given position expressed in tiles
@@ -992,14 +989,14 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 	def collide(self, x_pix, y_pix) :
 
-		self.info()
-
-		collide = False
-		if self.rect.collidepoint(x_pix, y_pix) :
-			if self.really_collide(x_pix, y_pix) :
-				collide = True
-
-		return collide
+		if self.transparent :
+			collide = False
+			if self.rect.collidepoint(x_pix, y_pix) :
+				if self.really_collide(x_pix, y_pix) :
+					collide = True
+			return collide
+		else :
+			return self.rect.collidepoint(x_pix, y_pix)
 
 
 	def really_collide(self, x_pix, y_pix) :
@@ -1007,10 +1004,26 @@ class ResizableSprite(pygame.sprite.Sprite):
 		x_pix_offset = x_pix - self.rect.left
 		y_pix_offset = y_pix - self.rect.top
 
-		logging.debug("x_pix_offset : %i / y_pix_offset : %i", x_pix_offset, y_pix_offset)
-		logging.debug("mask get at : %i", self.mask.get_at( (x_pix_offset, y_pix_offset) ))
-
 		return bool( self.mask.get_at( (x_pix_offset, y_pix_offset) ) )
+
+
+	def getMask(self, name) :
+
+		if hasattr(self, 'is_an_emoticom') :
+			name = 'common'
+
+		if (name in self.masks.keys()) :
+			return self.masks[name]
+		else :
+			mask = pygame.mask.Mask((0,0))
+			if self.transparent :
+				mask = pygame.mask.from_surface(self.image)
+				self.masks[name] = mask
+			else :
+				mask = pygame.mask.from_surface(self.image)
+				mask.fill()
+				self.masks[name] = mask
+			return mask
 
 
 	def info(self) :
@@ -1038,7 +1051,7 @@ class UI_Surface(ResizableSprite):
 
 #----- UI Image -----
 class UI_Image(ResizableSprite):
-	def __init__(self, name, tmp_path, pos_x, pos_y, width=None, height=None):
+	def __init__(self, name, tmp_path, pos_x, pos_y, width=None, height=None, tmp_transparent = False):
 
 		if ( width==None and height==None ) :
 			self.image = loadImage(path.join(tmp_path, name+'.png'))
@@ -1048,7 +1061,7 @@ class UI_Image(ResizableSprite):
 
 		self.name = name
 
-		ResizableSprite.__init__(self, name, pos_x, pos_y, tmp_path, transparent=True)
+		ResizableSprite.__init__(self, name, pos_x, pos_y, tmp_path, transparent=tmp_transparent)
 
 
 # ___ SPRITES ___ 
@@ -1099,23 +1112,27 @@ class Button(ResizableSprite):
 		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_buttons, transparent=True)
 
 	def turnOnHighlighted(self):
-		self.image = loadImage(path.join(self.path, self.name+'_highlighted.png'))
-		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))	
+		self.image = loadTransparentImage(path.join(self.path, self.name+'_highlighted.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'_highlighted.png')
 		self.is_highlighted = True
 
 	def turnOffHighlighted(self):
-		self.image = loadImage(path.join(self.path, self.name+'.png'))
+		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'.png')
 		self.is_highlighted = False
 
 	def push(self):
-		self.image = loadImage(path.join(self.path, self.name+'_pushed.png'))
+		self.image = loadTransparentImage(path.join(self.path, self.name+'_pushed.png'))
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'_pushed.png')
 		self.is_pushed = True	
 
 	def release(self):
-		self.image = loadImage(path.join(self.path, self.name+'.png'))
+		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'.png')
 		self.is_pushed = False	
 
 
@@ -1146,6 +1163,7 @@ class Emoticom(Button):
 		self.name = self.name.replace("un", "")
 		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'.png')
 		self.is_selected = True
 		#self.turnOnHighlighted()	
 
@@ -1153,6 +1171,7 @@ class Emoticom(Button):
 		self.name = 'un'+self.name
 		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'.png')
 		self.is_selected = False
 		#self.turnOnHighlighted()
 
@@ -1179,7 +1198,7 @@ class ProgressBar():
 		layers.progress_bar.add(self.progress_bar_filling)
 
 		#reinit progress bar
-		self.button_reinit = Button("reinit", pos_x-1.25, pos_y-0.56)
+		#self.button_reinit = Button("reinit", pos_x-1.25, pos_y-0.56)
 		#self.button_reinit.width, self.button_reinit.height = height, height
 		#self.button_reinit.resize()
 		#layers.progress_bar.add(self.button_reinit)
@@ -2440,7 +2459,7 @@ layers.pop_up_score.add(pop_up_score)
 
 #create mask for text
 surf_mask_text = pygame.Surface( (ui_text.score.width*var.tile_size, ui_text.score.height*var.tile_size) )
-logging.debug("Mask surface width : %i, height : %i", round(ui_text.score.width*2*var.tile_size), round(ui_text.score.height*var.tile_size) )
+#logging.debug("Mask surface width : %i, height : %i", round(ui_text.score.width*2*var.tile_size), round(ui_text.score.height*var.tile_size) )
 surf_mask_text.fill(COLOR.GREY_DEEP)				
 mask_text_score = UI_Surface('mask_text_score', ui_text.score.pos_x, ui_text.score.pos_y, surf_mask_text)
 layers.mask_text.add(mask_text_score)
@@ -2448,7 +2467,7 @@ layers.mask_text.add(mask_text_score)
 #create avatar
 #ui_avatar = UI_Image('ergonome', PATHS.path_background, 22, 2.84, 6, 6) #Screen 32*18
 #ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 3.84, 5, 5) #Screen 32*18
-ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5) #Screen 32*18
+ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5, tmp_transparent = True) #Screen 32*18
 layers.pop_up_window.add(ui_avatar)
 
 #last screen
@@ -2703,7 +2722,7 @@ while game_is_running:
 
 						#------ CLIC ON BUTTONS (VISUAL) -------
 						for button in layers.buttons_on_screen :
-							if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+							if button.collide(cursor_pos_x, cursor_pos_y) == True :
 								#change button state
 								button.is_highlighted = False
 								button.push()
@@ -2716,7 +2735,7 @@ while game_is_running:
 						var.a_button_is_pushed = False
 
 						#~~~~~~~~~~~ EMOTICOMS ~~~~~~~~~~~ 
-						if ( (happy.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (happy.is_pushed) ):
+						if ( (happy.collide(cursor_pos_x, cursor_pos_y) == True) and (happy.is_pushed) ):
 							happy.release()
 
 							if happy.is_selected :
@@ -2733,7 +2752,7 @@ while game_is_running:
 									sad.unselect()
 								need_refresh_buttons_on_screen = True
 
-						elif ( (neutral.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (neutral.is_pushed) ):
+						elif ( (neutral.collide(cursor_pos_x, cursor_pos_y) == True) and (neutral.is_pushed) ):
 							neutral.release()
 
 							if neutral.is_selected :
@@ -2751,7 +2770,7 @@ while game_is_running:
 								need_refresh_buttons_on_screen = True
 
 
-						elif ( (sad.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (sad.is_pushed) ):
+						elif ( (sad.collide(cursor_pos_x, cursor_pos_y) == True) and (sad.is_pushed) ):
 							sad.release()
 
 							if sad.is_selected :
@@ -2769,7 +2788,7 @@ while game_is_running:
 								need_refresh_buttons_on_screen = True
 
 						#~~~~~~~~~~~ BUTTON OK ~~~~~~~~~~~
-						elif ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
+						elif ( (button_ok.collide(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
 
 							button_ok.release()
 							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
@@ -3280,14 +3299,14 @@ while game_is_running:
 
 							for button in layers.buttons_on_screen :
 
-								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+								if button.collide(cursor_pos_x, cursor_pos_y) == True :
 									on_a_button = True
 									button.turnOnHighlighted()
 									need_refresh_buttons_on_screen = True
 
 								if button.is_pushed :
 									button.release() #release all pushed buttons
-									if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+									if button.collide(cursor_pos_x, cursor_pos_y) :
 										if button.is_a_checkbox :
 											if button.is_filled :
 												button.empty()
@@ -3308,7 +3327,7 @@ while game_is_running:
 							#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
 							for button in layers.buttons_on_screen :
 								if button.is_a_checkbox :
-									if ( (button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
+									if ( (button.collide(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
 										if button.is_filled :
 											button.release()
 											button.empty()
@@ -3339,11 +3358,11 @@ while game_is_running:
 						#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
 						buttons_changed = False
 						for button in layers.buttons_on_screen :
-							if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+							if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 								button.turnOnHighlighted()
 								pygame.mouse.set_cursor(*hand)
 								buttons_changed = True
-							elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+							elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
 								button.turnOffHighlighted()
 								pygame.mouse.set_cursor(*arrow)
 								buttons_changed = True
@@ -3429,7 +3448,7 @@ while game_is_running:
 
 							#------ CLIC ON BUTTONS (VISUAL) -------
 							for button in layers.buttons_on_screen :
-								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+								if button.collide(cursor_pos_x, cursor_pos_y) == True :
 									#change button state
 									button.is_highlighted = False
 									button.push()
@@ -3489,7 +3508,7 @@ while game_is_running:
 								#------ CLIC ON A TILE ON THE BOARD ? -------
 								for tile in layers.tiles :
 
-									if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if tile.collide(cursor_pos_x, cursor_pos_y) == True :
 
 										tile_x_on_board = int( tile.pos_x - DELTA )
 										tile_y_on_board = int( tile.pos_y - DELTA )
@@ -3536,7 +3555,7 @@ while game_is_running:
 							need_update = False
 
 							#------ RELEASE CLIC ON PLAY BUTTON -------
-							if ( (button_play.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
+							if ( (button_play.collide(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
 		
 								pygame.mouse.set_cursor(*arrow)
 								button_play.release()
@@ -3572,7 +3591,7 @@ while game_is_running:
 
 
 							#------ RELEASE CLIC ON END TURN BUTTON -------
-							elif ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
+							elif ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 								if STEP in (3,6,9) :
 									pygame.mouse.set_cursor(*arrow)
@@ -3784,7 +3803,7 @@ while game_is_running:
 									var.current_action = "WINDOW_DISPLAYED"
 									#break 
 
-							elif ( enable_shuffle_letter and (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
+							elif ( enable_shuffle_letter and (button_shuffle.collide(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
 									button_shuffle.release()
 									button_shuffle.turnOnHighlighted()
 
@@ -3899,7 +3918,7 @@ while game_is_running:
 								for button in layers.buttons_on_screen :
 									if button.is_pushed :
 										button.release() #release all pushed buttons
-										if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+										if button.collide(cursor_pos_x, cursor_pos_y) :
 											button.turnOnHighlighted()
 										else :
 											button.turnOffHighlighted()
@@ -3958,7 +3977,7 @@ while game_is_running:
 								#------ CLIC ON A TILE ON THE BOARD ? -------
 								for tile in layers.tiles :
 
-									if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+									if tile.collide(cursor_pos_x, cursor_pos_y) == True :
 
 										tile_x_on_board = int( tile.pos_x - DELTA )
 										tile_y_on_board = int( tile.pos_y - DELTA )
@@ -4004,11 +4023,11 @@ while game_is_running:
 				buttons_changed = False
 				#TODO restrict area to boost performance
 				for button in layers.buttons_on_screen :
-					if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+					if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
 						button.turnOnHighlighted()
 						pygame.mouse.set_cursor(*hand)
 						buttons_changed = True
-					elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+					elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
 						button.turnOffHighlighted()
 						pygame.mouse.set_cursor(*arrow)
 						buttons_changed = True
@@ -4054,7 +4073,7 @@ while game_is_running:
 
 					#Is cursor on a special tile ?
 					for tile in layers.tiles :
-						if tile.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+						if tile.collide(cursor_pos_x, cursor_pos_y) :
 							if  ( tile.name != 'normal' ) :
 								cursor_on_a_special_tile = True
 
