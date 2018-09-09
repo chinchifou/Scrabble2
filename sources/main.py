@@ -117,6 +117,7 @@ class GameVariable():
 		self.current_player = []
 
 		self.current_action = 'SELECT_A_LETTER'
+		self.a_button_is_pushed = False
 
 		self.background_empty = []
 		self.background_no_letter = []
@@ -2189,10 +2190,10 @@ ui_text = UITextPrinter(ui_content)
 tmp_first_hand = ['O',0,'S','B',0,'E','N']
 
 tmp_second_hand = ['C','I',0,'C','N','E','S']
-tmp_second_hand2 = ['S','C',0,'I','N','C','E']
+#tmp_second_hand2 = ['S','C',0,'I','N','C','E']
 
 tmp_third_hand = ['N','I','V',0,'A','R']
-tmp_third_hand2 = ['A','V','I',0,'N','R']
+#tmp_third_hand2 = ['A','V','I',0,'N','R']
 
 
 start_hand = GroupOfSprites()
@@ -2656,7 +2657,6 @@ while game_is_running:
 				#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
 				if ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
 
-					timer = clic_clock.tick()
 
 					#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
 					if ( event_type == pygame.MOUSEBUTTONDOWN ) :
@@ -2669,10 +2669,13 @@ while game_is_running:
 								#change button state
 								button.is_highlighted = False
 								button.push()
+								var.a_button_is_pushed = True
 								need_refresh_buttons_on_screen = True
 
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 					elif ( event_type == pygame.MOUSEBUTTONUP ) :
+
+						var.a_button_is_pushed = False
 
 						#~~~~~~~~~~~ EMOTICOMS ~~~~~~~~~~~ 
 						if ( (happy.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (happy.is_pushed) ):
@@ -2763,6 +2766,7 @@ while game_is_running:
 										nb_selected += 1
 								if nb_selected > 1 :
 									move_on = False
+									pygame.mouse.set_cursor(*arrow)
 
 									#creeate pop up
 									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
@@ -2880,19 +2884,9 @@ while game_is_running:
 
 									layers.buttons_on_screen.empty()
 
-
 									window.blit(var.background_pop_up_empty, (0,0))
 
-									layers.dark_filter.draw(window)
-									layers.pop_up_window.draw(window)
-
 									layers.buttons_on_screen.add(button_ok)
-									#layers.buttons_on_screen.add(progress_bar.button_reinit)
-
-									#layers.buttons_on_screen.add(checkbox_find_word2)
-									#layers.buttons_on_screen.add(checkbox_bonus_cases2)
-									#layers.buttons_on_screen.add(checkbox_calculate_score2)
-									#layers.buttons_on_screen.add(checkbox_suggest_word2)
 
 									if tmp_enable_shuffle :
 										checkbox_find_word2.fill()
@@ -2910,6 +2904,7 @@ while game_is_running:
 									layers.buttons_on_screen.draw(window)
 									progress_bar.draw()
 									ui_text.drawTextPopUp(STEP)
+									pygame.display.update()
 									
 
 							elif STEP == 8 :
@@ -2971,7 +2966,8 @@ while game_is_running:
 									else :
 										hand_state.append(0)
 									pos_x = pos_x+1
-
+									
+								hand_state.append(0)
 								PLAYERS[0].hand_state = hand_state
 
 								# update display
@@ -3010,6 +3006,7 @@ while game_is_running:
 								layers.pop_up.draw(window)
 
 								ui_text.drawTextPopUp(STEP)
+								pygame.display.update()
 
 
 							elif STEP == 11 :
@@ -3240,12 +3237,28 @@ while game_is_running:
 
 						#~~~~~~~~~~~ RELEASE CLIC AWAY FROM BUTTON ~~~~~~~~~~~ 
 						else :
-
+							var.a_button_is_pushed = False
 							on_a_button = False
-							
+
 							for button in layers.buttons_on_screen :
-								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True:
+
+								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
 									on_a_button = True
+									button.turnOnHighlighted()
+									need_refresh_buttons_on_screen = True
+
+								if button.is_pushed :
+									button.release() #release all pushed buttons
+									if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
+										if button.is_a_checkbox :
+											if button.is_filled :
+												button.empty()
+											else :
+												button.fill()
+										button.turnOnHighlighted()
+									else :
+										button.turnOffHighlighted()
+									need_refresh_buttons_on_screen = True
 
 							if not on_a_button :
 								pygame.mouse.set_cursor(*arrow)
@@ -3268,28 +3281,12 @@ while game_is_running:
 											button.turnOnHighlighted()
 
 										need_refresh_buttons_on_screen = True
-										
-							#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------	
-							for button in layers.buttons_on_screen :
-
-								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
-									button.turnOnHighlighted()
-									need_refresh_buttons_on_screen = True
-
-								if button.is_pushed :
-									button.release() #release all pushed buttons
-									if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) :
-										button.turnOnHighlighted()
-									else :
-										button.turnOffHighlighted()
-									need_refresh_buttons_on_screen = True
 
 
 				if need_refresh_buttons_on_screen :
 					layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
 					layers.buttons_on_screen.draw(window)
 					pygame.display.update()
-
 
 
 				#~~~~~~ MOUSE MOTION ~~~~~~	
@@ -3299,23 +3296,25 @@ while game_is_running:
 					cursor_pos_x = mouse_pos[0]
 					cursor_pos_y = mouse_pos[1]
 
-					#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
-					buttons_changed = False
-					for button in layers.buttons_on_screen :
-						if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
-							button.turnOnHighlighted()
-							pygame.mouse.set_cursor(*hand)
-							buttons_changed = True
-						elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
-							button.turnOffHighlighted()
-							pygame.mouse.set_cursor(*arrow)
-							buttons_changed = True
+					if not var.a_button_is_pushed :
 
-					if buttons_changed :
-						layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
-						layers.buttons_on_screen.draw(window)
+						#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
+						buttons_changed = False
+						for button in layers.buttons_on_screen :
+							if ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+								button.turnOnHighlighted()
+								pygame.mouse.set_cursor(*hand)
+								buttons_changed = True
+							elif ( button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+								button.turnOffHighlighted()
+								pygame.mouse.set_cursor(*arrow)
+								buttons_changed = True
 
-						pygame.display.update()
+						if buttons_changed :
+							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
+							layers.buttons_on_screen.draw(window)
+
+							pygame.display.update()
 
 
 			# //////// MAIN GAME SCREEN ////////
@@ -3396,6 +3395,7 @@ while game_is_running:
 									#change button state
 									button.is_highlighted = False
 									button.push()
+									var.a_button_is_pushed = True
 									layers.buttons_on_screen.clear(window, var.background_empty)
 									layers.buttons_on_screen.draw(window) 
 							pygame.display.update()
@@ -3440,10 +3440,10 @@ while game_is_running:
 
 											var.current_background = window.copy()
 
-											pygame.display.update()
-
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
+
+											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
 
@@ -3479,16 +3479,18 @@ while game_is_running:
 											#TODO REFRESH TEXT
 											var.current_background = window.copy()
 
-											pygame.display.update()
-
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
+
+											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
 
 
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
 					elif ( event_type == pygame.MOUSEBUTTONUP ) :
+
+						var.a_button_is_pushed = False
 
 						#------ SELECT A LETTER -------
 						if var.current_action == 'SELECT_A_LETTER' :
@@ -3851,7 +3853,10 @@ while game_is_running:
 
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
 							else :
-								pygame.mouse.set_cursor(*arrow)	
+								if not CURSOR_IS_OPEN_HAND == True :
+									pygame.mouse.set_cursor(*arrow)
+								#force update of mouse pointer
+								#pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
 								
 								for button in layers.buttons_on_screen :
 									if button.is_pushed :
@@ -3904,32 +3909,10 @@ while game_is_running:
 												layers.mask_text.draw(window)
 												ui_text.drawText(STEP)								
 
-											"""
-											#TODO SIMPLIFY (separate stuff)
-											#TODO CREATE A FUNCTION
-											#remove previously displayed text
-											layers.background.draw(window)
-											layers.tiles.draw(window)
-											layers.hand_holder.draw(window)
-											layers.buttons_on_screen.draw(window)
-											var.background_no_letter = window.copy()
-
-											layers.letters_on_board.draw(window)
-											layers.letters_just_played.draw(window)
-											var.current_player.hand.draw(window)
-											
-											var.current_background_no_text = window.copy()
-											progress_bar.draw()
-											ui_text.drawText()
-
-											var.current_background = window.copy()
-											"""
-											#TODO pop up score
-
-											pygame.display.update()
-
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
+
+											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
 
@@ -3961,32 +3944,12 @@ while game_is_running:
 												layers.mask_text.draw(window)
 												ui_text.drawText(STEP)								
 
-											"""
-											#remove previously displayed text
-											layers.background.draw(window)
-											layers.tiles.draw(window)
-											layers.hand_holder.draw(window)
-											layers.buttons_on_screen.draw(window)
-											var.background_no_letter = window.copy()
-
-											layers.letters_on_board.draw(window)
-											layers.letters_just_played.draw(window)
-											var.current_player.hand.draw(window)
-											var.current_background_no_text = window.copy()
-
-											progress_bar.draw()
-											ui_text.drawText()
-											var.current_background = window.copy()
-											"""
-											# TODo pop up score
-
-											pygame.display.update()
-
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
 
-											var.current_action = "SELECT_A_LETTER"
+											pygame.display.update()
 
+											var.current_action = "SELECT_A_LETTER"
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
@@ -3997,7 +3960,7 @@ while game_is_running:
 			cursor_pos_y = mouse_pos[1]
 
 			#------ SELECT A LETTER ------ 
-			if var.current_action == 'SELECT_A_LETTER' and not MUST_DIPSLAY_POP_UP :
+			if ( not var.a_button_is_pushed ) and ( not MUST_DIPSLAY_POP_UP ) and var.current_action == 'SELECT_A_LETTER' :
 
 				#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
 				buttons_changed = False
@@ -4120,6 +4083,8 @@ while game_is_running:
 			MUST_DIPSLAY_POP_UP = False
 			FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 			layers.pop_up.empty()
+			#force update of  mouse pointer
+			pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
 			pygame.display.update()
 
 logging.info("")
