@@ -2319,13 +2319,11 @@ for letter in "EVALUATIONS" :
 """
 # ------- CREATES BUTTONS --------
 button_ok = Button("ok", 32/2.0 - 1, 14.5 )
-#button_ok2 = Button("ok", 32/2.0 - 5, 14.5 )
 
 button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1)
 
 button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
-#button_play = Button("play", 32/2.0 + 6, 8.5)
 button_play = Button("play", 32/2.0 + 6, 7.5)
 
 
@@ -2694,7 +2692,7 @@ while game_is_running:
 									sad.unselect()
 								need_refresh_buttons_on_screen = True
 
-						if ( (neutral.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (neutral.is_pushed) ):
+						elif ( (neutral.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (neutral.is_pushed) ):
 							neutral.release()
 
 							if neutral.is_selected :
@@ -2712,7 +2710,7 @@ while game_is_running:
 								need_refresh_buttons_on_screen = True
 
 
-						if ( (sad.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (sad.is_pushed) ):
+						elif ( (sad.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (sad.is_pushed) ):
 							sad.release()
 
 							if sad.is_selected :
@@ -2730,7 +2728,7 @@ while game_is_running:
 								need_refresh_buttons_on_screen = True
 
 						#~~~~~~~~~~~ BUTTON OK ~~~~~~~~~~~
-						if ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
+						elif ( (button_ok.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
 
 							button_ok.release()
 							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
@@ -2792,22 +2790,6 @@ while game_is_running:
 									if checkbox_function_display_bonus.is_filled :
 										display_type_of_tile_on_hoovering = True
 
-
-									# ___ DRAW BOARD ___
-									"""
-									layers.background.draw(window)
-									layers.tiles.draw(window)
-									layers.hand_holder.draw(window)
-									layers.buttons_on_screen.draw(window)
-									var.background_no_letter = window.copy()
-									layers.letters_on_board.draw(window)
-									layers.letters_just_played.draw(window)
-									var.current_player.hand.draw(window)
-									var.current_background_no_text = window.copy()
-									ui_text.drawText(STEP)
-									var.current_background = window.copy()
-									layers.selected_letter.draw(window)
-									"""
 
 									# ___ RESET ALL BUTTONS ___
 									for button in layers.buttons_on_screen :
@@ -2898,23 +2880,6 @@ while game_is_running:
 
 									layers.buttons_on_screen.empty()
 
-									"""
-									layers.background.draw(window)
-									layers.tiles.draw(window)
-									layers.hand_holder.draw(window)
-									layers.buttons_on_screen.draw(window)
-									var.background_no_letter = window.copy()
-
-									layers.letters_on_board.draw(window)
-									layers.letters_just_played.draw(window)
-									var.current_player.hand.draw(window)
-									var.current_background_no_text = window.copy()
-									
-									progress_bar.draw()
-									ui_text.drawText(STEP)
-									var.current_background = window.copy()
-									layers.selected_letter.draw(window)
-									"""
 
 									window.blit(var.background_pop_up_empty, (0,0))
 
@@ -3268,29 +3233,25 @@ while game_is_running:
 								pygame.display.update()
 
 								MUST_DIPSLAY_POP_UP = True
+								need_refresh_buttons_on_screen = False
 
 								#prepare exit image (displayed when removing pop up)
 								window.blit(snapshot, (0,0))
 
+						#~~~~~~~~~~~ RELEASE CLIC AWAY FROM BUTTON ~~~~~~~~~~~ 
+						else :
 
-								#break
+							on_a_button = False
+							
+							for button in layers.buttons_on_screen :
+								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True:
+									on_a_button = True
 
-								"""
-								#------ CLOSE WINDOW -------
+							if not on_a_button :
+								pygame.mouse.set_cursor(*arrow)
 
-								#TO DEBUG
-								# Check if resolution changed during pop_up
-								same_width = var.current_background.get_width() == var.background_pop_up_empty.get_width()
-								same_height = var.current_background.get_height() == var.background_pop_up_empty.get_height()
-								#Same resolution
-								if same_width and same_height :
-									window.blit(var.current_background, (0,0))
-									pygame.display.update()
-									break
-								else :
-									pygame.event.post( pygame.event.Event(pygame.VIDEORESIZE, {'size' :[var.window_width,var.window_height]} ) )
-								"""
 
+						#~~~~~~~~~~~ REFRESH BUTTONS ~~~~~~~~~~~ 
 						if not MUST_DIPSLAY_POP_UP :
 
 							#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
@@ -3308,9 +3269,7 @@ while game_is_running:
 
 										need_refresh_buttons_on_screen = True
 										
-
-							#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------
-							
+							#------ RELEASE CLIC ON A BUTTON OR AWAY (VISUAL) -------	
 							for button in layers.buttons_on_screen :
 
 								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
@@ -3324,6 +3283,7 @@ while game_is_running:
 									else :
 										button.turnOffHighlighted()
 									need_refresh_buttons_on_screen = True
+
 
 				if need_refresh_buttons_on_screen :
 					layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
