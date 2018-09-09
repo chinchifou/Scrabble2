@@ -934,24 +934,27 @@ class ResizableSprite(pygame.sprite.Sprite):
 				self.image = loadTransparentImage(path.join(self.path, self.name.replace('*','joker')+'.png'))
 			else :
 				self.image = loadImage(path.join(self.path, self.name+'.png'))
-				#TODO debug
 
 		#auto detect width and height
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
 			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
 
-		self.center = (pos_x + self.width/2, pos_y + self.height / 2)
-		self.center_pix = pixels(self.center[0], self.center[1])
+		#self.center = (pos_x + self.width/2, pos_y + self.height / 2)
+		#self.center_pix = pixels(self.center[0], self.center[1])
 
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height, to_round=True ) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
+		#mask for collision
+		if self.name != "hand_holder" :
+			if self.transparent :
+				self.mask = pygame.mask.from_surface(self.image)
 
 
 	def resize(self):
 
-		self.center_pix = pixels(self.center[0], self.center[1])
+		#self.center_pix = pixels(self.center[0], self.center[1])
 		#TODO to use for better collide detection
 
 		#reload image
@@ -965,6 +968,40 @@ class ResizableSprite(pygame.sprite.Sprite):
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height, to_round=True) )
 		#set area to be displayed
 		self.rect = pygame.Rect( pixels(self.pos_x, self.pos_y), pixels(self.width, self.height) )
+		#mask for collision
+		if self.name != "hand_holder" :
+			if self.transparent :
+				self.mask = pygame.mask.from_surface(self.image)
+
+
+	#move a Sprite at a given position expressed in tiles
+	def moveAtTile(self, pos_x, pos_y) :
+		self.rect.x, self.rect.y = pixels(pos_x, pos_y)
+		self.pos_x, self.pos_y  = pos_x, pos_y
+
+
+	#move a Sprite at a given position expressed in pixels
+	def moveAtPixels(self, pos_x, pos_y) :
+		self.rect.x, self.rect.y = pos_x, pos_y
+		self.pos_x, self.pos_y  = tiles(pos_x, pos_y, to_round=True)
+
+
+	def collide(self, x_pix, y_pix) :
+
+		collide = False
+		if self.rect.collidepoint(x_pix, y_pix) == True :
+			if self.really_collide(x_pix, y_pix) :
+				collide = True
+
+		return collide
+
+
+	def really_collide(self, x_pix, y_pix) :
+
+		x_pix_offset = x_pix - self.rect.left
+		y_pix_offset = y_pix - self.rect.top
+
+		return bool( self.mask.get_at( (x_pix_offset, y_pix_offset) ) )
 
 
 	def info(self) :
@@ -976,6 +1013,7 @@ class ResizableSprite(pygame.sprite.Sprite):
 		logging.debug("width : %s / height : %s", self.width, self.height)
 		logging.debug("pixel width : %s /  pixel height : %s", self.rect.width, self.rect.height)
 		logging.debug("")
+
 
 # ___ SUBCALSSES ___
 #----- UI Surface -----
@@ -1116,16 +1154,6 @@ class Letter(ResizableSprite):
 		self.points = POINTS_FOR[name]
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_letters, transparent=True)		
-
-	#move a letter at a given position expressed in tiles
-	def moveAtTile(self, pos_x, pos_y) :
-		self.rect.x, self.rect.y = pixels(pos_x, pos_y)
-		self.pos_x, self.pos_y  = pos_x, pos_y
-
-	#move a letter at a given position expressed in pixels
-	def moveAtPixels(self, pos_x, pos_y) :
-		self.rect.x, self.rect.y = pos_x, pos_y
-		self.pos_x, self.pos_y  = tiles(pos_x, pos_y, to_round=True)
 
 
 ##----- Progress Bar -----
@@ -2966,7 +2994,7 @@ while game_is_running:
 									else :
 										hand_state.append(0)
 									pos_x = pos_x+1
-									
+
 								hand_state.append(0)
 								PLAYERS[0].hand_state = hand_state
 
@@ -3336,7 +3364,7 @@ while game_is_running:
 							#------ CLIC ON A LETTER IN HAND ? -------
 							for letter_from_hand in var.current_player.hand :
 
-								if letter_from_hand.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+								if letter_from_hand.collide(cursor_pos_x, cursor_pos_y) :
 
 									pygame.mouse.set_cursor(*close_hand)
 
@@ -3363,7 +3391,7 @@ while game_is_running:
 							#------ CLIC ON A LETTER JUST PLAYED ? -------
 							for letter_from_board in layers.letters_just_played :
 
-								if letter_from_board.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+								if letter_from_board.collide(cursor_pos_x, cursor_pos_y) :
 
 									pygame.mouse.set_cursor(*close_hand)
 
@@ -3982,12 +4010,12 @@ while game_is_running:
 
 				collide = False
 				for letter in layers.letters_just_played.sprites() :
-					if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+					if letter.collide(cursor_pos_x, cursor_pos_y) :
 						collide = True
 						pygame.mouse.set_cursor(*open_hand)
 						CURSOR_IS_OPEN_HAND = True		
 				for letter in var.current_player.hand :
-					if letter.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
+					if letter.collide(cursor_pos_x, cursor_pos_y) :
 						collide = True
 						pygame.mouse.set_cursor(*open_hand)
 						CURSOR_IS_OPEN_HAND = True
