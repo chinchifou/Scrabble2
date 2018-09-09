@@ -940,9 +940,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 		if not ( hasattr(self, 'width') and hasattr(self, 'height') ) :
 			self.width, self.height = in_reference_tiles(self.image.get_width(), self.image.get_height())
 
-		#self.center = (pos_x + self.width/2, pos_y + self.height / 2)
-		#self.center_pix = pixels(self.center[0], self.center[1])
-
 		#resize image
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height, to_round=True ) )
 		#set area to be displayed
@@ -953,9 +950,6 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 
 	def resize(self):
-
-		#self.center_pix = pixels(self.center[0], self.center[1])
-		#TODO to use for better collide detection	
 
 		#reload image
 		if self.path != None :
@@ -977,12 +971,14 @@ class ResizableSprite(pygame.sprite.Sprite):
 
 	#move a Sprite at a given position expressed in tiles
 	def moveAtTile(self, pos_x, pos_y) :
+
 		self.rect.x, self.rect.y = pixels(pos_x, pos_y)
 		self.pos_x, self.pos_y  = pos_x, pos_y
 
 
 	#move a Sprite at a given position expressed in pixels
 	def moveAtPixels(self, pos_x, pos_y) :
+
 		self.rect.x, self.rect.y = pos_x, pos_y
 		self.pos_x, self.pos_y  = tiles(pos_x, pos_y, to_round=True)
 
@@ -3465,17 +3461,18 @@ while game_is_running:
 							#------ A LETTER IS SELECTED -------
 							if len(layers.selected_letter) == 1 : 
 
+								selected_letter = layers.selected_letter.sprites()[0]
+								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery
+
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.collide(cursor_pos_x, cursor_pos_y) :
+									if hand_holder.collide(letter_center_x, letter_center_y) :
 
-										index_in_hand = hand_holder.indexAtPos(cursor_pos_x)
+										index_in_hand = hand_holder.indexAtPos(letter_center_x)
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
-
-											selected_letter = layers.selected_letter.sprites()[0]
 											
 											delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
@@ -3508,7 +3505,9 @@ while game_is_running:
 								#------ CLIC ON A TILE ON THE BOARD ? -------
 								for tile in layers.tiles :
 
-									if tile.collide(cursor_pos_x, cursor_pos_y) == True :
+									if tile.collide(letter_center_x, letter_center_y) == True :
+
+										logging.debug("Tile center pos : %i, %i", tile.rect.centerx, tile.rect.centery)
 
 										tile_x_on_board = int( tile.pos_x - DELTA )
 										tile_y_on_board = int( tile.pos_y - DELTA )
@@ -3937,19 +3936,21 @@ while game_is_running:
 
 							#TODO to improve based on "is a mouse" or "is a touchescreen"
 							#not a simple fast clic
-							if ( timer > 200 )  : 
+							if ( timer > 200 )  :
+
+								selected_letter = layers.selected_letter.sprites()[0]
+								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery 
 
 								#------ CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
-									if hand_holder.collide(cursor_pos_x, cursor_pos_y) :
+									if hand_holder.collide(letter_center_x, letter_center_y) :
 
-										index_in_hand = hand_holder.indexAtPos(cursor_pos_x)
+										index_in_hand = hand_holder.indexAtPos(letter_center_x)
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
 
-											selected_letter = layers.selected_letter.sprites()[0]	
 											delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
@@ -3977,7 +3978,7 @@ while game_is_running:
 								#------ CLIC ON A TILE ON THE BOARD ? -------
 								for tile in layers.tiles :
 
-									if tile.collide(cursor_pos_x, cursor_pos_y) == True :
+									if tile.collide(letter_center_x, letter_center_y) == True :
 
 										tile_x_on_board = int( tile.pos_x - DELTA )
 										tile_y_on_board = int( tile.pos_y - DELTA )
