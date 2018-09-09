@@ -3533,41 +3533,20 @@ while game_is_running:
 						#------ SELECT A LETTER -------
 						if var.current_action == 'SELECT_A_LETTER' :
 
-						
-							#------ RELEASE CLIC ON A BUTTON (VISUAL) -------
-							for button in layers.buttons_on_screen :
-
-								if button.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True :
-									button.turnOnHighlighted()
-									layers.buttons_on_screen.clear(window, var.background_empty)
-									layers.buttons_on_screen.draw(window)
+							need_update = False
 
 							#------ RELEASE CLIC ON PLAY BUTTON -------
 							if ( (button_play.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
 		
 								pygame.mouse.set_cursor(*arrow)
 								button_play.release()
+								need_update = True
 
 								if STEP == 0 :
 
 									#reset Board
 									layers.letters_on_board.empty()
 									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-									# ___ DRAW BOARD ___
-									"""
-									#screeshot background empty (USELESS ?)
-									layers.background.draw(window)
-									layers.tiles.draw(window)
-									layers.hand_holder.draw(window)
-									layers.buttons_on_screen.draw(window)
-
-									screeshot background no letter (USELESS ?)
-									var.background_no_letter = window.copy()
-									ar.current_background_no_text = window.copy()
-									#ui_text.drawText(STEP)
-									var.current_background = window.copy()
-									"""
 
 									# ___ UI elements new screen ___
 									STEP = STEP + 1
@@ -3589,26 +3568,19 @@ while game_is_running:
 									ui_text.drawTextPopUp(STEP)
 
 									#UPDATE
-									pygame.display.update()
 									var.current_action = "WINDOW_DISPLAYED"
 
 
 							#------ RELEASE CLIC ON END TURN BUTTON -------
-							if ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
+							elif ( (button_end_turn.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 								if STEP in (3,6,9) :
 									pygame.mouse.set_cursor(*arrow)
 
-								"""
-								logging.debug("End of turn board state : ")
-								for line in var.current_board_state :
-									logging.debug(line)
-								"""
 								button_end_turn.release()
 								layers.buttons_on_screen.clear(window, var.background_empty)
 								layers.buttons_on_screen.draw(window)
 
-								#SCORES
 								#calculate score
 								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
 
@@ -3645,25 +3617,13 @@ while game_is_running:
 								layers.dark_filter.draw(window)
 								layers.pop_up.draw(window)
 								pygame.display.update()
+								need_update = False
 
 								MUST_DIPSLAY_POP_UP = True
 
 								#prepare exit image (displayed when removing pop up)
 								window.blit(snapshot, (0,0))
 
-								#display score
-								#logging.debug("New Player score : %s", str(var.current_player.score))
-								#ui_text.drawText(COLOR.GREEN)
-								#pygame.display.update()
-
-								#TODO !!! activate TEMPO in final version
-								#pygame.time.wait(1500)
-
-								"""
-								#LETTERS (USELESS ?)
-								for letter in layers.letters_just_played :
-									layers.letters_on_board.add(letter)
-								"""
 
 								if move_on:
 
@@ -3789,7 +3749,6 @@ while game_is_running:
 										layers.pop_up_window.draw(window)
 										layers.buttons_on_screen.draw(window)
 
-										
 										progress_bar.draw()
 										ui_text.drawTextPopUp(STEP)
 										
@@ -3825,11 +3784,13 @@ while game_is_running:
 									var.current_action = "WINDOW_DISPLAYED"
 									#break 
 
-
-							if enable_shuffle_letter :
-								#------ RELEASE CLIC ON SHUFFLE BUTTON -------
-								if ( (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
+							elif ( enable_shuffle_letter and (button_shuffle.rect.collidepoint(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
 									button_shuffle.release()
+									button_shuffle.turnOnHighlighted()
+
+									layers.buttons_on_screen.clear(window, var.background_empty)
+									layers.buttons_on_screen.draw(window)
+									need_update = True
 
 									# ___ SHUFFLE ___
 									give_help = choice( [True, True, True, True] )
@@ -3880,10 +3841,7 @@ while game_is_running:
 													var.current_player.hand_state[6], var.current_player.hand_state[c_index] = var.current_player.hand_state[c_index], var.current_player.hand_state[6]
 
 
-
 										elif STEP == 9 :
-
-											#logging.debug("STEP 9")
 
 											letters_a = var.current_player.hand.findByName('A')
 											if letters_a != [] :
@@ -3914,9 +3872,7 @@ while game_is_running:
 													#reshuffle
 													var.current_player.hand_state[1], var.current_player.hand_state[v_index] = var.current_player.hand_state[v_index], var.current_player.hand_state[1]
 
-
 									#logging.debug("NEW hand state : %a", var.current_player.hand_state)
-
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
@@ -3930,7 +3886,8 @@ while game_is_running:
 									# ___ UPDATE DISPLAY ___
 									var.current_player.hand.clear(window, var.background_no_letter)
 									var.current_player.hand.draw(window)	
-									pygame.display.update()
+									#pygame.display.update()
+									need_update = True
 
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
 							else :
@@ -3946,8 +3903,11 @@ while game_is_running:
 
 										layers.buttons_on_screen.clear(window, var.background_empty)
 										layers.buttons_on_screen.draw(window)
-										
-										pygame.display.update()
+										need_update = True										
+
+							if need_update :
+								pygame.display.update()
+							
 
 
 						#------ PLAY A SELECTED LETTER-------
