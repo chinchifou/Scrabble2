@@ -3947,11 +3947,6 @@ while game_is_running:
 										layers.buttons_on_screen.clear(window, var.background_empty)
 										layers.buttons_on_screen.draw(window)
 										
-										#TO DO - prevent artefact see line 1287 ?
-										layers.selected_letter.clear(window, var.current_background)
-										var.current_background = window.copy()
-										layers.selected_letter.draw(window)
-										
 										pygame.display.update()
 
 
