@@ -1188,12 +1188,13 @@ class Letter(ResizableSprite):
 		my_index = hand_holder.indexAtPos(self.rect.centerx)
 
 		wanted_index = my_index+direction
-		wanted_index = max(0,wanted_index)
-		wanted_index = wanted_index%( len(var.current_player.hand_state) )
 
-		wanted_pos_id = var.current_player.hand_state[wanted_index]
+		if wanted_index < 0 or wanted_index > len(var.current_player.hand_state)-1 :
+			return False
 
-		return ( wanted_pos_id == 0 )		
+		else :
+			wanted_pos_id = var.current_player.hand_state[wanted_index]
+			return ( wanted_pos_id == 0 )		
 
 
 ##----- Progress Bar -----
@@ -3479,22 +3480,25 @@ while game_is_running:
 								selected_letter = layers.selected_letter.sprites()[0]
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery
 
-								#------ CLIC ON THE HAND HOLDER ? -------
+								#------ PRESS LEFT CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
 									move_my_letter = False
+									move_letters = False
+									push_direction = 0
+									visited_letters = []
 
 									if hand_holder.collide(letter_center_x, letter_center_y) :
 
 										index_in_hand = hand_holder.indexAtPos(letter_center_x)
+										logging.debug("INITIAL index_in_hand : %i", index_in_hand)
 										delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
-											logging.debug("empty slot")
 
 											move_my_letter = True
-											logging.debug("please move")
+											logging.debug("please move my letter")
 
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
@@ -3506,59 +3510,101 @@ while game_is_running:
 
 												offset_x = selected_letter.rect.centerx - old_letter.rect.centerx
 												if offset_x >= 0 : #want to push to the left
-													direction = -1
+													push_direction = -1
 												else :
-													direction = +1
+													push_direction = +1
 
-												if old_letter.canMove(direction) : #no need to push other letters
+												go_on = True
+												new_index = index_in_hand
+												logging.debug("Try to PUSH")
+												while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
 
-													old_letter.moveAtTile( delta_x + index_in_hand + direction, delta_y )
-													var.current_player.hand_state[index_in_hand+direction] = old_letter.id
-													var.current_player.hand_state[index_in_hand] = 0
+													blocking_letter_id = var.current_player.hand_state[new_index]
+													blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
 
-													move_my_letter = True
-
-
-												else : #need to push
-													#try backward
-													if old_letter.canMove(-direction) :
-
-														old_letter.moveAtTile( delta_x + index_in_hand - direction, delta_y )
-														var.current_player.hand_state[index_in_hand-direction] = old_letter.id
-														var.current_player.hand_state[index_in_hand] = 0
-
+													if blocking_letter.canMove(push_direction) :
+														logging.debug("CAN MOVE")
+														move_letters = True
 														move_my_letter = True
+														go_on = False
 													else :
-														pass
+														new_index = new_index + push_direction
+														logging.debug("new_index : %i", new_index)
 
+													visited_letters.append(blocking_letter)
+
+													logging.debug("visited letters :")
+													for letter in visited_letters :
+														letter.info()
+
+
+												if move_letters != True :
+
+													push_direction = - push_direction
+													visited_letters = []
+
+													go_on = True
+													new_index = index_in_hand
+													while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
+
+														logging.debug("new index : %i", new_index)
+
+														blocking_letter_id = var.current_player.hand_state[new_index]
+														blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
+
+														if blocking_letter.canMove(push_direction) :
+															move_letters = True
+															move_my_letter = True
+															go_on = False
+														else :
+															new_index = new_index + push_direction
+
+														visited_letters.append(blocking_letter)
+
+
+										if move_letters == True :	
+											logging.debug("moving THE LETTERS")
+											logging.debug("visited letters :")
+											for letter in visited_letters :
+												letter.info()
+
+											new_index = new_index + push_direction
+											for letter in reversed(visited_letters) :
+
+												letter.moveAtTile( delta_x + new_index, delta_y )
+												var.current_player.hand_state[new_index] = letter.id
+												var.current_player.hand_state[new_index-push_direction] = 0
+
+												new_index = new_index - push_direction
 
 										if move_my_letter == True :
-											logging.debug("MOVING")
-										
+											logging.debug("moving your letter")
+											logging.debug("")
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
-											#change letter from layers
-											var.current_player.hand.add(selected_letter)
-											layers.selected_letter.remove(selected_letter)
+										#change letter from layers
+										var.current_player.hand.add(selected_letter)
+										layers.selected_letter.remove(selected_letter)
 
-											#refresh screen
-											layers.selected_letter.clear(window, var.current_background)
-											var.current_player.hand.draw(window)
+										#refresh screen
+										layers.selected_letter.clear(window, var.current_background)
+										var.current_player.hand.draw(window)
 
-											if display_new_score_in_real_time :
-												incrementPredictedScore()
-												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)
+										if display_new_score_in_real_time :
+											incrementPredictedScore()
+											layers.mask_text.draw(window)
+											ui_text.drawText(STEP)
 
-											var.current_background = window.copy()
+										var.current_background = window.copy()
 
-											pygame.mouse.set_cursor(*open_hand)
-											CURSOR_IS_OPEN_HAND = True
+										pygame.mouse.set_cursor(*open_hand)
+										CURSOR_IS_OPEN_HAND = True
 
-											pygame.display.update()											
+										pygame.display.update()											
 
-											var.current_action = "SELECT_A_LETTER"
+										var.current_action = "SELECT_A_LETTER"
+
 
 
 								#------ CLIC ON A TILE ON THE BOARD ? -------
@@ -4000,22 +4046,25 @@ while game_is_running:
 								selected_letter = layers.selected_letter.sprites()[0]
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery 
 
-								#------ CLIC ON THE HAND HOLDER ? -------
+								#------ PRESS LEFT CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
 									move_my_letter = False
+									move_letters = False
+									push_direction = 0
+									visited_letters = []
 
 									if hand_holder.collide(letter_center_x, letter_center_y) :
 
 										index_in_hand = hand_holder.indexAtPos(letter_center_x)
+										logging.debug("INITIAL index_in_hand : %i", index_in_hand)
 										delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
-											logging.debug("empty slot")
 
 											move_my_letter = True
-											logging.debug("please move")
+											logging.debug("please move my letter")
 
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
@@ -4027,94 +4076,100 @@ while game_is_running:
 
 												offset_x = selected_letter.rect.centerx - old_letter.rect.centerx
 												if offset_x >= 0 : #want to push to the left
-													direction = -1
+													push_direction = -1
 												else :
-													direction = +1
+													push_direction = +1
 
-												if old_letter.canMove(direction) : #no need to push other letters
+												go_on = True
+												new_index = index_in_hand
+												logging.debug("Try to PUSH")
+												while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
 
-													old_letter.moveAtTile( delta_x + index_in_hand + direction, delta_y )
-													var.current_player.hand_state[index_in_hand+direction] = old_letter.id
-													var.current_player.hand_state[index_in_hand] = 0
+													blocking_letter_id = var.current_player.hand_state[new_index]
+													blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
 
-													move_my_letter = True
-
-
-												else : #need to push
-													#try backward
-													if old_letter.canMove(-direction) :
-
-														old_letter.moveAtTile( delta_x + index_in_hand - direction, delta_y )
-														var.current_player.hand_state[index_in_hand-direction] = old_letter.id
-														var.current_player.hand_state[index_in_hand] = 0
-
+													if blocking_letter.canMove(push_direction) :
+														logging.debug("CAN MOVE")
+														move_letters = True
 														move_my_letter = True
+														go_on = False
 													else :
-														pass
+														new_index = new_index + push_direction
+														logging.debug("new_index : %i", new_index)
 
+													visited_letters.append(blocking_letter)
+
+													logging.debug("visited letters :")
+													for letter in visited_letters :
+														letter.info()
+
+
+												if move_letters != True :
+
+													push_direction = - push_direction
+													visited_letters = []
+
+													go_on = True
+													new_index = index_in_hand
+													while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
+
+														logging.debug("new index : %i", new_index)
+
+														blocking_letter_id = var.current_player.hand_state[new_index]
+														blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
+
+														if blocking_letter.canMove(push_direction) :
+															move_letters = True
+															move_my_letter = True
+															go_on = False
+														else :
+															new_index = new_index + push_direction
+
+														visited_letters.append(blocking_letter)
+
+
+										if move_letters == True :	
+											logging.debug("moving THE LETTERS")
+											logging.debug("visited letters :")
+											for letter in visited_letters :
+												letter.info()
+
+											new_index = new_index + push_direction
+											for letter in reversed(visited_letters) :
+
+												letter.moveAtTile( delta_x + new_index, delta_y )
+												var.current_player.hand_state[new_index] = letter.id
+												var.current_player.hand_state[new_index-push_direction] = 0
+
+												new_index = new_index - push_direction
 
 										if move_my_letter == True :
-											logging.debug("MOVING")
-										
+											logging.debug("moving your letter")
+											logging.debug("")
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
-											#change letter from layers
-											var.current_player.hand.add(selected_letter)
-											layers.selected_letter.remove(selected_letter)
+										#change letter from layers
+										var.current_player.hand.add(selected_letter)
+										layers.selected_letter.remove(selected_letter)
 
-											#refresh screen
-											layers.selected_letter.clear(window, var.current_background)
-											var.current_player.hand.draw(window)
+										#refresh screen
+										layers.selected_letter.clear(window, var.current_background)
+										var.current_player.hand.draw(window)
 
-											if display_new_score_in_real_time :
-												incrementPredictedScore()
-												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)
+										if display_new_score_in_real_time :
+											incrementPredictedScore()
+											layers.mask_text.draw(window)
+											ui_text.drawText(STEP)
 
-											var.current_background = window.copy()
+										var.current_background = window.copy()
 
-											pygame.mouse.set_cursor(*open_hand)
-											CURSOR_IS_OPEN_HAND = True
+										pygame.mouse.set_cursor(*open_hand)
+										CURSOR_IS_OPEN_HAND = True
 
-											pygame.display.update()											
+										pygame.display.update()											
 
-											var.current_action = "SELECT_A_LETTER"
-
-
-								#------ CLIC ON A TILE ON THE BOARD ? -------
-								for tile in layers.tiles :
-
-									if tile.collide(letter_center_x, letter_center_y) == True :
-
-										tile_x_on_board = int( tile.pos_x - DELTA )
-										tile_y_on_board = int( tile.pos_y - DELTA )
-
-										#------ EMPTY TILE ? -------
-										if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
-
-											selected_letter = layers.selected_letter.sprites()[0]
-
-											selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
-											var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
-
-											layers.letters_just_played.add(selected_letter)								
-											layers.selected_letter.remove(selected_letter)
-
-											layers.selected_letter.clear(window, var.current_background)	
-											layers.letters_just_played.draw(window)
-
-											if display_new_score_in_real_time :
-												incrementPredictedScore()
-												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)								
-
-											pygame.mouse.set_cursor(*open_hand)
-											CURSOR_IS_OPEN_HAND = True
-
-											pygame.display.update()
-
-											var.current_action = "SELECT_A_LETTER"
+										var.current_action = "SELECT_A_LETTER"
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
