@@ -128,7 +128,7 @@ class GameVariable():
 
 		self.points_for_scrabble = 50
 
-		self.allow_fast_shuffle = True
+		self.enable_switch_letters = True
 
 var = GameVariable()
 
@@ -1749,6 +1749,7 @@ game_settings = config_reader.h_rules_params
 var.number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
 display_next_player_hand = game_settings['display_next_player_hand']
 enable_shuffle_letter = game_settings['enable_shuffle_letter']
+var.enable_switch_letters = game_settings['enable_switch_letters']
 LETTERS_LANGUAGE = game_settings['letters_language']
 UI_LANGUAGE = game_settings['ui_language']
 players_names = config_reader.players
@@ -3503,7 +3504,7 @@ while game_is_running:
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
 
-											if var.allow_fast_shuffle :
+											if var.enable_switch_letters :
 
 												letter_id = var.current_player.hand_state[index_in_hand]
 												old_letter = var.current_player.hand.findByIndex(letter_id)
@@ -3583,27 +3584,27 @@ while game_is_running:
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
-										#change letter from layers
-										var.current_player.hand.add(selected_letter)
-										layers.selected_letter.remove(selected_letter)
+											#change letter from layers
+											var.current_player.hand.add(selected_letter)
+											layers.selected_letter.remove(selected_letter)
 
-										#refresh screen
-										layers.selected_letter.clear(window, var.current_background)
-										var.current_player.hand.draw(window)
+											#refresh screen
+											layers.selected_letter.clear(window, var.current_background)
+											var.current_player.hand.draw(window)
 
-										if display_new_score_in_real_time :
-											incrementPredictedScore()
-											layers.mask_text.draw(window)
-											ui_text.drawText(STEP)
+											if display_new_score_in_real_time :
+												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText(STEP)
 
-										var.current_background = window.copy()
+											var.current_background = window.copy()
 
-										pygame.mouse.set_cursor(*open_hand)
-										CURSOR_IS_OPEN_HAND = True
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
 
-										pygame.display.update()											
+											pygame.display.update()											
 
-										var.current_action = "SELECT_A_LETTER"
+											var.current_action = "SELECT_A_LETTER"
 
 
 
@@ -4069,7 +4070,7 @@ while game_is_running:
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
 
-											if var.allow_fast_shuffle :
+											if var.enable_switch_letters :
 
 												letter_id = var.current_player.hand_state[index_in_hand]
 												old_letter = var.current_player.hand.findByIndex(letter_id)
@@ -4149,27 +4150,27 @@ while game_is_running:
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
-										#change letter from layers
-										var.current_player.hand.add(selected_letter)
-										layers.selected_letter.remove(selected_letter)
+											#change letter from layers
+											var.current_player.hand.add(selected_letter)
+											layers.selected_letter.remove(selected_letter)
 
-										#refresh screen
-										layers.selected_letter.clear(window, var.current_background)
-										var.current_player.hand.draw(window)
+											#refresh screen
+											layers.selected_letter.clear(window, var.current_background)
+											var.current_player.hand.draw(window)
 
-										if display_new_score_in_real_time :
-											incrementPredictedScore()
-											layers.mask_text.draw(window)
-											ui_text.drawText(STEP)
+											if display_new_score_in_real_time :
+												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText(STEP)
 
-										var.current_background = window.copy()
+											var.current_background = window.copy()
 
-										pygame.mouse.set_cursor(*open_hand)
-										CURSOR_IS_OPEN_HAND = True
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
 
-										pygame.display.update()											
+											pygame.display.update()											
 
-										var.current_action = "SELECT_A_LETTER"
+											var.current_action = "SELECT_A_LETTER"
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	

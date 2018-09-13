@@ -98,6 +98,8 @@ for line in open(path_conf_rules_file, "r", encoding="utf8") :
 		if param == 'display_next_player_hand' :
 			h_rules_params[ param ] = str_to_bool(word_found.group(2))
 		if param == 'enable_shuffle_letter' :
+			h_rules_params[ param ] = str_to_bool(word_found.group(2))		
+		if param == 'enable_switch_letters' :
 			h_rules_params[ param ] = str_to_bool(word_found.group(2))
 		#Show help
 		if param == 'display_type_of_tile_on_hoovering' :
