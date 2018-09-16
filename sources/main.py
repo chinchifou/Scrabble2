@@ -436,6 +436,15 @@ class UITextPrinter():
 
 			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size ) )
 			"""
+		if STEP in (3,6,9) :
+			if var.predicted_score >= MAPING_STEP_MAX_SCORE[STEP] :
+				layers.pop_up.add(ui_small_tick)
+				layers.pop_up.draw(window)
+			else :
+				layers.pop_up.add(ui_small_tick)
+				#layers.pop_up.clear(window, var.background_pop_up_empty)
+				layers.pop_up.remove(ui_small_tick)
+
 		if suggest_word :
 			for text_it in self.texts_suggest_word :
 				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
@@ -2603,6 +2612,9 @@ layers.mask_text.add(mask_text_score)
 ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5, tmp_transparent = True) #Screen 32*18
 layers.pop_up_window.add(ui_avatar)
 
+#small tick
+ui_small_tick = UI_Image('small_tick', PATHS.path_background, 26.5, 6.3, 0.6, 0.6, tmp_transparent = True)
+
 #last screen
 last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
 
@@ -2667,7 +2679,9 @@ while game_is_running:
 		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_SPACE ) :
 			logging.info("SPACE key pressed")
 			STEP = 0
+			var.predicted_score = 0
 			progress_bar.empty()
+			layers.pop_up.empty()
 
 			# Reset conf
 			enable_shuffle_letter = False
@@ -2959,6 +2973,7 @@ while game_is_running:
 									pygame.mouse.set_cursor(*arrow)
 
 									#creeate pop up
+									layers.pop_up.empty()
 									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
 									# snapshot of before pop_up
@@ -3030,6 +3045,7 @@ while game_is_running:
 									move_on = False
 
 									#creeate pop up
+									layers.pop_up.empty()
 									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
 									# snapshot of before pop_up
@@ -3202,7 +3218,9 @@ while game_is_running:
 							elif STEP == 11 :
 
 								STEP = 0
+								var.predicted_score = 0
 								progress_bar.fill()
+								layers.pop_up.empty()
 
 								# Reset conf
 								enable_shuffle_letter = False
@@ -3409,6 +3427,7 @@ while game_is_running:
 								]
 
 								#creeate pop up
+								layers.pop_up.empty()
 								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=11000)  )
 
 								# snapshot of before pop_up
@@ -3856,6 +3875,7 @@ while game_is_running:
 										move_on = True
 
 								#creeate pop up
+								layers.pop_up.empty()
 								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
 								# snapshot of before pop_up
@@ -3903,6 +3923,8 @@ while game_is_running:
 
 									if STEP == 3 :
 
+										var.predicted_score = 0
+
 										# ___ DRAW BOARD ___
 										window.blit(var.background_no_letter, (0,0))
 										
@@ -3942,6 +3964,7 @@ while game_is_running:
 									elif STEP == 6 :
 
 										# ___ RESET ___
+										var.predicted_score = 0
 										#reset Board
 										layers.letters_on_board.empty()
 										var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
