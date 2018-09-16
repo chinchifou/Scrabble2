@@ -130,6 +130,8 @@ class GameVariable():
 
 		self.enable_switch_letters = True
 
+		self.score_pop_up = []
+
 var = GameVariable()
 
 class AllPaths():
@@ -213,6 +215,7 @@ class ColorPannel():
 		self.BLUE_LIGHT = (113, 201, 249)
 		self.BLUE_SUPER_LIGHT = ( 124, 194, 191 )
 
+		self.RED_SUPER_DEEP = (170, 11, 15)
 		self.RED_DEEP = (239, 69, 86)
 		self.RED_LIGHT = (249, 179, 162)
 
@@ -417,10 +420,12 @@ class UITextPrinter():
 		window.blit(text, (self.max_score.pos_x_pix, self.max_score.pos_y_pix))
 
 		#Scores header
-		if display_new_score_in_real_time :	
+		if display_new_score_in_real_time :
+			drawPredictedScorePopUp()
+			"""	
 			text = self.score_header.font.render(self.score_header.text, 1, COLOR.WHITE )
 			window.blit(text, (self.score_header.pos_x_pix, self.score_header.pos_y_pix))
-
+			
 			if var.predicted_score > 0 :
 				self.score.font.set_bold(1)
 				text = self.score.font.render(str(var.predicted_score), 1, COLOR.BLUE_LIGHT )
@@ -430,7 +435,7 @@ class UITextPrinter():
 			window.blit(text, (self.score.pos_x_pix, self.score.pos_y_pix) )
 
 			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size ) )
-
+			"""
 		if suggest_word :
 			for text_it in self.texts_suggest_word :
 				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
@@ -1709,6 +1714,128 @@ def incrementPredictedScore():
 		var.predicted_score = var.predicted_score + h_word_point[1]
 
 
+def drawPredictedScorePopUp():
+
+	letters_played = {}
+	for letter in layers.letters_just_played :
+		letters_played[(int(letter.pos_x - DELTA), int(letter.pos_y - DELTA))] = letter.name
+
+	if len(letters_played) > 0 :
+
+		all_x, all_y = [], []
+
+		for tuple_pos in letters_played.keys() :
+			all_x.append(tuple_pos[0])
+			all_y.append(tuple_pos[1])
+
+		#find min, max and delta
+		min_x, max_x, delta_x = min(all_x), max(all_x), min(all_x)-max(all_x)
+		min_y, max_y, delta_y = min(all_y), max(all_y), min(all_y)-max(all_y)
+
+		valid_move = False
+
+		#___ VERTICAL WORD PLAYED ___
+		if delta_x == 0 :
+
+			start_y, end_y = min_y, max_y
+
+			#find first letter
+			while( ( (start_y - 1) >= 0) and (var.current_board_state[start_y - 1][min_x] != '?') ) :
+				start_y = start_y - 1
+
+			#find last letter
+			while( ( (end_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
+				end_y = end_y + 1
+
+			valid_move = True
+
+			#away from older letters (above or below but not between)
+			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
+				logging.debug("not played close to another word")
+				#valid_move = False
+
+			if (delta_y+1 != len(letters_played) ) :
+				logging.debug("there is a hole between letters played")
+				#browse all letters
+				it_y = start_y
+				while( ( (it_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[it_y + 1][min_x] != '?') ) :
+					it_y = it_y + 1
+				if ( (it_y-start_y) != (end_y-start_y) ) :
+					logging.debug("there is a hole between letters played - even using old letters")
+					valid_move = False
+
+			if valid_move :
+
+				#pos_last_word_letter = (max_x, end_y)
+				pos_last_word_letter = (max_x, max_y)
+				var.score_pop_up.text = ' '+str(var.predicted_score)+' '
+				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.POP_UP ) )
+
+
+		#___ HORIZONTAL WORD PLAYED ___
+		elif delta_y == 0 : 
+
+			start_x, end_x = min_x, max_x
+
+			#find first letter
+			while( ( (start_x - 1) >= 0) and (var.current_board_state[min_y][start_x - 1] != '?') ) :
+				start_x = start_x - 1
+
+			#find last letter
+			while( ( (end_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
+				end_x = end_x + 1
+
+
+			#away from older letters (left or right but not between)
+			if (start_x == min_x and end_x == max_x and len( layers.letters_on_board.sprites() ) > 0):
+				logging.debug("not played close to another word")
+				#valid_move = False
+
+
+			if (delta_x+1 != len(letters_played) ) :
+				logging.debug("there is a hole between letters played")
+				#browse all letters
+				it_x = start_x
+				while( ( (it_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x + 1] != '?') ) :
+					it_x = it_x + 1
+
+				logging.debug("it_x : %i, start_x : %i, end_x : %i", it_x, start_x, end_x)
+				if ( (it_x-start_x) != (end_x-start_x) ) :
+					logging.debug("there is a hole between letters played - even using old letters")
+					valid_move = False
+
+			if valid_move :
+
+				#pos_last_word_letter = (end_x, max_y)
+				pos_last_word_letter = (max_x, max_y)
+				var.score_pop_up.text = ' '+str(var.predicted_score)+' '
+				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.POP_UP ) )
+
+
+def refreshScreen():
+	incrementPredictedScore()
+
+	#remove previously displayed text
+	layers.background.draw(window)
+	layers.tiles.draw(window)
+	layers.hand_holder.draw(window)
+	layers.buttons_on_screen.draw(window)
+	var.background_no_letter = window.copy()
+
+	layers.letters_on_board.draw(window)
+	layers.letters_just_played.draw(window)
+	var.current_player.hand.draw(window)
+	var.current_background_no_text = window.copy()
+
+	progress_bar.draw()
+	ui_text.drawText(STEP)
+	#ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
+
+	var.current_background = window.copy()
+	layers.selected_letter.draw(window)
+	pygame.display.update()
+
+
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
 #----- Init logger -----
@@ -2469,6 +2596,9 @@ pop_up_score_surface = pygame.Surface((11*var.tile_size, 3.5*var.tile_size))
 pop_up_score_surface.fill(COLOR.GREY_DEEP)				
 pop_up_score = UI_Surface('score_pop_up', 11, 7.25, pop_up_score_surface)
 layers.pop_up_score.add(pop_up_score)
+
+#create score pop_up
+var.score_pop_up = UserInterFacePopUp( str(0), LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.WHITE, COLOR.RED_SUPER_DEEP )
 
 #create mask for text
 surf_mask_text = pygame.Surface( (ui_text.score.width*var.tile_size, ui_text.score.height*var.tile_size) )
@@ -3428,6 +3558,7 @@ while game_is_running:
 
 									pygame.mouse.set_cursor(*close_hand)
 									var.current_action = "PLAY_A_LETTER"
+									refreshScreen()
 
 
 							#------ CLIC ON A LETTER JUST PLAYED ? -------
@@ -3457,6 +3588,7 @@ while game_is_running:
 
 									pygame.mouse.set_cursor(*close_hand)
 									var.current_action = "PLAY_A_LETTER"
+									refreshScreen()
 							
 
 							#------ CLIC ON BUTTONS (VISUAL) -------
@@ -3605,6 +3737,7 @@ while game_is_running:
 											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
 
 
 
@@ -3647,6 +3780,7 @@ while game_is_running:
 											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
 
 
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
@@ -4161,6 +4295,7 @@ while game_is_running:
 											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
