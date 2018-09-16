@@ -393,7 +393,7 @@ class UITextPrinter():
 		# ___ UI TEXT init ___
 		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, hand_holder.pos_y - 1.0) )
 		
-		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1) )	
+		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1 + 1) )	
 
 		self.score_header = UIText("Score prévisionnel : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.max_score.bottom_tiles + 0.75) )
 		self.score = UIText("99", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT + self.score_header.width, self.score_header.pos_y-0.05) )
@@ -446,6 +446,8 @@ class UITextPrinter():
 				layers.pop_up.remove(ui_small_tick)
 
 		if suggest_word :
+			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5+3.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5+3.5)*var.tile_size) )
+
 			for text_it in self.texts_suggest_word :
 				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
 
@@ -2613,7 +2615,7 @@ ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5, tmp_transpa
 layers.pop_up_window.add(ui_avatar)
 
 #small tick
-ui_small_tick = UI_Image('small_tick', PATHS.path_background, 26.5, 6.3, 0.6, 0.6, tmp_transparent = True)
+ui_small_tick = UI_Image('small_tick', PATHS.path_background, 26.5, 7.3, 0.6, 0.6, tmp_transparent = True)
 
 #last screen
 last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
@@ -2680,6 +2682,7 @@ while game_is_running:
 			logging.info("SPACE key pressed")
 			STEP = 0
 			var.predicted_score = 0
+			var.enable_switch_letters = False
 			progress_bar.empty()
 			layers.pop_up.empty()
 
@@ -2941,7 +2944,7 @@ while game_is_running:
 							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
 							layers.buttons_on_screen.draw(window)
 
-							if STEP in (2,5,6) :
+							if STEP in (2,5,6,8,11) :
 								pygame.mouse.set_cursor(*arrow)
 
 
@@ -3043,6 +3046,7 @@ while game_is_running:
 										nb_selected += 1
 								if nb_selected > 1 :
 									move_on = False
+									pygame.mouse.set_cursor(*arrow)
 
 									#creeate pop up
 									layers.pop_up.empty()
@@ -3219,6 +3223,7 @@ while game_is_running:
 
 								STEP = 0
 								var.predicted_score = 0
+								var.enable_switch_letters = False
 								progress_bar.fill()
 								layers.pop_up.empty()
 
@@ -3841,8 +3846,8 @@ while game_is_running:
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							elif ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
-								if STEP in (3,6,9) :
-									pygame.mouse.set_cursor(*arrow)
+								#if STEP in (0,3,6,9) :
+								pygame.mouse.set_cursor(*arrow)
 
 								button_end_turn.release()
 								layers.buttons_on_screen.clear(window, var.background_empty)
@@ -3924,6 +3929,7 @@ while game_is_running:
 									if STEP == 3 :
 
 										var.predicted_score = 0
+										var.enable_switch_letters = True
 
 										# ___ DRAW BOARD ___
 										window.blit(var.background_no_letter, (0,0))
