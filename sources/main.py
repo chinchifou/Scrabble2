@@ -1749,19 +1749,14 @@ def drawPredictedScorePopUp():
 
 			valid_move = True
 
-			#away from older letters (above or below but not between)
-			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
-				logging.debug("not played close to another word")
-				#valid_move = False
-
 			if (delta_y+1 != len(letters_played) ) :
-				logging.debug("there is a hole between letters played")
+				#logging.debug("there is a hole between letters played")
 				#browse all letters
 				it_y = start_y
 				while( ( (it_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[it_y + 1][min_x] != '?') ) :
 					it_y = it_y + 1
 				if ( (it_y-start_y) != (end_y-start_y) ) :
-					logging.debug("there is a hole between letters played - even using old letters")
+					#logging.debug("there is a hole between letters played - even using old letters")
 					valid_move = False
 
 			if valid_move :
@@ -1785,15 +1780,10 @@ def drawPredictedScorePopUp():
 			while( ( (end_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
 				end_x = end_x + 1
 
-
-			#away from older letters (left or right but not between)
-			if (start_x == min_x and end_x == max_x and len( layers.letters_on_board.sprites() ) > 0):
-				logging.debug("not played close to another word")
-				#valid_move = False
-
+			valid_move = True
 
 			if (delta_x+1 != len(letters_played) ) :
-				logging.debug("there is a hole between letters played")
+				#logging.debug("there is a hole between letters played")
 				#browse all letters
 				it_x = start_x
 				while( ( (it_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x + 1] != '?') ) :
@@ -1801,7 +1791,7 @@ def drawPredictedScorePopUp():
 
 				logging.debug("it_x : %i, start_x : %i, end_x : %i", it_x, start_x, end_x)
 				if ( (it_x-start_x) != (end_x-start_x) ) :
-					logging.debug("there is a hole between letters played - even using old letters")
+					#logging.debug("there is a hole between letters played - even using old letters")
 					valid_move = False
 
 			if valid_move :
@@ -1842,7 +1832,7 @@ def refreshScreen():
 
 log_file = path.join(PATHS.path_log,'scrabble.log')
 # levels : NOTSET < DEBUG < INFO < WARNING < ERROR < CRITICAL
-logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
+logging.basicConfig(filename=log_file, filemode='w', level=logging.ERROR, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
 
