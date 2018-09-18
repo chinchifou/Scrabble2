@@ -87,11 +87,9 @@ global CURSOR_IS_OPEN_HAND
 CURSOR_IS_OPEN_HAND = False
 
 
-global MUST_DIPSLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR
+global MUST_DIPSLAY_POP_UP
 # boolean to indicate wether to display pop_up or not
 MUST_DIPSLAY_POP_UP = False
-# number of frames before the pop_up disappear
-FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 
 
 
@@ -131,6 +129,9 @@ class GameVariable():
 		self.enable_switch_letters = True
 
 		self.score_pop_up = []
+
+		# number of frames before the pop_up disappear
+		FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 
 var = GameVariable()
 
@@ -801,10 +802,10 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 4000):
+def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 3200):
 
 	# ___ Init ___
-	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time / 20.0)
+	var.FRAMES_BEFORE_POP_UP_DISAPPEAR = (time * 60) / 1000
 
 	nb_lignes = len(ar_texts)
 	my_line_height = LINE_HEIGHT
@@ -1775,7 +1776,7 @@ def drawPredictedScorePopUp():
 				#pos_last_word_letter = (max_x, end_y)
 				pos_last_word_letter = (max_x, max_y)
 				var.score_pop_up.text = ' '+str(var.predicted_score)+' '
-				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.POP_UP ) )
+				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.NORMAL ) )
 
 
 		#___ HORIZONTAL WORD PLAYED ___
@@ -1810,7 +1811,7 @@ def drawPredictedScorePopUp():
 				#pos_last_word_letter = (end_x, max_y)
 				pos_last_word_letter = (max_x, max_y)
 				var.score_pop_up.text = ' '+str(var.predicted_score)+' '
-				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.POP_UP ) )
+				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.NORMAL ) )
 
 
 def refreshScreen():
@@ -2599,7 +2600,7 @@ pop_up_score = UI_Surface('score_pop_up', 11, 7.25, pop_up_score_surface)
 layers.pop_up_score.add(pop_up_score)
 
 #create score pop_up
-var.score_pop_up = UserInterFacePopUp( str(0), LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.WHITE, COLOR.RED_SUPER_DEEP )
+var.score_pop_up = UserInterFacePopUp( str(0), LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.WHITE, COLOR.GREY_DEEP )
 
 #create mask for text
 surf_mask_text = pygame.Surface( (ui_text.score.width*var.tile_size, ui_text.score.height*var.tile_size) )
@@ -2735,6 +2736,9 @@ while game_is_running:
 			checkbox_bonus_cases2.empty()
 			checkbox_calculate_score2.empty()
 
+			for emo in all_emoticoms :
+				if not emo.is_selected :
+					emo.select()
 
 			layers.buttons_on_screen.empty()
 			layers.buttons_on_screen.add(button_play)
@@ -2854,7 +2858,7 @@ while game_is_running:
 			# //////// POP UP DISPLAYED ////////
 			if MUST_DIPSLAY_POP_UP :
 				if ( event_type == pygame.MOUSEBUTTONUP  and event.button == 1 ) :
-					FRAMES_BEFORE_POP_UP_DISAPPEAR = 0
+					var.FRAMES_BEFORE_POP_UP_DISAPPEAR = 0
 
 			# //////// WINDOW DISPLAYED ////////
 			elif (var.current_action == "WINDOW_DISPLAYED") :
@@ -2977,7 +2981,7 @@ while game_is_running:
 
 									#creeate pop up
 									layers.pop_up.empty()
-									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 3000)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
@@ -3050,7 +3054,7 @@ while game_is_running:
 
 									#creeate pop up
 									layers.pop_up.empty()
-									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 3000)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
@@ -3275,6 +3279,9 @@ while game_is_running:
 								checkbox_bonus_cases2.empty()
 								checkbox_calculate_score2.empty()
 
+								for emo in all_emoticoms :
+									if not emo.is_selected :
+										emo.select()
 
 								layers.buttons_on_screen.empty()
 								layers.buttons_on_screen.add(button_play)
@@ -3433,7 +3440,7 @@ while game_is_running:
 
 								#creeate pop up
 								layers.pop_up.empty()
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=11000)  )
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=6000)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
@@ -3881,7 +3888,7 @@ while game_is_running:
 
 								#creeate pop up
 								layers.pop_up.empty()
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 3000)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
@@ -4442,11 +4449,11 @@ while game_is_running:
 	#logging.debug('fps : %s', str(fps_clock.get_fps() ) )
 
 	if MUST_DIPSLAY_POP_UP :
-		if FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
-			FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
+		if var.FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
+			var.FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
 		else :
 			MUST_DIPSLAY_POP_UP = False
-			FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
+			var.FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 			layers.pop_up.empty()
 			#force update of  mouse pointer
 			pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
