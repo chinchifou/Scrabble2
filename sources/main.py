@@ -4186,7 +4186,6 @@ while game_is_running:
 								pygame.display.update()
 							
 
-
 						#------ PLAY A SELECTED LETTER-------
 						if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
 
@@ -4197,7 +4196,7 @@ while game_is_running:
 								selected_letter = layers.selected_letter.sprites()[0]
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery 
 
-								#------ PRESS LEFT CLIC ON THE HAND HOLDER ? -------
+								#------ RELEASE LEFT CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
 									move_my_letter = False
@@ -4321,7 +4320,51 @@ while game_is_running:
 											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
+								
 											refreshScreen()
+
+
+								#------ RELEASE LEFT CLIC ON THE BOARD ? -------
+								
+								for tile in layers.tiles :
+
+									if tile.collide(letter_center_x, letter_center_y) == True :
+
+										logging.debug("Tile center pos : %i, %i", tile.rect.centerx, tile.rect.centery)
+
+										tile_x_on_board = int( tile.pos_x - DELTA )
+										tile_y_on_board = int( tile.pos_y - DELTA )
+
+										#------ EMPTY TILE ? -------
+										if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+
+											selected_letter = layers.selected_letter.sprites()[0]
+
+											selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
+											var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+
+											layers.letters_just_played.add(selected_letter)								
+											layers.selected_letter.remove(selected_letter)
+
+											layers.selected_letter.clear(window, var.current_background)	
+											layers.letters_just_played.draw(window)
+
+
+											if display_new_score_in_real_time :
+												incrementPredictedScore()
+												layers.mask_text.draw(window)
+												ui_text.drawText(STEP)
+
+											#TODO REFRESH TEXT
+											var.current_background = window.copy()
+
+											pygame.mouse.set_cursor(*open_hand)
+											CURSOR_IS_OPEN_HAND = True
+
+											pygame.display.update()
+
+											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()			
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
