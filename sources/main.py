@@ -78,7 +78,7 @@ PLAYERS = []
 STEP = 0
 #for a step give the corresponding max number of points
 MAPING_STEP_MAX_SCORE = {
-3 : 16,
+3 : 20,
 6 : 34,
 9: 26
 }
@@ -4325,7 +4325,6 @@ while game_is_running:
 
 
 								#------ RELEASE LEFT CLIC ON THE BOARD ? -------
-								
 								for tile in layers.tiles :
 
 									if tile.collide(letter_center_x, letter_center_y) == True :
