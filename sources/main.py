@@ -87,11 +87,9 @@ global CURSOR_IS_OPEN_HAND
 CURSOR_IS_OPEN_HAND = False
 
 
-global MUST_DIPSLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR
+global MUST_DIPSLAY_POP_UP
 # boolean to indicate wether to display pop_up or not
 MUST_DIPSLAY_POP_UP = False
-# number of frames before the pop_up disappear
-FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 
 
 
@@ -128,7 +126,12 @@ class GameVariable():
 
 		self.points_for_scrabble = 50
 
-		self.allow_fast_shuffle = True
+		self.enable_switch_letters = True
+
+		self.score_pop_up = []
+
+		# number of frames before the pop_up disappear
+		FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 
 var = GameVariable()
 
@@ -213,6 +216,7 @@ class ColorPannel():
 		self.BLUE_LIGHT = (113, 201, 249)
 		self.BLUE_SUPER_LIGHT = ( 124, 194, 191 )
 
+		self.RED_SUPER_DEEP = (170, 11, 15)
 		self.RED_DEEP = (239, 69, 86)
 		self.RED_LIGHT = (249, 179, 162)
 
@@ -390,7 +394,7 @@ class UITextPrinter():
 		# ___ UI TEXT init ___
 		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, hand_holder.pos_y - 1.0) )
 		
-		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1) )	
+		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1 + 1) )	
 
 		self.score_header = UIText("Score prévisionnel : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.max_score.bottom_tiles + 0.75) )
 		self.score = UIText("99", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT + self.score_header.width, self.score_header.pos_y-0.05) )
@@ -417,10 +421,12 @@ class UITextPrinter():
 		window.blit(text, (self.max_score.pos_x_pix, self.max_score.pos_y_pix))
 
 		#Scores header
-		if display_new_score_in_real_time :	
+		if display_new_score_in_real_time :
+			drawPredictedScorePopUp()
+			"""	
 			text = self.score_header.font.render(self.score_header.text, 1, COLOR.WHITE )
 			window.blit(text, (self.score_header.pos_x_pix, self.score_header.pos_y_pix))
-
+			
 			if var.predicted_score > 0 :
 				self.score.font.set_bold(1)
 				text = self.score.font.render(str(var.predicted_score), 1, COLOR.BLUE_LIGHT )
@@ -430,8 +436,19 @@ class UITextPrinter():
 			window.blit(text, (self.score.pos_x_pix, self.score.pos_y_pix) )
 
 			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size ) )
+			"""
+		if STEP in (3,6,9) :
+			if var.predicted_score >= MAPING_STEP_MAX_SCORE[STEP] :
+				layers.pop_up.add(ui_small_tick)
+				layers.pop_up.draw(window)
+			else :
+				layers.pop_up.add(ui_small_tick)
+				#layers.pop_up.clear(window, var.background_pop_up_empty)
+				layers.pop_up.remove(ui_small_tick)
 
 		if suggest_word :
+			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5+3.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5+3.5)*var.tile_size) )
+
 			for text_it in self.texts_suggest_word :
 				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
 
@@ -785,10 +802,10 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 4000):
+def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 3200):
 
 	# ___ Init ___
-	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time / 20.0)
+	var.FRAMES_BEFORE_POP_UP_DISAPPEAR = (time * 60) / 1000
 
 	nb_lignes = len(ar_texts)
 	my_line_height = LINE_HEIGHT
@@ -1188,12 +1205,13 @@ class Letter(ResizableSprite):
 		my_index = hand_holder.indexAtPos(self.rect.centerx)
 
 		wanted_index = my_index+direction
-		wanted_index = max(0,wanted_index)
-		wanted_index = wanted_index%( len(var.current_player.hand_state) )
 
-		wanted_pos_id = var.current_player.hand_state[wanted_index]
+		if wanted_index < 0 or wanted_index > len(var.current_player.hand_state)-1 :
+			return False
 
-		return ( wanted_pos_id == 0 )		
+		else :
+			wanted_pos_id = var.current_player.hand_state[wanted_index]
+			return ( wanted_pos_id == 0 )		
 
 
 ##----- Progress Bar -----
@@ -1405,7 +1423,7 @@ def logPlayersInfo():
 def calculatePoints(layer_letters_played) :
 
 	#format 'letters_played' {(x, y) : 'a' }
-	# 'x' and 'y' will then be swapped when accessing 'board_state' it is a matrix
+	# 'x' and 'y' will then be swapped when accessing 'board_state' because it is a matrix
 	# eg : m =[[a, b], [c, d]] -> to get 'b' you need to access : m[1][2] which for the UI would be m(2, 1)
 	letters_played = {}
 	for letter in layer_letters_played :
@@ -1708,13 +1726,125 @@ def incrementPredictedScore():
 		var.predicted_score = var.predicted_score + h_word_point[1]
 
 
+def drawPredictedScorePopUp():
+
+	letters_played = {}
+	for letter in layers.letters_just_played :
+		letters_played[(int(letter.pos_x - DELTA), int(letter.pos_y - DELTA))] = letter.name
+
+	if len(letters_played) > 0 :
+
+		all_x, all_y = [], []
+
+		for tuple_pos in letters_played.keys() :
+			all_x.append(tuple_pos[0])
+			all_y.append(tuple_pos[1])
+
+		#find min, max and delta
+		min_x, max_x, delta_x = min(all_x), max(all_x), min(all_x)-max(all_x)
+		min_y, max_y, delta_y = min(all_y), max(all_y), min(all_y)-max(all_y)
+
+		valid_move = False
+
+		#___ VERTICAL WORD PLAYED ___
+		if delta_x == 0 :
+
+			start_y, end_y = min_y, max_y
+
+			#find first letter
+			while( ( (start_y - 1) >= 0) and (var.current_board_state[start_y - 1][min_x] != '?') ) :
+				start_y = start_y - 1
+
+			#find last letter
+			while( ( (end_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
+				end_y = end_y + 1
+
+			valid_move = True
+
+			if (delta_y+1 != len(letters_played) ) :
+				#logging.debug("there is a hole between letters played")
+				#browse all letters
+				it_y = start_y
+				while( ( (it_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[it_y + 1][min_x] != '?') ) :
+					it_y = it_y + 1
+				if ( (it_y-start_y) != (end_y-start_y) ) :
+					#logging.debug("there is a hole between letters played - even using old letters")
+					valid_move = False
+
+			if valid_move :
+
+				#pos_last_word_letter = (max_x, end_y)
+				pos_last_word_letter = (max_x, max_y)
+				var.score_pop_up.text = ' '+str(var.predicted_score)+' '
+				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.NORMAL ) )
+
+
+		#___ HORIZONTAL WORD PLAYED ___
+		elif delta_y == 0 : 
+
+			start_x, end_x = min_x, max_x
+
+			#find first letter
+			while( ( (start_x - 1) >= 0) and (var.current_board_state[min_y][start_x - 1] != '?') ) :
+				start_x = start_x - 1
+
+			#find last letter
+			while( ( (end_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
+				end_x = end_x + 1
+
+			valid_move = True
+
+			if (delta_x+1 != len(letters_played) ) :
+				#logging.debug("there is a hole between letters played")
+				#browse all letters
+				it_x = start_x
+				while( ( (it_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x + 1] != '?') ) :
+					it_x = it_x + 1
+
+				logging.debug("it_x : %i, start_x : %i, end_x : %i", it_x, start_x, end_x)
+				if ( (it_x-start_x) != (end_x-start_x) ) :
+					#logging.debug("there is a hole between letters played - even using old letters")
+					valid_move = False
+
+			if valid_move :
+
+				#pos_last_word_letter = (end_x, max_y)
+				pos_last_word_letter = (max_x, max_y)
+				var.score_pop_up.text = ' '+str(var.predicted_score)+' '
+				var.score_pop_up.drawAt( solo_pixels( pos_last_word_letter[0]+DELTA+1), solo_pixels( pos_last_word_letter[1]+DELTA+1- LINE_HEIGHT.NORMAL ) )
+
+
+def refreshScreen():
+	incrementPredictedScore()
+
+	#remove previously displayed text
+	layers.background.draw(window)
+	layers.tiles.draw(window)
+	layers.hand_holder.draw(window)
+	layers.buttons_on_screen.draw(window)
+	var.background_no_letter = window.copy()
+
+	layers.letters_on_board.draw(window)
+	layers.letters_just_played.draw(window)
+	var.current_player.hand.draw(window)
+	var.current_background_no_text = window.copy()
+
+	progress_bar.draw()
+	ui_text.drawText(STEP)
+	#ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
+
+	var.current_background = window.copy()
+	layers.selected_letter.draw(window)
+	pygame.display.update()
+
+
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
 
 #----- Init logger -----
 
 log_file = path.join(PATHS.path_log,'scrabble.log')
 # levels : NOTSET < DEBUG < INFO < WARNING < ERROR < CRITICAL
-logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
+logging.basicConfig(filename=log_file, filemode='w', level=logging.ERROR, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
 
@@ -1748,6 +1878,7 @@ game_settings = config_reader.h_rules_params
 var.number_of_letters_per_hand = game_settings['number_of_letters_per_hand']
 display_next_player_hand = game_settings['display_next_player_hand']
 enable_shuffle_letter = game_settings['enable_shuffle_letter']
+var.enable_switch_letters = game_settings['enable_switch_letters']
 LETTERS_LANGUAGE = game_settings['letters_language']
 UI_LANGUAGE = game_settings['ui_language']
 players_names = config_reader.players
@@ -2468,6 +2599,9 @@ pop_up_score_surface.fill(COLOR.GREY_DEEP)
 pop_up_score = UI_Surface('score_pop_up', 11, 7.25, pop_up_score_surface)
 layers.pop_up_score.add(pop_up_score)
 
+#create score pop_up
+var.score_pop_up = UserInterFacePopUp( str(0), LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.WHITE, COLOR.GREY_DEEP )
+
 #create mask for text
 surf_mask_text = pygame.Surface( (ui_text.score.width*var.tile_size, ui_text.score.height*var.tile_size) )
 #logging.debug("Mask surface width : %i, height : %i", round(ui_text.score.width*2*var.tile_size), round(ui_text.score.height*var.tile_size) )
@@ -2480,6 +2614,9 @@ layers.mask_text.add(mask_text_score)
 #ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 3.84, 5, 5) #Screen 32*18
 ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5, tmp_transparent = True) #Screen 32*18
 layers.pop_up_window.add(ui_avatar)
+
+#small tick
+ui_small_tick = UI_Image('small_tick', PATHS.path_background, 26.5, 7.3, 0.6, 0.6, tmp_transparent = True)
 
 #last screen
 last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
@@ -2545,7 +2682,10 @@ while game_is_running:
 		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_SPACE ) :
 			logging.info("SPACE key pressed")
 			STEP = 0
+			var.predicted_score = 0
+			var.enable_switch_letters = False
 			progress_bar.empty()
+			layers.pop_up.empty()
 
 			# Reset conf
 			enable_shuffle_letter = False
@@ -2596,6 +2736,9 @@ while game_is_running:
 			checkbox_bonus_cases2.empty()
 			checkbox_calculate_score2.empty()
 
+			for emo in all_emoticoms :
+				if not emo.is_selected :
+					emo.select()
 
 			layers.buttons_on_screen.empty()
 			layers.buttons_on_screen.add(button_play)
@@ -2715,7 +2858,7 @@ while game_is_running:
 			# //////// POP UP DISPLAYED ////////
 			if MUST_DIPSLAY_POP_UP :
 				if ( event_type == pygame.MOUSEBUTTONUP  and event.button == 1 ) :
-					FRAMES_BEFORE_POP_UP_DISAPPEAR = 0
+					var.FRAMES_BEFORE_POP_UP_DISAPPEAR = 0
 
 			# //////// WINDOW DISPLAYED ////////
 			elif (var.current_action == "WINDOW_DISPLAYED") :
@@ -2805,7 +2948,7 @@ while game_is_running:
 							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
 							layers.buttons_on_screen.draw(window)
 
-							if STEP in (2,5,6) :
+							if STEP in (2,5,6,8,11) :
 								pygame.mouse.set_cursor(*arrow)
 
 
@@ -2837,7 +2980,8 @@ while game_is_running:
 									pygame.mouse.set_cursor(*arrow)
 
 									#creeate pop up
-									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+									layers.pop_up.empty()
+									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 3000)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
@@ -2906,9 +3050,11 @@ while game_is_running:
 										nb_selected += 1
 								if nb_selected > 1 :
 									move_on = False
+									pygame.mouse.set_cursor(*arrow)
 
 									#creeate pop up
-									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+									layers.pop_up.empty()
+									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 3000)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
@@ -3080,7 +3226,10 @@ while game_is_running:
 							elif STEP == 11 :
 
 								STEP = 0
+								var.predicted_score = 0
+								var.enable_switch_letters = False
 								progress_bar.fill()
+								layers.pop_up.empty()
 
 								# Reset conf
 								enable_shuffle_letter = False
@@ -3130,6 +3279,9 @@ while game_is_running:
 								checkbox_bonus_cases2.empty()
 								checkbox_calculate_score2.empty()
 
+								for emo in all_emoticoms :
+									if not emo.is_selected :
+										emo.select()
 
 								layers.buttons_on_screen.empty()
 								layers.buttons_on_screen.add(button_play)
@@ -3287,7 +3439,8 @@ while game_is_running:
 								]
 
 								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=11000)  )
+								layers.pop_up.empty()
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=6000)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
@@ -3426,6 +3579,7 @@ while game_is_running:
 
 									pygame.mouse.set_cursor(*close_hand)
 									var.current_action = "PLAY_A_LETTER"
+									refreshScreen()
 
 
 							#------ CLIC ON A LETTER JUST PLAYED ? -------
@@ -3455,6 +3609,7 @@ while game_is_running:
 
 									pygame.mouse.set_cursor(*close_hand)
 									var.current_action = "PLAY_A_LETTER"
+									refreshScreen()
 							
 
 							#------ CLIC ON BUTTONS (VISUAL) -------
@@ -3479,62 +3634,106 @@ while game_is_running:
 								selected_letter = layers.selected_letter.sprites()[0]
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery
 
-								#------ CLIC ON THE HAND HOLDER ? -------
+								#------ PRESS LEFT CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
 									move_my_letter = False
+									move_letters = False
+									push_direction = 0
+									visited_letters = []
 
 									if hand_holder.collide(letter_center_x, letter_center_y) :
 
 										index_in_hand = hand_holder.indexAtPos(letter_center_x)
+										logging.debug("INITIAL index_in_hand : %i", index_in_hand)
 										delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
-											logging.debug("empty slot")
 
 											move_my_letter = True
-											logging.debug("please move")
+											logging.debug("please move my letter")
 
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
 
-											if var.allow_fast_shuffle :
+											if var.enable_switch_letters :
 
 												letter_id = var.current_player.hand_state[index_in_hand]
 												old_letter = var.current_player.hand.findByIndex(letter_id)
 
 												offset_x = selected_letter.rect.centerx - old_letter.rect.centerx
 												if offset_x >= 0 : #want to push to the left
-													direction = -1
+													push_direction = -1
 												else :
-													direction = +1
+													push_direction = +1
 
-												if old_letter.canMove(direction) : #no need to push other letters
+												go_on = True
+												new_index = index_in_hand
+												logging.debug("Try to PUSH")
+												while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
 
-													old_letter.moveAtTile( delta_x + index_in_hand + direction, delta_y )
-													var.current_player.hand_state[index_in_hand+direction] = old_letter.id
-													var.current_player.hand_state[index_in_hand] = 0
+													blocking_letter_id = var.current_player.hand_state[new_index]
+													blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
 
-													move_my_letter = True
-
-
-												else : #need to push
-													#try backward
-													if old_letter.canMove(-direction) :
-
-														old_letter.moveAtTile( delta_x + index_in_hand - direction, delta_y )
-														var.current_player.hand_state[index_in_hand-direction] = old_letter.id
-														var.current_player.hand_state[index_in_hand] = 0
-
+													if blocking_letter.canMove(push_direction) :
+														logging.debug("CAN MOVE")
+														move_letters = True
 														move_my_letter = True
+														go_on = False
 													else :
-														pass
+														new_index = new_index + push_direction
+														logging.debug("new_index : %i", new_index)
 
+													visited_letters.append(blocking_letter)
+
+													logging.debug("visited letters :")
+													for letter in visited_letters :
+														letter.info()
+
+
+												if move_letters != True :
+
+													push_direction = - push_direction
+													visited_letters = []
+
+													go_on = True
+													new_index = index_in_hand
+													while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
+
+														logging.debug("new index : %i", new_index)
+
+														blocking_letter_id = var.current_player.hand_state[new_index]
+														blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
+
+														if blocking_letter.canMove(push_direction) :
+															move_letters = True
+															move_my_letter = True
+															go_on = False
+														else :
+															new_index = new_index + push_direction
+
+														visited_letters.append(blocking_letter)
+
+
+										if move_letters == True :	
+											logging.debug("moving THE LETTERS")
+											logging.debug("visited letters :")
+											for letter in visited_letters :
+												letter.info()
+
+											new_index = new_index + push_direction
+											for letter in reversed(visited_letters) :
+
+												letter.moveAtTile( delta_x + new_index, delta_y )
+												var.current_player.hand_state[new_index] = letter.id
+												var.current_player.hand_state[new_index-push_direction] = 0
+
+												new_index = new_index - push_direction
 
 										if move_my_letter == True :
-											logging.debug("MOVING")
-										
+											logging.debug("moving your letter")
+											logging.debug("")
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
@@ -3559,6 +3758,8 @@ while game_is_running:
 											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
+
 
 
 								#------ CLIC ON A TILE ON THE BOARD ? -------
@@ -3600,6 +3801,7 @@ while game_is_running:
 											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
 
 
 					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
@@ -3651,8 +3853,8 @@ while game_is_running:
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							elif ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
-								if STEP in (3,6,9) :
-									pygame.mouse.set_cursor(*arrow)
+								#if STEP in (0,3,6,9) :
+								pygame.mouse.set_cursor(*arrow)
 
 								button_end_turn.release()
 								layers.buttons_on_screen.clear(window, var.background_empty)
@@ -3685,7 +3887,8 @@ while game_is_running:
 										move_on = True
 
 								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+								layers.pop_up.empty()
+								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 3000)  )
 
 								# snapshot of before pop_up
 								snapshot = window.copy()
@@ -3732,6 +3935,9 @@ while game_is_running:
 
 									if STEP == 3 :
 
+										var.predicted_score = 0
+										var.enable_switch_letters = True
+
 										# ___ DRAW BOARD ___
 										window.blit(var.background_no_letter, (0,0))
 										
@@ -3771,6 +3977,7 @@ while game_is_running:
 									elif STEP == 6 :
 
 										# ___ RESET ___
+										var.predicted_score = 0
 										#reset Board
 										layers.letters_on_board.empty()
 										var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -3871,7 +4078,7 @@ while game_is_running:
 
 									# ___ SHUFFLE ___
 									give_help = choice( [True, True, True, True] )
-									more_help = choice( [True, True, False] )	
+									more_help = choice( [True, True, True] )	
 
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
@@ -3883,14 +4090,12 @@ while game_is_running:
 									#logging.debug("hand state : %a", var.current_player.hand_state)
 
 									if give_help :
-										#logging.debug("litte help")
 
 										if STEP == 6 :
-											#logging.debug("STEP 6")
 
 											letters_s = var.current_player.hand.findByName('S')
 											if letters_s != [] :
-												#logging.debug("S in hand")
+
 												first_letter_s = letters_s[0]
 												s_index = var.current_player.hand_state.index(first_letter_s.id)
 												#reshuffle
@@ -3899,30 +4104,26 @@ while game_is_running:
 											letters_e = var.current_player.hand.findByName('E')
 											if letters_e != [] :
 
-												#logging.debug("E in hand")
 												first_letter_e = letters_e[0]
 												e_index = var.current_player.hand_state.index(first_letter_e.id)
 												#reshuffle
 												var.current_player.hand_state[6], var.current_player.hand_state[e_index] = var.current_player.hand_state[e_index], var.current_player.hand_state[6]
 
 											if more_help :
-												#logging.debug("MORE HELP")
 
 												letters_c = var.current_player.hand.findByName('C')
 												if letters_c != [] :
 
-													#logging.debug("C in hand")
 													first_letter_c = letters_c[0]
 													c_index = var.current_player.hand_state.index(first_letter_c.id)
 													#reshuffle
-													var.current_player.hand_state[6], var.current_player.hand_state[c_index] = var.current_player.hand_state[c_index], var.current_player.hand_state[6]
+													var.current_player.hand_state[1], var.current_player.hand_state[c_index] = var.current_player.hand_state[c_index], var.current_player.hand_state[1]
 
 
 										elif STEP == 9 :
 
 											letters_a = var.current_player.hand.findByName('A')
 											if letters_a != [] :
-												#logging.debug("A in hand")
 												first_letter_a = letters_a[0]
 												a_index = var.current_player.hand_state.index(first_letter_a.id)
 												#reshuffle
@@ -3931,25 +4132,21 @@ while game_is_running:
 											letters_r = var.current_player.hand.findByName('R')
 											if letters_r != [] :
 
-												#logging.debug("R in hand")
 												first_letter_r = letters_r[0]
 												r_index = var.current_player.hand_state.index(first_letter_r.id)
 												#reshuffle
 												var.current_player.hand_state[5], var.current_player.hand_state[r_index] = var.current_player.hand_state[r_index], var.current_player.hand_state[5]
 
 											if more_help :
-												#logging.debug("MORE HELP")
 
 												letters_v = var.current_player.hand.findByName('V')
 												if letters_v != [] :
 
-													#logging.debug("V in hand")
 													first_letter_v = letters_v[0]
 													v_index = var.current_player.hand_state.index(first_letter_v.id)
 													#reshuffle
 													var.current_player.hand_state[1], var.current_player.hand_state[v_index] = var.current_player.hand_state[v_index], var.current_player.hand_state[1]
 
-									#logging.debug("NEW hand state : %a", var.current_player.hand_state)
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
@@ -4000,62 +4197,106 @@ while game_is_running:
 								selected_letter = layers.selected_letter.sprites()[0]
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery 
 
-								#------ CLIC ON THE HAND HOLDER ? -------
+								#------ PRESS LEFT CLIC ON THE HAND HOLDER ? -------
 								for hand_holder in layers.hand_holder :
 
 									move_my_letter = False
+									move_letters = False
+									push_direction = 0
+									visited_letters = []
 
 									if hand_holder.collide(letter_center_x, letter_center_y) :
 
 										index_in_hand = hand_holder.indexAtPos(letter_center_x)
+										logging.debug("INITIAL index_in_hand : %i", index_in_hand)
 										delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
-											logging.debug("empty slot")
 
 											move_my_letter = True
-											logging.debug("please move")
+											logging.debug("please move my letter")
 
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
 
-											if var.allow_fast_shuffle :
+											if var.enable_switch_letters :
 
 												letter_id = var.current_player.hand_state[index_in_hand]
 												old_letter = var.current_player.hand.findByIndex(letter_id)
 
 												offset_x = selected_letter.rect.centerx - old_letter.rect.centerx
 												if offset_x >= 0 : #want to push to the left
-													direction = -1
+													push_direction = -1
 												else :
-													direction = +1
+													push_direction = +1
 
-												if old_letter.canMove(direction) : #no need to push other letters
+												go_on = True
+												new_index = index_in_hand
+												logging.debug("Try to PUSH")
+												while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
 
-													old_letter.moveAtTile( delta_x + index_in_hand + direction, delta_y )
-													var.current_player.hand_state[index_in_hand+direction] = old_letter.id
-													var.current_player.hand_state[index_in_hand] = 0
+													blocking_letter_id = var.current_player.hand_state[new_index]
+													blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
 
-													move_my_letter = True
-
-
-												else : #need to push
-													#try backward
-													if old_letter.canMove(-direction) :
-
-														old_letter.moveAtTile( delta_x + index_in_hand - direction, delta_y )
-														var.current_player.hand_state[index_in_hand-direction] = old_letter.id
-														var.current_player.hand_state[index_in_hand] = 0
-
+													if blocking_letter.canMove(push_direction) :
+														logging.debug("CAN MOVE")
+														move_letters = True
 														move_my_letter = True
+														go_on = False
 													else :
-														pass
+														new_index = new_index + push_direction
+														logging.debug("new_index : %i", new_index)
 
+													visited_letters.append(blocking_letter)
+
+													logging.debug("visited letters :")
+													for letter in visited_letters :
+														letter.info()
+
+
+												if move_letters != True :
+
+													push_direction = - push_direction
+													visited_letters = []
+
+													go_on = True
+													new_index = index_in_hand
+													while go_on and new_index >= 0 and new_index < len(var.current_player.hand_state) :
+
+														logging.debug("new index : %i", new_index)
+
+														blocking_letter_id = var.current_player.hand_state[new_index]
+														blocking_letter = var.current_player.hand.findByIndex(blocking_letter_id)
+
+														if blocking_letter.canMove(push_direction) :
+															move_letters = True
+															move_my_letter = True
+															go_on = False
+														else :
+															new_index = new_index + push_direction
+
+														visited_letters.append(blocking_letter)
+
+
+										if move_letters == True :	
+											logging.debug("moving THE LETTERS")
+											logging.debug("visited letters :")
+											for letter in visited_letters :
+												letter.info()
+
+											new_index = new_index + push_direction
+											for letter in reversed(visited_letters) :
+
+												letter.moveAtTile( delta_x + new_index, delta_y )
+												var.current_player.hand_state[new_index] = letter.id
+												var.current_player.hand_state[new_index-push_direction] = 0
+
+												new_index = new_index - push_direction
 
 										if move_my_letter == True :
-											logging.debug("MOVING")
-										
+											logging.debug("moving your letter")
+											logging.debug("")
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
 
@@ -4080,12 +4321,15 @@ while game_is_running:
 											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
 
-
+											
 								#------ CLIC ON A TILE ON THE BOARD ? -------
 								for tile in layers.tiles :
 
 									if tile.collide(letter_center_x, letter_center_y) == True :
+
+										logging.debug("Tile center pos : %i, %i", tile.rect.centerx, tile.rect.centery)
 
 										tile_x_on_board = int( tile.pos_x - DELTA )
 										tile_y_on_board = int( tile.pos_y - DELTA )
@@ -4104,10 +4348,14 @@ while game_is_running:
 											layers.selected_letter.clear(window, var.current_background)	
 											layers.letters_just_played.draw(window)
 
+
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
 												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)								
+												ui_text.drawText(STEP)
+
+											#TODO REFRESH TEXT
+											var.current_background = window.copy()
 
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
@@ -4115,6 +4363,7 @@ while game_is_running:
 											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
+											refreshScreen()
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
@@ -4242,11 +4491,11 @@ while game_is_running:
 	#logging.debug('fps : %s', str(fps_clock.get_fps() ) )
 
 	if MUST_DIPSLAY_POP_UP :
-		if FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
-			FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
+		if var.FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
+			var.FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
 		else :
 			MUST_DIPSLAY_POP_UP = False
-			FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
+			var.FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 			layers.pop_up.empty()
 			#force update of  mouse pointer
 			pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
