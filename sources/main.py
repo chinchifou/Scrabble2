@@ -71,17 +71,11 @@ UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
 
-global PLAYERS, STEP, MAPING_STEP_MAX_SCORE
+global PLAYERS, TURN
 #all players
 PLAYERS = []
 # Turn number
-STEP = 0
-#for a step give the corresponding max number of points
-MAPING_STEP_MAX_SCORE = {
-3 : 16,
-6 : 34,
-9: 26
-}
+TURN = 0
 
 global CURSOR_IS_OPEN_HAND
 CURSOR_IS_OPEN_HAND = False
@@ -239,8 +233,7 @@ class LineHeights():
 		self.NORMAL = 0.6		
 		#size for small pop up
 		self.POP_UP = 0.5
-		#size for the progress bar text
-		self.PROGRESS_BAR = 0.46
+
 
 LINE_HEIGHT = LineHeights()
 
@@ -263,7 +256,6 @@ class Layer():
 		self.pop_up_window = GroupOfSprites()
 		self.pop_up_score = GroupOfSprites()
 
-		self.progress_bar = GroupOfSprites()
 		self.mask_text = GroupOfSprites()
 
 		self.pop_up = GroupOfSprites()
@@ -485,6 +477,8 @@ class UITextPrinter():
 def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 4000):
 
 	# ___ Init ___
+	pygame.mouse.set_cursor(*arrow) 
+
 	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time / 20.0)
 
 	nb_lignes = len(ar_texts)
@@ -1067,13 +1061,14 @@ def calculatePoints(layer_letters_played) :
 		#___ INITIALISATION ___
 		words_and_scores = []
 		all_x, all_y = [], []
+		is_valid_move = True
 
 		for tuple_pos in letters_played.keys() :
 			all_x.append(tuple_pos[0])
 			all_y.append(tuple_pos[1])
 
-		min_x, max_x, delta_x = min(all_x), max(all_x), min(all_x)-max(all_x)
-		min_y, max_y, delta_y = min(all_y), max(all_y), min(all_y)-max(all_y)
+		min_x, max_x, delta_x = min(all_x), max(all_x), max(all_x)-min(all_x)
+		min_y, max_y, delta_y = min(all_y), max(all_y), max(all_y)-min(all_y)
 
 
 		#___ ERROR CHECKING ___	
@@ -1081,7 +1076,8 @@ def calculatePoints(layer_letters_played) :
 		if (delta_x != 0 and delta_y != 0) :
 			#TODO display error message
 			logging.debug("played in diagonal")
-			return []
+			is_valid_move = False
+			return[]
 
 
 		#___ VERTICAL WORD PLAYED ___
@@ -1101,119 +1097,123 @@ def calculatePoints(layer_letters_played) :
 			#away from older letters (above or below)
 			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
 				logging.debug("not played close to another word")
+				if len(layer_letters_played) > 0 :
+					is_valid_move = False
 
-
-			if (delta_y+1 != len(letters_played) ) :
+			if (delta_y+1 > len(letters_played) ) :
 				logging.debug("there is a hole between letters played")
 				#browse all letters
 				it_y = start_y
 				while( ( (it_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[it_y + 1][min_x] != '?') ) :
+					#TODO - search left and right
 					it_y = it_y + 1
 				if ( (it_y-start_y) != (end_y-start_y) ) :
-					logging.debug("there is a hole between letters played - even using old letters")
-					return []
-				"""
-				logging.debug("min_y : %i, max_y : %i, start_y : %i, end_y : %i", min_y, max_y, start_y, end_y)
+					logging.debug("there is a hole between letters played - even using old letters in vertical")
+					is_valid_move = False
 
-				if not ( (end_y - start_y == max_y - start_y) or (end_y - start_y == end_y - min_y) ):
-					logging.debug("there is a hole in the word - even using old letters")
-					return []
-				"""
 
-			#___ SCRABBLE ___
-			if len(letters_played) == 7 : #is a SCRABBLE ?
+			#----- VALID MOVE -----
+			if is_valid_move :
 
-				#TODO do not add a scrabble if invalid move
-				words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
-				SOUNDS.victory.play()
-		
+				#___ SCRABBLE ___
+				if len(letters_played) == 7 : #is a SCRABBLE ?
 
-			#TODO : do not allow one letter in first turn
-			# prevent one letter word
-			if ( end_y > start_y ) : 
+					#TODO do not add a scrabble if invalid move
+					words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+					SOUNDS.victory.play()
+			
 
-				logging.debug('VERTICAL WORD')
-				new_word, new_word_multiplier, new_word_score = '', 1, 0
+				#TODO : do not allow one letter in first turn
+				# prevent one letter word
+				if ( end_y > start_y ) : 
 
-				#___ FIRST PASSAGE : calculate points for word just created ___
+					logging.debug('VERTICAL WORD')
+					new_word, new_word_multiplier, new_word_score = '', 1, 0
+
+					#___ FIRST PASSAGE : calculate points for word just created ___
+					for it_y in range( start_y, end_y+1 ) :
+
+						letter = var.current_board_state[it_y][min_x]
+						new_word += letter
+
+						#letters just played
+						if ((min_x, it_y) in letters_played ): 
+
+							# get corresponding multipliers for this tile
+							bonus = rules.BOARD_LAYOUT[it_y][min_x]
+							tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
+
+							# increment score and calculate the global multipier
+							new_word_score += POINTS_FOR[letter] * tile_letter_multiplier
+							new_word_multiplier *= tile_word_multiplier
+
+						# letters already on board
+						else : 
+							old_letter_points = POINTS_FOR[letter]
+							new_word_score = new_word_score + old_letter_points
+							
+					# total score for this word		
+					new_word_score = new_word_score * new_word_multiplier
+					words_and_scores.append([new_word, new_word_score])
+
+
+				#___ SECOND PASSAGE : calculate points for words already on board and completed by the new word ___
 				for it_y in range( start_y, end_y+1 ) :
 
-					letter = var.current_board_state[it_y][min_x]
-					new_word += letter
+					#check for old words complete by this new played word
+					it_x = min_x
+					if (it_x, it_y) in (letters_played) : #prevent to count already existing words
 
-					#letters just played
-					if ((min_x, it_y) in letters_played ): 
+						condition_1 = ( (it_x - 1) >= 0 ) and ( var.current_board_state[it_y][it_x-1] != '?' )
+						condition_2 = ( (it_x + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y][it_x+1] != '?' ) 
 
-						# get corresponding multipliers for this tile
-						bonus = rules.BOARD_LAYOUT[it_y][min_x]
-						tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
+						if ( condition_1  or condition_2 ) :       
+							logging.debug('HORIZONTAL WORD')
 
-						# increment score and calculate the global multipier
-						new_word_score += POINTS_FOR[letter] * tile_letter_multiplier
-						new_word_multiplier *= tile_word_multiplier
+							#___ PREPARE ITERATION : go to the begining of the word ___
+							while( ( (it_x - 1) >= 0) and (var.current_board_state[it_y][it_x-1] != '?') ) : 
+								it_x = it_x - 1
 
-					# letters already on board
-					else : 
-						old_letter_points = POINTS_FOR[letter]
-						new_word_score = new_word_score + old_letter_points
-						
-				# total score for this word		
-				new_word_score = new_word_score * new_word_multiplier
-				words_and_scores.append([new_word, new_word_score])
+							old_word, old_word_score, old_word_multiplier = '', 0, 1
+							#___ ITERATE ON THE LETTER OF THE WORD (go to the end of the word) ___
+							while( ( (it_x) <= TILES_PER_LINE-1) and (var.current_board_state[it_y][it_x] != '?') ) :
 
+								old_letter = var.current_board_state[it_y][it_x]
+								old_word += old_letter
 
-			#___ SECOND PASSAGE : calculate points for words already on board and completed by the new word ___
-			for it_y in range( start_y, end_y+1 ) :
+								#letters just played
+								if (it_x, it_y) in (letters_played) :
 
-				#check for old words complete by this new played word
-				it_x = min_x
-				if (it_x, it_y) in (letters_played) : #prevent to count already existing words
+									# get corresponding multipliers for this tile
+									bonus = rules.BOARD_LAYOUT[it_y][it_x]
+									tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
 
-					condition_1 = ( (it_x - 1) >= 0 ) and ( var.current_board_state[it_y][it_x-1] != '?' )
-					condition_2 = ( (it_x + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y][it_x+1] != '?' ) 
+									# increment score and calculate the global multipier
+									old_word_score += POINTS_FOR[old_letter] * tile_letter_multiplier
+									old_word_multiplier *= tile_word_multiplier
 
-					if ( condition_1  or condition_2 ) :       
-						logging.debug('HORIZONTAL WORD')
+								else :
+									old_word_score += POINTS_FOR[old_letter]
 
-						#___ PREPARE ITERATION : go to the begining of the word ___
-						while( ( (it_x - 1) >= 0) and (var.current_board_state[it_y][it_x-1] != '?') ) : 
-							it_x = it_x - 1
+								it_x = it_x + 1
 
-						old_word, old_word_score, old_word_multiplier = '', 0, 1
-						#___ ITERATE ON THE LETTER OF THE WORD (go to the end of the word) ___
-						while( ( (it_x) <= TILES_PER_LINE-1) and (var.current_board_state[it_y][it_x] != '?') ) :
+							old_word_score = old_word_score * old_word_multiplier
+							words_and_scores.append([old_word, old_word_score])
 
-							old_letter = var.current_board_state[it_y][it_x]
-							old_word += old_letter
+				total_score = 0 
 
-							#letters just played
-							if (it_x, it_y) in (letters_played) :
+				for association in words_and_scores :
+					logging.info('Word %s gives %i points', association[0], association[1])
+					total_score += association[1]
+				
+				logging.info('total_score : %i', total_score)
+				logging.info('')
+				return words_and_scores 
 
-								# get corresponding multipliers for this tile
-								bonus = rules.BOARD_LAYOUT[it_y][it_x]
-								tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
+			#----- INVALID MOVE -----
+			else :
+				return[]
 
-								# increment score and calculate the global multipier
-								old_word_score += POINTS_FOR[old_letter] * tile_letter_multiplier
-								old_word_multiplier *= tile_word_multiplier
-
-							else :
-								old_word_score += POINTS_FOR[old_letter]
-
-							it_x = it_x + 1
-
-						old_word_score = old_word_score * old_word_multiplier
-						words_and_scores.append([old_word, old_word_score])
-
-			total_score = 0 
-
-			for association in words_and_scores :
-				logging.info('Word %s gives %i points', association[0], association[1])
-				total_score += association[1]
-			
-			logging.info('total_score : %i', total_score)
-			logging.info('')
-			return words_and_scores 
 
 		#___ HORIZONTAL WORD PLAYED ___
 		elif delta_y == 0 : 
@@ -1232,105 +1232,112 @@ def calculatePoints(layer_letters_played) :
 			#away from older letters (left or right)
 			if (start_x == min_x and end_x == max_x and len( layers.letters_on_board.sprites() ) > 0):
 				logging.debug("not played close to another word")
+				if len(layer_letters_played) > 0 :
+					is_valid_move = False
 
-
-			if (delta_x+1 != len(letters_played) ) :
+			if (delta_x+1 > len(letters_played) ) :
 				logging.debug("there is a hole between letters played")
 				#browse all letters
 				it_x = start_x
 				while( ( (it_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x + 1] != '?') ) :
+					#TODO - search up and down
 					it_x = it_x + 1
 
 				logging.debug("it_x : %i, start_x : %i, end_x : %i", it_x, start_x, end_x)
 				if ( (it_x-start_x) != (end_x-start_x) ) :
-					logging.debug("there is a hole between letters played - even using old letters")
-					return []
+					logging.debug("there is a hole between letters played - even using old letters in horizontal")
+					is_valid_move = False
+
+			#----- VALID MOVE -----
+			if is_valid_move :
+				#___ SCRABBLE ___
+				if len(letters_played) == 7 : #is a SCRABBLE ?
+
+					#TODO do not add a scrabble if invalid move
+					words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+					SOUNDS.victory.play()
 
 
-			#___ SCRABBLE ___
-			if len(letters_played) == 7 : #is a SCRABBLE ?
+				#TODO : do not allow one letter in first turn
+				#prevent one letter word
+				if ( end_x > start_x ) : 
 
-				#TODO do not add a scrabble if invalid move
-				words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
-				SOUNDS.victory.play()
-			
+					logging.debug('HORIZONTAL WORD')
+					new_word, new_word_multiplier, new_word_score= '', 1, 0
 
-			#TODO : do not allow one letter in first turn
-			#prevent one letter word
-			if ( end_x > start_x ) : 
+					#___ FIRST PASSAGE : calculate points for word just created ___
+					for it_x in range( start_x, end_x+1 ) :
 
-				logging.debug('HORIZONTAL WORD')
-				new_word, new_word_multiplier, new_word_score= '', 1, 0
+						letter = var.current_board_state[min_y][it_x]
+						new_word += letter
 
-				#___ FIRST PASSAGE : calculate points for word just created ___
+						#letters just played
+						if ((it_x, min_y) in letters_played ): 
+
+							# get corresponding multipliers for this tile
+							bonus = rules.BOARD_LAYOUT[min_y][it_x]
+							tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
+
+							# increment score and calculate the global multipier
+							new_word_score += POINTS_FOR[letter] * tile_letter_multiplier
+							new_word_multiplier *= tile_word_multiplier
+
+						# letters already on board
+						else : 
+							old_letter_points = POINTS_FOR[letter]
+							new_word_score = new_word_score + old_letter_points
+							
+					# total score for this word		
+					new_word_score = new_word_score * new_word_multiplier
+					words_and_scores.append([new_word, new_word_score])
+
+
+				#___ SECOND PASSAGE : calculate points for words already on board and completed by the new word ___
 				for it_x in range( start_x, end_x+1 ) :
 
-					letter = var.current_board_state[min_y][it_x]
-					new_word += letter
+					#check for old words complete by this new played word
+					it_y = min_y
+					if (it_x, it_y) in (letters_played) : #prevent to count already existing words
 
-					#letters just played
-					if ((it_x, min_y) in letters_played ): 
+						condition_1 = ( (it_y - 1) >= 0 ) and ( var.current_board_state[it_y-1][it_x] != '?' )
+						condition_2 = ( (it_y + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y+1][it_x] != '?' ) 
 
-						# get corresponding multipliers for this tile
-						bonus = rules.BOARD_LAYOUT[min_y][it_x]
-						tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
+						if ( condition_1  or condition_2 ) :
+							logging.debug('VERTICAL WORD')
 
-						# increment score and calculate the global multipier
-						new_word_score += POINTS_FOR[letter] * tile_letter_multiplier
-						new_word_multiplier *= tile_word_multiplier
+							#___ PREPARE ITERATION : go to the begining of the word ___
+							while( ( (it_y - 1) >= 0) and (var.current_board_state[it_y-1][it_x] != '?') ) : #go to the begining of the word
+								it_y = it_y - 1
 
-					# letters already on board
-					else : 
-						old_letter_points = POINTS_FOR[letter]
-						new_word_score = new_word_score + old_letter_points
-						
-				# total score for this word		
-				new_word_score = new_word_score * new_word_multiplier
-				words_and_scores.append([new_word, new_word_score])
+							old_word, old_word_score, old_word_multiplier= '', 0, 1
+							#___ ITERATE ON THE LETTER OF THE WORD (go to the end of the word) ___
+							while( ( (it_y) <= TILES_PER_LINE-1) and (var.current_board_state[it_y][it_x] != '?') ) :
 
+								old_letter = var.current_board_state[it_y][it_x]
+								old_word += old_letter
 
-			#___ SECOND PASSAGE : calculate points for words already on board and completed by the new word ___
-			for it_x in range( start_x, end_x+1 ) :
+								#letters just played
+								if (it_x, it_y) in (letters_played) :
 
-				#check for old words complete by this new played word
-				it_y = min_y
-				if (it_x, it_y) in (letters_played) : #prevent to count already existing words
+									# get corresponding multipliers for this tile
+									bonus = rules.BOARD_LAYOUT[it_y][it_x]
+									tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
 
-					condition_1 = ( (it_y - 1) >= 0 ) and ( var.current_board_state[it_y-1][it_x] != '?' )
-					condition_2 = ( (it_y + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y+1][it_x] != '?' ) 
+									# increment score and calculate the global multipier
+									old_word_score += POINTS_FOR[old_letter] * tile_letter_multiplier
+									old_word_multiplier *= tile_word_multiplier
 
-					if ( condition_1  or condition_2 ) :
-						logging.debug('VERTICAL WORD')
+								else :
+									old_word_score += POINTS_FOR[old_letter]
+								
+								it_y = it_y + 1
 
-						#___ PREPARE ITERATION : go to the begining of the word ___
-						while( ( (it_y - 1) >= 0) and (var.current_board_state[it_y-1][it_x] != '?') ) : #go to the begining of the word
-							it_y = it_y - 1
+							old_word_score = old_word_score * old_word_multiplier
+							words_and_scores.append([old_word, old_word_score])
 
-						old_word, old_word_score, old_word_multiplier= '', 0, 1
-						#___ ITERATE ON THE LETTER OF THE WORD (go to the end of the word) ___
-						while( ( (it_y) <= TILES_PER_LINE-1) and (var.current_board_state[it_y][it_x] != '?') ) :
-
-							old_letter = var.current_board_state[it_y][it_x]
-							old_word += old_letter
-
-							#letters just played
-							if (it_x, it_y) in (letters_played) :
-
-								# get corresponding multipliers for this tile
-								bonus = rules.BOARD_LAYOUT[it_y][it_x]
-								tile_letter_multiplier, tile_word_multiplier = rules.MULTIPLIERS[bonus][0], rules.MULTIPLIERS[bonus][1]
-
-								# increment score and calculate the global multipier
-								old_word_score += POINTS_FOR[old_letter] * tile_letter_multiplier
-								old_word_multiplier *= tile_word_multiplier
-
-							else :
-								old_word_score += POINTS_FOR[old_letter]
-							
-							it_y = it_y + 1
-
-						old_word_score = old_word_score * old_word_multiplier
-						words_and_scores.append([old_word, old_word_score])
+			#----- INVALID MOVE -----
+			else :
+				return []
 
 			total_score = 0 #TEMP
 
@@ -2123,33 +2130,10 @@ while game_is_running:
 			var.current_player.hand.draw(window)
 			var.current_background_no_text = window.copy()
 
-			progress_bar.draw()
-			if STEP in (3,6,9):
-				ui_text.drawText(STEP)
+			ui_text.drawText()
 			var.current_background = window.copy()
 
 			layers.selected_letter.draw(window)
-
-
-			if var.current_action == "WINDOW_DISPLAYED":
-				layers.dark_filter.draw(window)
-				layers.pop_up_window.draw(window)
-				layers.background_pop_up_empty = window.copy()
-				layers.buttons_on_screen.draw(window)
-				progress_bar.draw()
-				ui_text.drawTextPopUp(STEP)	
-			else :
-				layers.dark_filter.draw(window)
-				layers.pop_up_window.draw(window)
-				layers.background_pop_up_empty = window.copy()
-				window.blit(var.current_background, (0,0))
-
-			# ///// DIRTY PATCH /////
-			if STEP == 0 :
-				layers.background.draw(window)
-				layers.tiles.draw(window)
-				layers.buttons_on_screen.draw(window)
-				layers.letters_on_board.draw(window)
 
 			pygame.display.update()
 			
@@ -2330,7 +2314,6 @@ while game_is_running:
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
 												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)
 
 											var.current_background = window.copy()
 
@@ -2370,7 +2353,6 @@ while game_is_running:
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
 												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)
 
 											#TODO REFRESH TEXT
 											var.current_background = window.copy()
@@ -2408,20 +2390,20 @@ while game_is_running:
 									var.current_player.score += association[1]
 									words.append(association[0])
 
+
 								#------ CHECK IF VALID MOVE ------
-								
 								move_on = True
 
-								#nothing played
-								if ( len( layers.letters_just_played.sprites() ) == 0) :
-									texts = ["Déposer vos lettres sur le plateau pour marquer des points."]
-									move_on = False
-								#played something
-								else :
+								if ( len( layers.letters_just_played.sprites() ) > 0) :
+									#TODO
+
 									if len(words) == 0 :
-										texts =["Ecrivez votre mot verticalement ou horizontalement et sans espace."]
+										#TODO
+										texts =["Coup invalide."]
 										move_on = False
 
+
+								#------ INVALID MOVE -> Display Pop Up ------		
 								if move_on == False :
 									#create pop up
 									layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
@@ -2440,8 +2422,8 @@ while game_is_running:
 									#prepare exit image (displayed when removing pop up)
 									window.blit(snapshot, (0,0))
 								
-								#------ CONINUE ------
 
+								#------ VALID MOVE -> Draw letters and next player ------
 								else :
 
 									#letters
@@ -2478,6 +2460,8 @@ while game_is_running:
 
 									var.current_background_no_text = window.copy()
 									ui_text.drawText()
+
+									TURN += 1
 
 									need_update = True
 
@@ -2625,7 +2609,6 @@ while game_is_running:
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
 												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)
 
 											var.current_background = window.copy()
 
@@ -2661,8 +2644,7 @@ while game_is_running:
 
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
-												layers.mask_text.draw(window)
-												ui_text.drawText(STEP)								
+												layers.mask_text.draw(window)							
 
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
@@ -2755,8 +2737,6 @@ while game_is_running:
 									var.current_player.hand.draw(window)
 									var.current_background_no_text = window.copy()
 
-									progress_bar.draw()
-									ui_text.drawText(STEP)
 									ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
 
 									var.current_background = window.copy()
@@ -2780,9 +2760,6 @@ while game_is_running:
 						layers.letters_just_played.draw(window)
 						var.current_player.hand.draw(window)
 						var.current_background_no_text = window.copy()
-
-						progress_bar.draw()
-						ui_text.drawText(STEP)
 
 						var.current_background = window.copy()
 						layers.selected_letter.draw(window)
