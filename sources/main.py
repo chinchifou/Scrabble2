@@ -340,116 +340,51 @@ class UITextPrinter():
 
 	def __init__(self, ui_content):
 
-		"""		
 		#UI text init
-		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], 1.0, False, ( UI_LEFT_LIMIT, 3*UI_INTERLIGNE) )
+		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2*UI_INTERLIGNE) )
 
 		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1.2+1*UI_INTERLIGNE) )
 
 		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.pos_y+1) )
 
 		if display_next_player_hand :
-			self.scores = UIText(ui_content['scores'][language_id], 1.0, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
+			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
 		else :
-			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+2+UI_INTERLIGNE) )
+			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1+UI_INTERLIGNE) )
 
 		self.player_score = UIText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles) )
 
-		#previous turn summary
-		if False :
-			self.previous_turn_summary = UIText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
+		self.previous_turn_summary = UIText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
 
-		self.word_and_points = UIText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.player_score.bottom_tiles )  )		
+		self.word_and_points = UIText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles )  )		
 
 		self.nothing_played = UIText( ui_content['nothing_played'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE) )
 
-		#Scrabble obtained
-		if False :
-			self.scrabble_obtained = UIText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles) )
+		self.scrabble_obtained = UIText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles) )
 		
-		#remaining letters
-		if False :
-			self.remaining_letters = UIText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+		self.remaining_letters = UIText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 
-			self.remaining_letter = UIText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+		self.remaining_letter = UIText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
 		
-			self.no_remaining_letter = UIText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
-		"""
+		self.no_remaining_letter = UIText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+		
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
 		self.pop_up_displayed = False
 
-		self.double_letter = UserInterFacePopUp( ui_content['double_letter'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
-		self.triple_letter = UserInterFacePopUp( ui_content['triple_letter'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
+		self.double_letter = UserInterFacePopUp( ui_content['double_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
+		self.triple_letter = UserInterFacePopUp( ui_content['triple_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
 
-		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
-		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.NORMAL, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
+		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
+		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
 
-		hand_holder = layers.hand_holder.sprites()[0]
-
-		# ___ UI TEXT init ___
-		self.header = UIText("Marquez le plus de points possible.", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT, hand_holder.pos_y - 1.0) )
-		
-		self.max_score = UIText("Score maximal atteignable : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, hand_holder.pos_y + 1.2 + 1.25 + 1) )	
-
-		self.score_header = UIText("Score prévisionnel : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.max_score.bottom_tiles + 0.75) )
-		self.score = UIText("99", LINE_HEIGHT.SUBTITLE, False, ( UI_LEFT_LIMIT + self.score_header.width, self.score_header.pos_y-0.05) )
-
-		self.texts_suggest_word =[
-		UIText("Mots suggérés : ", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT, self.score.bottom_tiles + 1.5) ),
-		UIText("NAVIR[E] - RAVIN[E] - AV[E]NIR", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_LIMIT + 0.5, self.score.bottom_tiles + 1.5 + 1.25) )
-		]
-
-
-	#Custom UI text
-	def drawText(self, step):
-
-		hand_holder = layers.hand_holder.sprites()[0]
-
-		# ___ DISPLAY ON SCREEN ___
-		#Header
-		text = self.header.font.render( self.header.text, 1, COLOR.WHITE )
-		window.blit(text, (self.header.pos_x_pix, self.header.pos_y_pix))
-
-		pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (hand_holder.pos_y +1.2+1.25+0.5)*var.tile_size) )
-
-		text = self.max_score.font.render( self.max_score.text + str(MAPING_STEP_MAX_SCORE[step]), 1, COLOR.WHITE )
-		window.blit(text, (self.max_score.pos_x_pix, self.max_score.pos_y_pix))
-
-		#Scores header
-		if display_new_score_in_real_time :	
-			text = self.score_header.font.render(self.score_header.text, 1, COLOR.WHITE )
-			window.blit(text, (self.score_header.pos_x_pix, self.score_header.pos_y_pix))
-
-			if var.predicted_score > 0 :
-				self.score.font.set_bold(1)
-				text = self.score.font.render(str(var.predicted_score), 1, COLOR.BLUE_LIGHT )
-				self.score.font.set_bold(0)
-			else :
-				text = self.score.font.render(str(var.predicted_score), 1, COLOR.WHITE )
-			window.blit(text, (self.score.pos_x_pix, self.score.pos_y_pix) )
-
-			pygame.draw.aaline(window, COLOR.GREY_LIGHT, (UI_LEFT_LIMIT*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size), ( (UI_LEFT_LIMIT+hand_holder.width)*var.tile_size, (self.score.bottom_tiles + 0.5)*var.tile_size ) )
-
-		if suggest_word :
-			for text_it in self.texts_suggest_word :
-				window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
-
-
-
-	"""
-	#Draw UI text
-	def drawText(self, *args):
-
-		custom_color = COLOR.WHITE
-		for arg in args:
-			custom_color = arg
+#Draw UI text
+	def drawText(self):
 
 		#Current player hand
 		text = self.current_player_turn.font.render( self.current_player_turn.text.replace('<CURRENT_PLAYER>',var.current_player.name), 1, COLOR.GREY_LIGHT )
-		window.blit(text, (self.current_player_turn.pos_x_pix, self.current_player_turn.pos_y_pix))		
+		window.blit(text, (self.current_player_turn.pos_x_pix, self.current_player_turn.pos_y_pix))
 
-		
 		#display next player hand
 		if display_next_player_hand :
 			#Next player hand header
@@ -469,309 +404,71 @@ class UITextPrinter():
 			window.blit(text, (self.next_player_hand.pos_x_pix, self.next_player_hand.pos_y_pix))
 
 		#Scores header
-		if display_new_score_in_real_time :
-			text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
-			window.blit(text, (self.scores.pos_x_pix, self.scores.pos_y_pix))		
+		text = self.scores.font.render( self.scores.text, 1, COLOR.GREY_LIGHT )
+		window.blit(text, (self.scores.pos_x_pix, self.scores.pos_y_pix))
 
-			#text = self.player_score.font.render( self.player_score.text.replace('<SCORE>', str(var.current_player.score) ), 1, COLOR.GREY_LIGHT )
-			#window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix))
-
-			#score of each player
-			pos_y_delta = 0
-			for player in PLAYERS :
-				if ( player == var.current_player ) :
-					self.player_score.font.set_bold(1)
-					if var.predicted_score == 0 : #move does not give points
-						text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, custom_color )
-					else :
-						text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, custom_color )
-					self.player_score.font.set_bold(0)
-					window.blit(text, (self.player_score.pos_x_pix+(( pos_y_delta+0.2)*var.tile_size), self.player_score.pos_y_pix+(( pos_y_delta+0.4)*var.tile_size) ) )
+		#score of each player
+		pos_y_delta = 0
+		for player in PLAYERS :
+			if ( player == var.current_player ) :
+				self.player_score.font.set_bold(1)
+				if var.predicted_score == 0 : #move does not give points
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.BLUE_SUPER_LIGHT )
 				else :
-					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
-					window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+(pos_y_delta*var.tile_size) ) )
-				pos_y_delta += 0.8
+					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, COLOR.BLUE_SUPER_LIGHT )
+				self.player_score.font.set_bold(0)
+				window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+(pos_y_delta*var.tile_size) ) )
+			else :
+				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
+				window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+(pos_y_delta*var.tile_size) ) )
+			pos_y_delta += 0.8
 
 		#previous turn summary
-		if False :
-			if len(var.last_words_and_scores) > 0 :
+		if len(var.last_words_and_scores) > 0 :
 
-				#header
-				text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
-				window.blit(text, (self.previous_turn_summary.pos_x_pix, self.previous_turn_summary.pos_y_pix))
+			#header
+			text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
+			window.blit(text, (self.previous_turn_summary.pos_x_pix, self.previous_turn_summary.pos_y_pix))
 
-				pos_y_delta = 0
-				for association in var.last_words_and_scores :
-					if association[0] == "!! SCRABBLE !!" :
-						text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
-						window.blit(text, (self.scrabble_obtained.pos_x_pix, self.scrabble_obtained.pos_y_pix+(pos_y_delta*var.tile_size)))
-					else :		
-						text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY_LIGHT )
-						window.blit(text, (self.word_and_points.pos_x_pix, self.word_and_points.pos_y_pix+(pos_y_delta*var.tile_size)))
-					pos_y_delta += 0.8
-
-			else :
-				#nothing played
-				text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
-				window.blit(text, (self.nothing_played.pos_x_pix, self.nothing_played.pos_y_pix) )
-
-		#remaining_letters
-		if False :
-
-			if len(var.bag_of_letters) == 0 :
-				text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY_LIGHT )
-					
-				if len(var.last_words_and_scores) > 0 :
-					window.blit(text, (self.no_remaining_letter.pos_x_pix, self.no_remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-				else :
-					window.blit(text, (self.no_remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
-
-			elif len(var.bag_of_letters) == 1 :
-				text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY_LIGHT )
-					
-				if len(var.last_words_and_scores) > 0 :
-					window.blit(text, (self.remaining_letter.pos_x_pix, self.remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-				else :
-					window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
-
-			else :
-				text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY_LIGHT )
-
-				if len(var.last_words_and_scores) > 0 :
-					window.blit(text, (self.remaining_letters.pos_x_pix, self.remaining_letters.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-				else :
-					window.blit(text, (self.remaining_letters.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
-			"""
-
-
-	def drawTextPopUp(self, step):
-
-		pop_up_window = layers.pop_up_window.sprites()[0]
-		limit_left = tiles1( pop_up_window.rect.left )
-		limit_top = tiles1( pop_up_window.rect.top )
-
-		if step == 1 :
-			all_texts = [
-			UIText( "Bonjour !", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
-			UIText( "Je suis votre ergonome virtuelle.", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+4) ),
-			UIText( "Pouvez-vous m'aider à améliorer ce logiciel ?", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+6) )
-			]
-			"""
-			buble_points = [
-			pixels(2.5, 2.5),
-			pixels(23.5, 2.5),
-			pixels(23.5, 10.5),
-			pixels(24.5, 11.25), <-Mouse
-			pixels(23.5, 11.1),
-			pixels(23.5, 14),
-			pixels(2.5, 14)
-			]
-			"""
-			buble_points = [
-			pixels(2.5, 3.5),
-			pixels(23.5, 3.5),
-			pixels(23.5, 7.5),
-			pixels(24.5, 10.25),
-			pixels(23.5, 8.5),
-			pixels(23.5, 9.5),
-			pixels(2.5, 9.5)
-			]		
-
-		elif step == 2 :
-			all_texts = [
-			UIText( "Votre objectif :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+2) ),
-			UIText( "Marquer le plus de points possibles en plaçant un mot", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+3.5) ),
-			UIText( "sur le plateau.", LINE_HEIGHT.TITLE, False, (limit_top+1, limit_top+4.5) ),
-			UIText( "Astuce :", LINE_HEIGHT.TITLE, True, (limit_left+1, limit_top+6.5) ),
-			UIText( "Les cases bonus rapportent plus de points.", LINE_HEIGHT.TITLE, False, (limit_left+1, limit_top+8) )
-			]
-			buble_points = [
-			pixels(2.5, 3.5),
-			pixels(23.5, 3.5),
-			pixels(23.5, 8.5),
-			pixels(24.5, 10.25),
-			pixels(23.5, 9.1),
-			pixels(23.5, 11.5),
-			pixels(2.5, 11.5)
-			]
-
-		elif step == 4 :
-			all_texts = [
-			UIText( "Alors, comment cela vous a t'il paru ? Je pense que l'on peut faire mieux ...", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+0.5) ),
-			UIText( "Aidez moi à améliorer l'ergonomie de ce logiciel en répondant à ces questions.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+1.5) ),
-			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+0.75, limit_top+7.25) ),			
-			UIText( "Normal", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+4+0.6, limit_top+7.25) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+8+0.5, limit_top+7.25) ),
-
-
-			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8.25) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+9.75) ),
-			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+11.25) )
-			]
-			buble_points = [
-			pixels(2.25, 2.25),
-			pixels(23.5, 2.25),
-			pixels(23.5, 8.5),
-			pixels(24.5, 10.25),
-			pixels(23.5, 9.1),
-			pixels(23.5, 14.3),
-			pixels(2.25, 14.3)
-			]
-		elif step == 5 :
-			all_texts = [
-			UIText( "J'ai pris en compte vos remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1.5) ),
-			UIText( "Voici une nouvelle version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_left+1, limit_top+2.5) ),
-			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4.5) ),
-			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.5) ),
-			UIText( "> Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+6.75) ),
-			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
-			UIText( "> Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+9.5) )
-			]
-			buble_points = [
-			pixels(2.5, 3.25),
-			pixels(23.5, 3.25),
-			pixels(23.5, 8.5),
-			pixels(24.5, 10.25),
-			pixels(23.5, 9.1),
-			pixels(23.5, 12.5),
-			pixels(2.5, 12.5)
-			]
-		elif step == 7 :
-			all_texts = [
-			UIText( "Alors, comment vous a paru cette nouvelle version ?", LINE_HEIGHT.NORMAL, True, (limit_top+1, limit_top+1.5) ),
-			UIText( "Marquer des points vous a paru :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-
-			UIText( "Facile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+0.75, limit_top+7.25) ),			
-			UIText( "Normal", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+4+0.6, limit_top+7.25) ),
-			UIText( "Difficile", LINE_HEIGHT.NORMAL, False, (limit_left+2.75+8+0.5, limit_top+7.25) ),
-
-			UIText( "Cochez ce qui vous a posé problème :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+8) ),
-			UIText( "Réussir à composer un mot", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+9.25) ),
-			UIText( "Marquer le plus de points possible", LINE_HEIGHT.NORMAL, False, (limit_left+2.75, limit_top+10.75) )
-			]
-			buble_points = [
-			pixels(2.25, 3.25),
-			pixels(23.5, 3.25),
-			pixels(23.5, 8.5),
-			pixels(24.5, 10.25),
-			pixels(23.5, 9.1),
-			pixels(23.5, 14),
-			pixels(2.25, 14)
-			]
-		elif step == 8 :
-			"""
-			all_texts = [
-			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+0.5) ),
-			UIText( "Voici une dernière version dans laquelle j'ai apporté quelques améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+1.5) ),
-			UIText( "Améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+3) ),
-			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+4.25) ),
-			UIText( "Pouvoir réorganiser mes lettres", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+5.75) ),
-			UIText( "Me proposer des mots possibles", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+7.25) ),
-			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.75) ),
-			UIText( "Afficher l'effet des cases bonus au survol", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+10.25) ),
-			UIText( "Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4.25, limit_top+11.5) )
-			]
-			"""
-			all_texts = [
-			UIText( "J'ai pris en compte ces nouvelles remarques.", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+1.5) ),
-			UIText( "Voici une dernière version dans laquelle j'ai apporté de nouvelles améliorations.", LINE_HEIGHT.NORMAL, False, (limit_top+1, limit_top+2.5) ),
-			UIText( "Nouvelles améliorations :", LINE_HEIGHT.NORMAL, True, (limit_left+1, limit_top+4) ),
-			UIText( "Pour composer un mot :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+5.25) ),
-			UIText( "> Me proposer des mots possibles", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+6.75) ),
-			UIText( "Pour marquer le plus de points possible :", LINE_HEIGHT.NORMAL, False, (limit_left+2, limit_top+8.25) ),
-			UIText( "> Afficher mon score en temps réel", LINE_HEIGHT.NORMAL, False, (limit_left+4, limit_top+9.75) )
-			]
-			buble_points = [
-			pixels(2.5, 3.25),
-			pixels(23.5, 3.25),
-			pixels(23.5, 8.5),
-			pixels(24.5, 10.25),
-			pixels(23.5, 9.1),
-			pixels(23.5, 13.3),
-			pixels(2.5, 13.3)
-			]
-		elif step == 10 :			
-			all_texts = [
-			UIText( "Notre travail est maintenant terminé.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+4) ),
-			UIText( "Ensemble nous avons améliorer l'ergonomie de ce logiciel.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+6) ),
-			UIText( "Merci de votre participation !", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+7) ),
-			UIText( "Un récapitulatif concernant l'ergonomie vous attend à la page suivante.", LINE_HEIGHT.SUBTITLE, False, (limit_left+1, limit_top+9) )
-			]
-			buble_points = [
-			pixels(2.5, 5.5),
-			pixels(23.5, 5.5),
-			pixels(23.5, 10.5),
-			pixels(24.5, 11.25),
-			pixels(23.5, 11.1),
-			pixels(23.5, 12.25),
-			pixels(2.5, 12.25)
-			]
-		elif step == 11 :
-			"""
-			custom_height = 0.65
-			all_texts = [
-			UIText( "Comme nous venons de le voir, l'ergonomie c'est :", custom_height, False, (limit_left+1, limit_top+1) ),
-			UIText( "> Ecouter et observer l'utilisateur pour cerner son besoin", custom_height, False, (limit_left+2, limit_top+2.75) ),
-			UIText( "> Une science avec des méthodes pour concevoir et améliorer le logiciel", custom_height, False, (limit_left+2, limit_top+4) ),
-			UIText( "> Recommencer et améliorer jusqu'à satisfaire l'utilisateur", custom_height, False, (limit_left+2, limit_top+5.25) ),
-			UIText( "En fait, l'ergonomie c'est l'avenir !", custom_height, False, (limit_left+1, limit_left+7.5) ),
-			UIText( "Apprenez-en plus en regardant notre vidéo de présentation.", custom_height, False, (limit_left+1, limit_top+9) ),
-			UIText( "A bientôt !", custom_height, True, (limit_left+12.25, limit_top+11) ),
-			]
-			"""
-			all_texts=[]
-			buble_points = [
-			pixels(2.5, 2.5),
-			pixels(23.5, 2.5),
-			pixels(23.5, 10.5),
-			pixels(24.5, 11.25),
-			pixels(23.5, 11.1),
-			pixels(23.5, 14),
-			pixels(2.5, 14)
-			]		
-			
-		for text_it in all_texts :
-			window.blit( text_it.font.render(text_it.text, 1, COLOR.WHITE), (text_it.pos_x_pix, text_it.pos_y_pix) )
-		
-		pygame.draw.aalines( window, COLOR.GREY_LIGHT, True, buble_points, 1 )	
-
-	"""
-	def drawPopUpScore2(self, word):
-
-		if len(word) > 0 :
-			text = "Vous avez marqué "+str(var.current_player.score)+" points."
-			ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
+			pos_y_delta = 0
+			for association in var.last_words_and_scores :
+				if association[0] == "!! SCRABBLE !!" :
+					text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
+					window.blit(text, (self.scrabble_obtained.pos_x_pix, self.scrabble_obtained.pos_y_pix+(pos_y_delta*var.tile_size)))
+				else :		
+					text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY_LIGHT )
+					window.blit(text, (self.word_and_points.pos_x_pix, self.word_and_points.pos_y_pix+(pos_y_delta*var.tile_size)))
+				pos_y_delta += 0.8
 
 		else :
-			if ( len( layers.letters_just_played.sprites() ) > 0) :
-				text = "Vous n'avez pas marqué de points."
-				ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
+			#nothing played
+			text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
+			window.blit(text, (self.nothing_played.pos_x_pix, self.nothing_played.pos_y_pix) )
+
+		if len(var.bag_of_letters) == 0 :
+			text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY_LIGHT )
+				
+			if len(var.last_words_and_scores) > 0 :
+				window.blit(text, (self.no_remaining_letter.pos_x_pix, self.no_remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
 			else :
-				text = "Déposer des lettres sur le plateau pour marquer des points."
-				ui_text = UIText( text, LINE_HEIGHT.SUBTITLE, False, (12, 9) )
+				window.blit(text, (self.no_remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
+		elif len(var.bag_of_letters) == 1 :
+			text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY_LIGHT )
+				
+			if len(var.last_words_and_scores) > 0 :
+				window.blit(text, (self.remaining_letter.pos_x_pix, self.remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+			else :
+				window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
-		ui_text.pos_x = 16 - round(ui_text.width / 2.0)
-		ui_text.pos_y = 8 - round(ui_text.height / 2.0)
-		ui_text.pos_x_pix, ui_text.pos_y_pix = pixels(ui_text.pos_x, ui_text.pos_y)
+		else :
+			text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY_LIGHT )
 
+			if len(var.last_words_and_scores) > 0 :
+				window.blit(text, (self.remaining_letters.pos_x_pix, self.remaining_letters.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+			else :
+				window.blit(text, (self.remaining_letters.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
 
-		layers.pop_up_score.sprites()[0].pos_x = ui_text.pos_x - 1
-		layers.pop_up_score.sprites()[0].pos_y = ui_text.pos_y - 0.5
-
-		layers.pop_up_score.sprites()[0].width = ui_text.width + 2
-		layers.pop_up_score.sprites()[0].height = ui_text.height + 1
-
-		layers.pop_up_score.sprites()[0].resize()
-
-
-		layers.dark_filter.draw(window)
-		layers.pop_up_score.draw(window)
-
-		window.blit( ui_text.font.render(text, 1, COLOR.WHITE), (ui_text.pos_x_pix, ui_text.pos_y_pix) )
-	"""
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
 		if tile.name == 'double_letter' :
@@ -801,7 +498,7 @@ def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, marg
 	to_move_in_the_center = ( position == (0,0) )
 
 
-	# ___ Prevent to go out of the boudary ___
+	# ___ Prevent to go out of the boundaries ___
 	max_nb_letters = 0
 	longest_word = ""
 	for text in ar_texts :
@@ -1196,67 +893,6 @@ class Letter(ResizableSprite):
 		return ( wanted_pos_id == 0 )		
 
 
-##----- Progress Bar -----
-class ProgressBar():
-	def __init__(self, pos_x, pos_y, width, height, nb_state):
-
-		#create progress bar
-		self.progress_bar_bck = UI_Image('progress_bar_background', PATHS.path_background, pos_x, pos_y, width, height)
-		layers.progress_bar.add(self.progress_bar_bck)
-
-		#filling of the progress bar
-		self.progress_bar_filling = UI_Image('progress_bar_tile', PATHS.path_background, pos_x, pos_y, 0, height)
-		layers.progress_bar.add(self.progress_bar_filling)
-
-		#reinit progress bar
-		#self.button_reinit = Button("reinit", pos_x-1.25, pos_y-0.56)
-		#self.button_reinit.width, self.button_reinit.height = height, height
-		#self.button_reinit.resize()
-		#layers.progress_bar.add(self.button_reinit)
-
- 		#diggerent states of the progress bar
-		self.state = 0
-		self.nb_state = nb_state
-		self.ratio_width = width/float(nb_state-1)
-
-	def draw(self):
-
-		layers.progress_bar.draw(window)
-
-		#text = UIText( "Etape : "+str(self.state)+" / "+str(self.nb_state-1), LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-		if self.state in (0,1,2,3,4,5) :
-			text = UIText( "Etape : 1 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-		elif self.state in (6,7,8) :
-			text = UIText( "Etape : 2 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )
-		else :
-			text = UIText( "Etape : 3 / 3", LINE_HEIGHT.PROGRESS_BAR, False, (28.6-7/3.0, 14.4) )	
-		window.blit( text.font.render(text.text, 1, COLOR.GREY_LIGHT), (text.pos_x_pix, text.pos_y_pix) )
-
-		if self.state == 3 :		
-			text2 = UIText( "V : 1.0", LINE_HEIGHT.PROGRESS_BAR, False, (30, 17) )
-		elif self.state == 6 :
-			text2 = UIText( "V : 2.0", LINE_HEIGHT.PROGRESS_BAR, False, (30, 17) )
-		elif self.state == 9 :
-			text2 = UIText( "V : 3.0", LINE_HEIGHT.PROGRESS_BAR, False, (30, 17) )
-
-		if self.state in (3,6,9) :
-			window.blit( text2.font.render(text2.text, 1, COLOR.GREY_LIGHT), (text2.pos_x_pix, text2.pos_y_pix) )
-
-	def fill(self):
-
-		self.state = (self.state+1)%(self.nb_state)
-
-		self.progress_bar_filling.width = self.state * self.ratio_width
-		self.progress_bar_filling.resize()
-
-	def empty(self):
-
-		self.state = 0
-
-		self.progress_bar_filling.width = self.state * self.ratio_width
-		self.progress_bar_filling.resize()
-
-
 #----- Define sprites behavior -----
 
 #set default groups
@@ -1428,15 +1064,6 @@ def calculatePoints(layer_letters_played) :
 	#___ SOMETHING PLAYED ___
 	else :
 
-		#___ SCRABBLE ___
-		if len(letters_played) == 7 : #is a SCRABBLE ?
-			pass
-			"""
-			#TODO do not add a scrabble if invalid move
-			words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
-			SOUNDS.victory.play()
-			"""
-
 		#___ INITIALISATION ___
 		words_and_scores = []
 		all_x, all_y = [], []
@@ -1491,8 +1118,15 @@ def calculatePoints(layer_letters_played) :
 				if not ( (end_y - start_y == max_y - start_y) or (end_y - start_y == end_y - min_y) ):
 					logging.debug("there is a hole in the word - even using old letters")
 					return []
-				"""		
+				"""
 
+			#___ SCRABBLE ___
+			if len(letters_played) == 7 : #is a SCRABBLE ?
+
+				#TODO do not add a scrabble if invalid move
+				words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+				SOUNDS.victory.play()
+		
 
 			#TODO : do not allow one letter in first turn
 			# prevent one letter word
@@ -1611,6 +1245,15 @@ def calculatePoints(layer_letters_played) :
 				if ( (it_x-start_x) != (end_x-start_x) ) :
 					logging.debug("there is a hole between letters played - even using old letters")
 					return []
+
+
+			#___ SCRABBLE ___
+			if len(letters_played) == 7 : #is a SCRABBLE ?
+
+				#TODO do not add a scrabble if invalid move
+				words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+				SOUNDS.victory.play()
+			
 
 			#TODO : do not allow one letter in first turn
 			#prevent one letter word
@@ -1754,9 +1397,6 @@ players_names = config_reader.players
 display_type_of_tile_on_hoovering = game_settings['display_type_of_tile_on_hoovering']
 display_new_score_in_real_time = game_settings['display_new_score_in_real_time']
 
-#dirty
-suggest_word = False
-
 #Letters and points
 if LETTERS_LANGUAGE == 'english' :
 	var.bag_of_letters = rules.letters_english
@@ -1766,6 +1406,8 @@ elif LETTERS_LANGUAGE == 'french':
 	var.bag_of_letters = rules.letters_french
 	POINTS_FOR = rules.points_french
 	PATHS.path_letters = PATHS.path_letters_french
+
+
 
 #Data validation
 forced = ""
@@ -1815,9 +1457,7 @@ if cfg_enable_windows_ten_upscaling == False :
 
 
 game_engine = pygame.init() #init() -> (numpass, numfail)
-"""
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
-"""
 game_is_running = True
 
 
@@ -2190,12 +1830,11 @@ logging.info("GAME STARTED")
 logging.info("-------------------")
 logging.info("")
 
-"""
+
 #----- Load Sounds -----
 SOUNDS = Sounds()
 logging.debug("SOUNDS loaded")
 logging.debug("")
-"""
 
 #----- Window init -----
 
@@ -2218,7 +1857,6 @@ else :
 #Initialize game window
 window = resizeWindow(var.window_width, var.window_height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
-#----- Initializing User Interface texts -----
 
 #----- Create board game -----
 
@@ -2247,46 +1885,6 @@ ui_content = config_reader.h_ui_params
 ui_text = UITextPrinter(ui_content)
 
 
-#~~~~~~ PLAYERS LETTERS ~~~~~~
-
-#tmp_first_hand = ['B','E','S','O','I', 'N']
-#tmp_second_hand = ['S','Y','S','T','E','M','E']
-#tmp_third_hand = ['U','T','I','L','I','S','A']
-#tmp_second_hand = ['S','E','T','E','S','M','Y']
-#tmp_third_hand = ['U','A','S','L','I','T','I']
-
-tmp_first_hand = ['O',0,'S','B',0,'E','N']
-
-tmp_second_hand = ['C','I',0,'C','N','E','S']
-#tmp_second_hand2 = ['S','C',0,'I','N','C','E']
-
-tmp_third_hand = ['N','I','V',0,'A','R']
-#tmp_third_hand2 = ['A','V','I',0,'N','R']
-
-
-start_hand = GroupOfSprites()
-hand_state = []
-pos_x = (UI_LEFT_LIMIT)
-pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
-
-for tmp_letter in tmp_first_hand :
-	if tmp_letter != 0 :
-		letter = Letter(tmp_letter, pos_x, pos_y)
-		start_hand.add(letter)
-		hand_state.append(letter.id)
-	else :
-		hand_state.append(0)
-	pos_x = pos_x+1
-
-
-#~~~~~~ CREATE PLAYER ~~~~~~
-
-PLAYERS.append(Player(players_names[0], 0, start_hand, hand_state))
-
-var.current_player = PLAYERS[0]
-
-'''
-
 #----- Create players -----
 enough_letters = len(players_names)*var.number_of_letters_per_hand < len(var.bag_of_letters)
 
@@ -2300,7 +1898,8 @@ if enough_letters :
 
 		for i in range(var.number_of_letters_per_hand) :
 			if len(var.bag_of_letters) > 0 :
-				letter = Letter(var.bag_of_letters[0], pos_x, pos_y)
+				random_int = randint(0,len(var.bag_of_letters)-1)
+				letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
 				start_hand.add(letter)
 				hand_state.append(letter.id)
 				del(var.bag_of_letters[0])
@@ -2313,11 +1912,10 @@ if enough_letters :
 	var.current_player = PLAYERS[0]
 	var.current_player.info()
 
-
 else :
 	game_is_running = False
 	ERROR.not_enough_letters()
-'''
+
 
 #~~~~~~ CREATE SPRITES ~~~~~~
 
@@ -2343,97 +1941,12 @@ for row in range(0,TILES_PER_LINE) :
 	x_pos = 0 + DELTA
 	y_pos += 1
 
-
-# //////// Add letters on Board ///////////
-
-x, y = 4, 2
-for letter in "METHODES" :
-	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	y += 1
-
-x, y = 3, 4
-for letter in "UTILISATEUR" :
-	if (x, y) != (4,4) :
-		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	x += 1
-
-x, y = 4, 8
-for letter in "ERGONOMIE" :
-	if (x, y) != (4,8) :
-		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	x += 1
-"""
-x, y = 2, 1
-for letter in "CONTEXTE" :
-	layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	y += 1
-
-x, y = 1, 4
-for letter in "UTILISATEUR" :
-	if (x, y) != (2,4) :
-		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	x += 1
-
-x, y = 7, 3
-for letter in "MAQUETTAGE" :
-	if (x, y) != (7,4) :
-		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	y += 1
-
-x, y = 2, 10
-for letter in "EVALUATIONS" :
-	if (x, y) != (7,10) :
-		layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-	x += 1
-"""
 # ------- CREATES BUTTONS --------
 button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 
 button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1)
 
 button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
-
-button_play = Button("play", 32/2.0 + 6, 7.5)
-
-
-# ------- CHECKBOXES --------
-# STEP 4
-"""
-checkbox_facile = Checkbox("checkbox", 3.5, 6 )
-checkbox_moyen = Checkbox("checkbox", 3.5, 7.5 )
-checkbox_difficile = Checkbox("checkbox", 3.5, 9 )
-"""
-checkbox_function_shuffle = Checkbox("checkbox", 3.5, 11.5 )
-checkbox_function_display_bonus = Checkbox("checkbox", 3.5, 13 )
-#checkbox_function_score = Checkbox("checkbox", 3, 16 )
-
-# STEP 5
-checkbox_find_word = Checkbox("checkbox", 5, 8.5 )
-checkbox_bonus_cases = Checkbox("checkbox", 5, 11.25 )
-
-# STEP 7
-#checkbox_facile2 = Checkbox("checkbox", 3.5, 5 )
-#checkbox_moyen2 = Checkbox("checkbox", 3.5, 6.5 )
-#checkbox_difficile2 = Checkbox("checkbox", 3.5, 8 )
-
-checkbox_function_shuffle2 = Checkbox("checkbox", 3.5, 11 )
-checkbox_function_display_bonus2 = Checkbox("checkbox", 3.5, 12.50 )
-#checkbox_function_score2 = Checkbox("checkbox", 3.5, 14 )
-
-#STEP 8
-checkbox_find_word2 = Checkbox("checkbox", 5, 7.5)
-checkbox_suggest_word2 = Checkbox("checkbox", 5, 9)
-
-checkbox_bonus_cases2 = Checkbox("checkbox", 5, 12 )
-checkbox_calculate_score2 = Checkbox("checkbox", 5, 13.25 )
-
-
-# ------- EMOTICOM --------
-happy = Emoticom("happy", 5, 6.5)
-neutral = Emoticom("neutral", 9, 6.5)
-sad = Emoticom("sad", 13, 6.5)
-
-all_emoticoms = [happy, neutral, sad]
 
 
 #create dark_filter
@@ -2445,50 +1958,10 @@ mask_surface = mask_surface.convert_alpha()
 dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface)
 layers.dark_filter.add(dark_filter)
 
-#create window_pop_up
-pop_up_window_surface = pygame.Surface((28*var.tile_size, 14*var.tile_size))
-pop_up_window_surface.fill(COLOR.GREY_DEEP)
-pygame.draw.rect( pop_up_window_surface, COLOR.GREY_LIGHT, pygame.Rect((0, 0), pixels(28, 14, to_round=False)), 3 )
-buble_points = [
-pixels(0.5, 0.5),
-pixels(21.5, 0.5),
-pixels(21.5, 8.6),
-pixels(22.5, 9.25),
-pixels(21.5, 9.1),
-pixels(21.5, 12),
-pixels(0.5, 12)
-]	
-#pygame.draw.aalines( pop_up_window_surface, COLOR.GREY_LIGHT, True, buble_points, 1 )			
-pop_up_window = UI_Surface('pop_up_window', 2, 2, pop_up_window_surface)
-layers.pop_up_window.add(pop_up_window)
-
-#create score window_pop_up
-pop_up_score_surface = pygame.Surface((11*var.tile_size, 3.5*var.tile_size))
-pop_up_score_surface.fill(COLOR.GREY_DEEP)				
-pop_up_score = UI_Surface('score_pop_up', 11, 7.25, pop_up_score_surface)
-layers.pop_up_score.add(pop_up_score)
-
-#create mask for text
-surf_mask_text = pygame.Surface( (ui_text.score.width*var.tile_size, ui_text.score.height*var.tile_size) )
-#logging.debug("Mask surface width : %i, height : %i", round(ui_text.score.width*2*var.tile_size), round(ui_text.score.height*var.tile_size) )
-surf_mask_text.fill(COLOR.GREY_DEEP)				
-mask_text_score = UI_Surface('mask_text_score', ui_text.score.pos_x, ui_text.score.pos_y, surf_mask_text)
-layers.mask_text.add(mask_text_score)
-
-#create avatar
-#ui_avatar = UI_Image('ergonome', PATHS.path_background, 22, 2.84, 6, 6) #Screen 32*18
-#ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 3.84, 5, 5) #Screen 32*18
-ui_avatar = UI_Image('ergonome', PATHS.path_background, 24, 9, 5, 5, tmp_transparent = True) #Screen 32*18
-layers.pop_up_window.add(ui_avatar)
-
-#last screen
-last_screen = UI_Image('last_step', PATHS.path_background, 2.5, 2.75)
-
-#create progress bar
-progress_bar = ProgressBar(28.6-7/3.0, 15, 7/3.0, 1.2/3.0, 12)
 
 # ___ SNAPSHOT FOR LATER EASY REFRESH ___
 layers.buttons_on_screen.add(button_end_turn)
+layers.buttons_on_screen.add(button_shuffle)
 
 layers.background.draw(window)
 layers.tiles.draw(window)
@@ -2504,17 +1977,24 @@ layers.background_pop_up_empty = window.copy()
 
 
 # ___ FIRST IMAGE ___
-layers.buttons_on_screen.remove(button_end_turn)
-layers.buttons_on_screen.add(button_play)
 
-layers.background.draw(window)
-layers.tiles.draw(window)
+if game_is_running :
 
-layers.buttons_on_screen.draw(window)
+	layers.background.draw(window)
+	layers.tiles.draw(window)
+	layers.hand_holder.draw(window)
+	var.background_empty = window.copy()
 
-layers.letters_on_board.draw(window)
-pygame.display.update()
+	layers.buttons_on_screen.draw(window)
+	var.background_no_letter = window.copy()
 
+	var.current_player.hand.draw(window)
+	var.current_background_no_text = window.copy()
+
+	ui_text.drawText()
+	var.current_background = window.copy()
+
+	pygame.display.update()
 
 
 #~~~~~~ MAIN  ~~~~~~
@@ -2544,14 +2024,9 @@ while game_is_running:
 		#~~~~~~ KEY PRESSED - RESTART GAME ~~~~~~			
 		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_SPACE ) :
 			logging.info("SPACE key pressed")
-			STEP = 0
-			progress_bar.empty()
 
-			# Reset conf
-			enable_shuffle_letter = False
-			display_type_of_tile_on_hoovering = False
-			display_new_score_in_real_time = False
-			suggest_word = False
+			#TODO : creatre a real restart !
+
 
 			# Reset Board
 			var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
@@ -2565,36 +2040,6 @@ while game_is_running:
 
 			for letter in var.current_player.hand :
 				letter.kill()
-
-			x, y = 4, 2
-			for letter in "METHODES" :
-				layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-				y += 1
-
-			x, y = 3, 4
-			for letter in "UTILISATEUR" :
-				if (x, y) != (4,4) :
-					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-				x += 1
-
-			x, y = 4, 8
-			for letter in "ERGONOMIE" :
-				if (x, y) != (4,8) :
-					layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-				x += 1
-
-
-			# ___ CHECKBOXES ___
-			checkbox_function_shuffle.empty()
-			checkbox_function_display_bonus.empty()
-			checkbox_find_word.empty()
-			checkbox_bonus_cases.empty()
-			checkbox_function_shuffle2.empty()
-			checkbox_function_display_bonus2.empty()
-			checkbox_find_word2.empty()
-			checkbox_suggest_word2.empty()
-			checkbox_bonus_cases2.empty()
-			checkbox_calculate_score2.empty()
 
 
 			layers.buttons_on_screen.empty()
@@ -2648,7 +2093,6 @@ while game_is_running:
 
 			var.current_action = "SELECT_A_LETTER"		
 			
-
 
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
@@ -2719,670 +2163,7 @@ while game_is_running:
 
 			# //////// WINDOW DISPLAYED ////////
 			elif (var.current_action == "WINDOW_DISPLAYED") :
-
-				need_refresh_buttons_on_screen = False
-
-				#~~~~~~~~~~~ MOUSE BUTTONS ~~~~~~~~~~~
-				if ( ( (event_type == pygame.MOUSEBUTTONDOWN) or (event_type == pygame.MOUSEBUTTONUP) ) and event.button == 1 ) :
-
-
-					#~~~~~~~~~~~ PRESS LEFT CLIC ~~~~~~~~~~~
-					if ( event_type == pygame.MOUSEBUTTONDOWN ) :
-
-						cursor_pos_x, cursor_pos_y = event.pos[0], event.pos[1]
-
-						#------ CLIC ON BUTTONS (VISUAL) -------
-						for button in layers.buttons_on_screen :
-							if button.collide(cursor_pos_x, cursor_pos_y) == True :
-								#change button state
-								button.is_highlighted = False
-								button.push()
-								var.a_button_is_pushed = True
-								need_refresh_buttons_on_screen = True
-
-					#~~~~~~~~~~~ RELEASE LEFT CLIC ~~~~~~~~~~~
-					elif ( event_type == pygame.MOUSEBUTTONUP ) :
-
-						var.a_button_is_pushed = False
-
-						#~~~~~~~~~~~ EMOTICOMS ~~~~~~~~~~~ 
-						if ( (happy.collide(cursor_pos_x, cursor_pos_y) == True) and (happy.is_pushed) ):
-							happy.release()
-
-							if happy.is_selected :
-								if neutral.is_selected :
-									neutral.unselect()
-								if sad.is_selected :
-									sad.unselect()
-								need_refresh_buttons_on_screen = True
-							else :
-								happy.select()
-								if neutral.is_selected :
-									neutral.unselect()
-								if sad.is_selected :
-									sad.unselect()
-								need_refresh_buttons_on_screen = True
-
-						elif ( (neutral.collide(cursor_pos_x, cursor_pos_y) == True) and (neutral.is_pushed) ):
-							neutral.release()
-
-							if neutral.is_selected :
-								if happy.is_selected :
-									happy.unselect()
-								if sad.is_selected :
-									sad.unselect()
-								need_refresh_buttons_on_screen = True
-							else :
-								neutral.select()
-								if happy.is_selected :
-									happy.unselect()
-								if sad.is_selected :
-									sad.unselect()
-								need_refresh_buttons_on_screen = True
-
-
-						elif ( (sad.collide(cursor_pos_x, cursor_pos_y) == True) and (sad.is_pushed) ):
-							sad.release()
-
-							if sad.is_selected :
-								if neutral.is_selected :
-									neutral.unselect()
-								if happy.is_selected :
-									happy.unselect()
-								need_refresh_buttons_on_screen = True
-							else :
-								sad.select()
-								if neutral.is_selected :
-									neutral.unselect()
-								if happy.is_selected :
-									happy.unselect()
-								need_refresh_buttons_on_screen = True
-
-						#~~~~~~~~~~~ BUTTON OK ~~~~~~~~~~~
-						elif ( (button_ok.collide(cursor_pos_x, cursor_pos_y) == True) and (button_ok.is_pushed) ):
-
-							button_ok.release()
-							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
-							layers.buttons_on_screen.draw(window)
-
-							if STEP in (2,5,6) :
-								pygame.mouse.set_cursor(*arrow)
-
-
-							if STEP == 1 :
-
-								# ___ NEXT STEP ___
-								STEP = STEP + 1
-								progress_bar.fill()
-
-								# ___ DRAW WINDOW ___
-								window.blit(var.background_pop_up_empty, (0,0))
-
-								layers.buttons_on_screen.draw(window)
-								progress_bar.draw()
-								ui_text.drawTextPopUp(STEP)
-
-								pygame.display.update()
-
-
-							elif STEP == 4 :
-
-								move_on = True
-								nb_selected = 0
-								for emo in all_emoticoms :
-									if emo.is_selected :
-										nb_selected += 1
-								if nb_selected > 1 :
-									move_on = False
-									pygame.mouse.set_cursor(*arrow)
-
-									#creeate pop up
-									layers.pop_up.add( createPopUp(["Donnez votre avis en cliquant sur un emoticône svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
-
-									# snapshot of before pop_up
-									snapshot = window.copy()
-
-									#display pop_up
-									layers.dark_filter.draw(window)
-									layers.pop_up.draw(window)
-									pygame.display.update()
-
-									MUST_DIPSLAY_POP_UP = True
-
-									#prepare exit image (displayed when removing pop up)
-									window.blit(snapshot, (0,0))
-
-
-								if move_on :
-
-									# ___ CHANGE CONF ___
-									if checkbox_function_shuffle.is_filled :
-										enable_shuffle_letter = True
-										layers.buttons_on_screen.add(button_shuffle)
-									if checkbox_function_display_bonus.is_filled :
-										display_type_of_tile_on_hoovering = True
-
-
-									# ___ RESET ALL BUTTONS ___
-									for button in layers.buttons_on_screen :
-										if button.is_a_checkbox :
-											button.empty()
-										if button.is_an_emoticom :
-											button.select()
-										else :
-											button.turnOffHighlighted()
-
-									# ___ NEXT STEP ___
-									STEP = STEP + 1
-									progress_bar.fill()
-
-									# ___ ADD BUTTONS ___
-									layers.buttons_on_screen.empty()
-									layers.buttons_on_screen.add(button_ok)
-
-									#layers.buttons_on_screen.add(checkbox_find_word)
-									checkbox_find_word.fill()
-									#layers.buttons_on_screen.add(checkbox_bonus_cases)
-									#if display_type_of_tile_on_hoovering :
-									checkbox_bonus_cases.fill()
-
-									# ___ DRAW WINDOW ___
-									window.blit(var.background_pop_up_empty, (0,0))
-
-									layers.buttons_on_screen.draw(window)
-									progress_bar.draw()
-									ui_text.drawTextPopUp(STEP)
-
-									pygame.display.update()
-									#TODO based on selected checkboxes
-
-
-							elif STEP == 7 :
-
-								move_on = True
-								nb_selected = 0
-								for emo in all_emoticoms :
-									if emo.is_selected :
-										nb_selected += 1
-								if nb_selected > 1 :
-									move_on = False
-
-									#creeate pop up
-									layers.pop_up.add( createPopUp(["Donner votre avis en cliquant sur un emoticôme svp."], LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
-
-									# snapshot of before pop_up
-									snapshot = window.copy()
-
-									#display pop_up
-									layers.dark_filter.draw(window)
-									layers.pop_up.draw(window)
-									pygame.display.update()
-
-									MUST_DIPSLAY_POP_UP = True
-
-									#prepare exit image (displayed when removing pop up)
-									window.blit(snapshot, (0,0))
-
-								if move_on :
-
-									STEP = STEP + 1
-									progress_bar.fill()
-
-									# Keep track of choice
-									tmp_enable_shuffle, tmp_display_pop_up, tmp_display_score = False, False, False
-
-									if checkbox_function_shuffle2.is_filled or enable_shuffle_letter :
-										tmp_enable_shuffle = True
-									if checkbox_function_display_bonus2.is_filled or display_type_of_tile_on_hoovering :
-										tmp_display_pop_up = True
-									#if checkbox_function_score2.is_filled :
-									tmp_display_score = True
-									tmp_suggest_word = True
-
-									#TODO NO CHECKBOX
-
-									# ___ RESET ALL BUTTONS ___
-									for button in layers.buttons_on_screen :
-										if button.is_a_checkbox :
-											button.empty()
-										if button.is_an_emoticom :
-											button.select()
-										else :
-											button.turnOffHighlighted()
-
-									layers.buttons_on_screen.empty()
-
-									window.blit(var.background_pop_up_empty, (0,0))
-
-									layers.buttons_on_screen.add(button_ok)
-
-									if tmp_enable_shuffle :
-										checkbox_find_word2.fill()
-										checkbox_find_word2.turnOffHighlighted()
-									if tmp_display_pop_up :
-										checkbox_bonus_cases2.fill()
-										checkbox_bonus_cases2.turnOffHighlighted()
-									if tmp_display_score :
-										checkbox_calculate_score2.fill()
-										checkbox_calculate_score2.turnOffHighlighted()
-									if tmp_suggest_word :
-										checkbox_suggest_word2.fill()
-										checkbox_suggest_word2.turnOffHighlighted()
-
-									layers.buttons_on_screen.draw(window)
-									progress_bar.draw()
-									ui_text.drawTextPopUp(STEP)
-									pygame.display.update()
-									
-
-							elif STEP == 8 :
-
-								"""
-								# settings
-								if checkbox_find_word2.is_filled :
-									enable_shuffle_letter = True
-								if checkbox_bonus_cases2.is_filled :
-									display_type_of_tile_on_hoovering = True
-								if checkbox_calculate_score2.is_filled :
-									display_new_score_in_real_time = True
-								"""
-								# settings
-								enable_shuffle_letter = checkbox_find_word2.is_filled
-								display_type_of_tile_on_hoovering = checkbox_bonus_cases2.is_filled
-
-								display_new_score_in_real_time = checkbox_calculate_score2.is_filled
-								suggest_word = checkbox_suggest_word2.is_filled
-
-								# ___ RESET ALL BUTTONS ___
-								for button in layers.buttons_on_screen :
-									if button.is_a_checkbox :
-										button.empty()
-									if button.is_an_emoticom :
-										button.select()
-									else :
-										button.turnOffHighlighted()
-
-								layers.buttons_on_screen.empty()
-								if enable_shuffle_letter :
-									layers.buttons_on_screen.add(button_shuffle)
-								layers.buttons_on_screen.add(button_end_turn)
-								#layers.buttons_on_screen.add(progress_bar.button_reinit)
-
-								# letters
-								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-								# ___ NEXT TURN ___
-								STEP = STEP + 1
-								progress_bar.fill()
-
-								# new letters
-								x, y = 4, 8
-								for letter in "ERGONOMIE" :
-									var.current_board_state[y][x] = letter
-									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-									x += 1
-
-								pos_x = (UI_LEFT_LIMIT)
-								pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
-								hand_state = []
-								
-								for tmp_letter in tmp_third_hand :
-									if tmp_letter != 0 :
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										start_hand.add(letter)
-										hand_state.append(letter.id)
-									else :
-										hand_state.append(0)
-									pos_x = pos_x+1
-
-								hand_state.append(0)
-								PLAYERS[0].hand_state = hand_state
-
-								# update display
-								layers.background.draw(window)
-								layers.tiles.draw(window)
-								layers.hand_holder.draw(window)
-								layers.buttons_on_screen.draw(window)
-								var.background_no_letter = window.copy()
-
-								layers.letters_on_board.draw(window)
-								layers.letters_just_played.draw(window)
-								var.current_player.hand.draw(window)
-								var.current_background_no_text = window.copy()
-
-								progress_bar.draw()
-								ui_text.drawText(STEP)
-								var.current_background = window.copy()
-
-								layers.selected_letter.draw(window)
-
-								pygame.display.update()
-								var.current_action = "SELECT_A_LETTER"
-
-							elif STEP == 10 :
-
-								STEP = STEP + 1
-								progress_bar.fill()
-
-								window.blit(var.background_pop_up_empty, (0,0))
-
-								layers.buttons_on_screen.draw(window)
-								progress_bar.draw()
-								
-								layers.pop_up.empty()
-								layers.pop_up.add(last_screen)
-								layers.pop_up.draw(window)
-
-								ui_text.drawTextPopUp(STEP)
-								pygame.display.update()
-
-
-							elif STEP == 11 :
-
-								STEP = 0
-								progress_bar.fill()
-
-								# Reset conf
-								enable_shuffle_letter = False
-								display_type_of_tile_on_hoovering = False
-								display_new_score_in_real_time = False
-								suggest_word = False
-
-								# Reset Board
-								var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-								# Reset letters
-								for letter in layers.letters_on_board :
-									letter.kill()
-								
-								for letter in layers.letters_just_played :
-									letter.kill()
-
-								for letter in var.current_player.hand :
-									letter.kill()
-
-								x, y = 4, 2
-								for letter in "METHODES" :
-									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-									y += 1
-
-								x, y = 3, 4
-								for letter in "UTILISATEUR" :
-									if (x, y) != (4,4) :
-										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-									x += 1
-
-								x, y = 4, 8
-								for letter in "ERGONOMIE" :
-									if (x, y) != (4,8) :
-										layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-									x += 1
-
-								# ___ CHECKBOXES ___
-								checkbox_function_shuffle.empty()
-								checkbox_function_display_bonus.empty()
-								checkbox_find_word.empty()
-								checkbox_bonus_cases.empty()
-								checkbox_function_shuffle2.empty()
-								checkbox_function_display_bonus2.empty()
-								checkbox_find_word2.empty()
-								checkbox_suggest_word2.empty()
-								checkbox_bonus_cases2.empty()
-								checkbox_calculate_score2.empty()
-
-
-								layers.buttons_on_screen.empty()
-								layers.buttons_on_screen.add(button_play)
-								layers.pop_up.empty()
-
-								# Reset player
-								var.current_player.score = 0
-
-								pos_x = (UI_LEFT_LIMIT)
-								pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
-
-								hand_state = []
-								for tmp_letter in tmp_first_hand :
-									if tmp_letter != 0 :
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										start_hand.add(letter)
-										hand_state.append(letter.id)
-									else :
-										hand_state.append(0)
-									pos_x = pos_x+1
-
-								PLAYERS[0].hand_state = hand_state
-
-								# ___ SNAPSHOT FOR LATER EASY REFRESH ___
-								layers.buttons_on_screen.add(button_end_turn)
-
-								layers.background.draw(window)
-								layers.tiles.draw(window)
-								layers.hand_holder.draw(window)
-								var.background_empty = window.copy()
-
-								layers.buttons_on_screen.draw(window)
-								var.background_no_letter = window.copy()
-
-								layers.dark_filter.draw(window)
-								layers.pop_up_window.draw(window)
-								layers.background_pop_up_empty = window.copy()
-
-								# ___ FIRST IMAGE ___
-								layers.buttons_on_screen.remove(button_end_turn)
-								layers.buttons_on_screen.add(button_play)
-
-								layers.background.draw(window)
-								layers.tiles.draw(window)
-
-								layers.buttons_on_screen.draw(window)
-
-								layers.letters_on_board.draw(window)
-								pygame.display.update()
-								var.current_action = "SELECT_A_LETTER"															
-
-
-							elif STEP == 2 :
-
-								# letters on board
-								x, y = 3, 4
-								for letter in "UTILISATEUR" :
-									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-									var.current_board_state[y][x] = letter
-									x += 1
-
-								# ___ NEXT STEP ___
-								STEP = STEP + 1
-								progress_bar.fill()	
-
-								# ___ ADD BUTTONS ___
-								layers.buttons_on_screen.remove(button_ok)
-								layers.buttons_on_screen.add(button_end_turn)
-								if enable_shuffle_letter :
-									layers.buttons_on_screen.add(button_shuffle)
-
-								# ___ DRAW BOARD ___
-								window.blit(var.background_empty, (0,0))
-
-								layers.buttons_on_screen.draw(window)
-
-								layers.letters_on_board.draw(window)
-								var.current_player.hand.draw(window)
-								var.current_background_no_text = window.copy()
-
-								progress_bar.draw()
-								ui_text.drawText(STEP)
-
-								var.current_background = window.copy()
-
-								pygame.display.update()
-								var.current_action = "SELECT_A_LETTER"
-
-
-							elif STEP == 5 :
-
-								if checkbox_find_word.is_filled :
-									enable_shuffle_letter = True
-								if checkbox_bonus_cases.is_filled :
-									display_type_of_tile_on_hoovering = True
-
-								# Reset
-								for button in layers.buttons_on_screen :
-									if button.is_a_checkbox :
-										button.empty()
-
-								# letters on board
-								x, y = 4, 2
-								for letter in "METHODES" :
-									layers.letters_on_board.add( Letter(letter,DELTA+x,DELTA+y) )
-									var.current_board_state[y][x] = letter
-									y += 1
-
-								# letters in hand
-								pos_x = (UI_LEFT_LIMIT)
-								pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
-								hand_state = []
-								
-								for tmp_letter in tmp_second_hand :
-									if tmp_letter != 0 :
-										letter = Letter(tmp_letter, pos_x, pos_y)
-										start_hand.add(letter)
-										hand_state.append(letter.id)
-									else :
-										hand_state.append(0)
-									pos_x = pos_x+1
-
-								PLAYERS[0].hand_state = hand_state
-
-								# ___ NEXT STEP ___
-								STEP = STEP + 1
-								progress_bar.fill()	
-
-								# ___ ADD BUTTONS ___
-								layers.buttons_on_screen.remove(button_ok)	
-
-								layers.buttons_on_screen.remove(checkbox_find_word)
-								layers.buttons_on_screen.remove(checkbox_bonus_cases)
-
-								layers.buttons_on_screen.add(button_end_turn)
-								if enable_shuffle_letter :
-									layers.buttons_on_screen.add(button_shuffle)
-
-								# ___ DRAW WINDOW ___
-								window.blit(var.background_empty, (0,0))
-
-								layers.buttons_on_screen.draw(window)
-
-								layers.letters_on_board.draw(window)
-								var.current_player.hand.draw(window)
-
-								progress_bar.draw()
-								ui_text.drawText(STEP)
-
-								var.current_action = "SELECT_A_LETTER"
-
-								texts = [
-								"Utiliser le bouton 'Mélanger' pour trouver plus",
-								"  facilement un mot qui rapporte des points."
-								]
-
-								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT = LINE_HEIGHT.SUBTITLE, time=11000)  )
-
-								# snapshot of before pop_up
-								snapshot = window.copy()
-
-								#display pop_up
-								layers.dark_filter.draw(window)
-								layers.pop_up.draw(window)
-								pygame.display.update()
-
-								MUST_DIPSLAY_POP_UP = True
-								need_refresh_buttons_on_screen = False
-
-								#prepare exit image (displayed when removing pop up)
-								window.blit(snapshot, (0,0))
-
-						#~~~~~~~~~~~ RELEASE CLIC AWAY FROM BUTTON ~~~~~~~~~~~ 
-						else :
-							var.a_button_is_pushed = False
-							on_a_button = False
-
-							for button in layers.buttons_on_screen :
-
-								if button.collide(cursor_pos_x, cursor_pos_y) == True :
-									on_a_button = True
-									button.turnOnHighlighted()
-									need_refresh_buttons_on_screen = True
-
-								if button.is_pushed :
-									button.release() #release all pushed buttons
-									if button.collide(cursor_pos_x, cursor_pos_y) :
-										if button.is_a_checkbox :
-											if button.is_filled :
-												button.empty()
-											else :
-												button.fill()
-										button.turnOnHighlighted()
-									else :
-										button.turnOffHighlighted()
-									need_refresh_buttons_on_screen = True
-
-							if not on_a_button :
-								pygame.mouse.set_cursor(*arrow)
-
-
-						#~~~~~~~~~~~ REFRESH BUTTONS ~~~~~~~~~~~ 
-						if not MUST_DIPSLAY_POP_UP :
-
-							#~~~~~~~~~~~ CHECKBOX ~~~~~~~~~~~
-							for button in layers.buttons_on_screen :
-								if button.is_a_checkbox :
-									if ( (button.collide(cursor_pos_x, cursor_pos_y) == True) and (button.is_pushed) ):
-										if button.is_filled :
-											button.release()
-											button.empty()
-											button.turnOnHighlighted()
-										else :								
-											button.release()
-											button.fill()
-											button.turnOnHighlighted()
-
-										need_refresh_buttons_on_screen = True
-
-
-				if need_refresh_buttons_on_screen :
-					layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
-					layers.buttons_on_screen.draw(window)
-					pygame.display.update()
-
-
-				#~~~~~~ MOUSE MOTION ~~~~~~	
-				elif(event_type == pygame.MOUSEMOTION ):
-
-					mouse_pos = pygame.mouse.get_pos()
-					cursor_pos_x = mouse_pos[0]
-					cursor_pos_y = mouse_pos[1]
-
-					if not var.a_button_is_pushed :
-
-						#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
-						buttons_changed = False
-						for button in layers.buttons_on_screen :
-							if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
-								button.turnOnHighlighted()
-								pygame.mouse.set_cursor(*hand)
-								buttons_changed = True
-							elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
-								button.turnOffHighlighted()
-								pygame.mouse.set_cursor(*arrow)
-								buttons_changed = True
-
-						if buttons_changed :
-							layers.buttons_on_screen.clear(window, var.background_pop_up_empty)
-							layers.buttons_on_screen.draw(window)
-
-							pygame.display.update()
+				pass
 
 
 			# //////// MAIN GAME SCREEN ////////
@@ -3608,51 +2389,12 @@ while game_is_running:
 						var.a_button_is_pushed = False
 
 						#------ SELECT A LETTER -------
-						if var.current_action == 'SELECT_A_LETTER' :
+						if ( var.current_action == 'SELECT_A_LETTER' ) :
 
 							need_update = False
 
-							#------ RELEASE CLIC ON PLAY BUTTON -------
-							if ( (button_play.collide(cursor_pos_x, cursor_pos_y) == True) and (button_play.is_pushed) ):
-		
-								pygame.mouse.set_cursor(*arrow)
-								button_play.release()
-								need_update = True
-
-								if STEP == 0 :
-
-									#reset Board
-									layers.letters_on_board.empty()
-									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-									# ___ UI elements new screen ___
-									STEP = STEP + 1
-
-									layers.buttons_on_screen.remove(button_play)
-
-									progress_bar.fill()
-									layers.buttons_on_screen.add(button_ok)
-									#layers.buttons_on_screen.add(progress_bar.button_reinit)
-
-									# ___ DRAW WINDOW ___
-									#draw new screen
-									layers.dark_filter.draw(window)
-									layers.pop_up_window.draw(window)
-									layers.buttons_on_screen.draw(window)
-									var.background_pop_up_empty = window.copy()
-
-									progress_bar.draw()
-									ui_text.drawTextPopUp(STEP)
-
-									#UPDATE
-									var.current_action = "WINDOW_DISPLAYED"
-
-
 							#------ RELEASE CLIC ON END TURN BUTTON -------
-							elif ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
-
-								if STEP in (3,6,9) :
-									pygame.mouse.set_cursor(*arrow)
+							if ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 								button_end_turn.release()
 								layers.buttons_on_screen.clear(window, var.background_empty)
@@ -3666,200 +2408,84 @@ while game_is_running:
 									var.current_player.score += association[1]
 									words.append(association[0])
 
-								move_on = False
+								#------ CHECK IF VALID MOVE ------
+								
+								move_on = True
 
 								#nothing played
 								if ( len( layers.letters_just_played.sprites() ) == 0) :
 									texts = ["Déposer vos lettres sur le plateau pour marquer des points."]
+									move_on = False
 								#played something
 								else :
 									if len(words) == 0 :
 										texts =["Ecrivez votre mot verticalement ou horizontalement et sans espace."]
-									else :
-										if var.current_player.score == MAPING_STEP_MAX_SCORE[STEP] :
-											texts = ["Félicitations ! Vous avez marqué le score maximal."]
-										elif var.current_player.score > MAPING_STEP_MAX_SCORE[STEP] :
-											texts = ["Wow ... Mieux que prévu. Félicitations pour vos "+str(var.current_player.score)+" points !"]
-										else :
-											texts = ["Vous avez marqué "+str(var.current_player.score)+" points."]
-										move_on = True
+										move_on = False
 
-								#creeate pop up
-								layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+								if move_on == False :
+									#create pop up
+									layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
-								# snapshot of before pop_up
-								snapshot = window.copy()
+									# snapshot of before pop_up
+									snapshot = window.copy()
 
-								#display pop_up
-								layers.dark_filter.draw(window)
-								layers.pop_up.draw(window)
-								pygame.display.update()
-								need_update = False
+									#display pop_up
+									layers.dark_filter.draw(window)
+									layers.pop_up.draw(window)
+									pygame.display.update()
+									need_update = False
 
-								MUST_DIPSLAY_POP_UP = True
+									MUST_DIPSLAY_POP_UP = True
 
-								#prepare exit image (displayed when removing pop up)
-								window.blit(snapshot, (0,0))
+									#prepare exit image (displayed when removing pop up)
+									window.blit(snapshot, (0,0))
+								
+								#------ CONINUE ------
 
+								else :
 
-								if move_on:
+									#letters
+									for letter in layers.letters_just_played :
+										layers.letters_on_board.add(letter)
 
-									# ___ RESET ___
-									#reset letters		
 									layers.letters_just_played.empty()
-									for letter in var.current_player.hand :
-										letter.kill()
-									layers.letters_on_board.empty()
-
-									#reset board state
-									var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-									#reset score between turns
-									var.current_player.score = 0
-
-									# ___ RESET VISUAL ___
-									#reset screenshot background no letter (USELESS ?)
-									#window.blit(var.background_no_letter, (0,0))
+									window.blit(var.background_no_letter, (0,0))
 									var.current_player.hand.clear(window, var.background_no_letter)
+
+									#redraw letters
+									index_hand = 0
+									while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
+										if var.current_player.hand_state[index_hand] == 0 :
+											random_int = randint(0,len(var.bag_of_letters)-1)
+											drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
+											del(var.bag_of_letters[random_int])	
+
+											var.current_player.hand_state[index_hand] = drawn_letter.id
+											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.pos_y+1
+											drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
+											var.current_player.hand.add(drawn_letter)
+
+										index_hand += 1
+
+									var.current_player = var.current_player.next()
+									var.current_player.info()
+
+									#display
 									layers.letters_just_played.clear(window, var.background_no_letter)
-
 									layers.letters_on_board.draw(window)
+
 									var.current_player.hand.draw(window)
+
 									var.current_background_no_text = window.copy()
-									#progress_bar.draw()
-									var.current_background = window.copy()
+									ui_text.drawText()
+
+									need_update = True
 
 
-									if STEP == 3 :
 
-										# ___ DRAW BOARD ___
-										window.blit(var.background_no_letter, (0,0))
-										
-										var.current_player.hand.draw(window)
+							#------ RELEASE CLIC ON SHUFFLE BUTTON -------
 
-										var.current_background_no_text = window.copy()
-										ui_text.drawText(STEP)
-										var.current_background = window.copy()
-
-										#NEW SCREEN
-										STEP = STEP + 1
-										progress_bar.fill()									
-
-										# ADD BUTTONS									
-										layers.buttons_on_screen.remove(button_end_turn)
-										layers.buttons_on_screen.add(button_ok)
-
-										#layers.buttons_on_screen.add(checkbox_facile)
-										#layers.buttons_on_screen.add(checkbox_moyen)
-										#layers.buttons_on_screen.add(checkbox_difficile)
-
-										for emoticom in all_emoticoms :
-											layers.buttons_on_screen.add(emoticom)
-
-										layers.buttons_on_screen.add(checkbox_function_shuffle)
-										layers.buttons_on_screen.add(checkbox_function_display_bonus)
-
-										# DRAW WINDOW
-										layers.dark_filter.draw(window)
-										layers.pop_up_window.draw(window)
-										layers.buttons_on_screen.draw(window)
-										
-										progress_bar.draw()
-										ui_text.drawTextPopUp(STEP)							
-
-
-									elif STEP == 6 :
-
-										# ___ RESET ___
-										#reset Board
-										layers.letters_on_board.empty()
-										var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-										#reset letters
-										for letter in var.current_player.hand :
-											letter.kill()
-
-										# ___ RESET ALL BUTTONS ___
-										for button in layers.buttons_on_screen :
-											if button.is_a_checkbox :
-												button.empty()
-											if button.is_an_emoticom :
-												button.select()
-											else :
-												button.turnOffHighlighted()
-										
-										# ___ DRAW BOARD ___
-										#screeshot background no letter (USELESS ?)
-										window.blit(var.background_no_letter, (0,0))
-										var.current_player.hand.draw(window)
-
-										var.current_background_no_text = window.copy()
-										ui_text.drawText(STEP)
-										var.current_background = window.copy()
-
-
-										# ___ NEXT STEP ___	
-										STEP = STEP + 1
-										progress_bar.fill()
-
-										# new buttons
-										layers.buttons_on_screen.remove(button_end_turn)
-										if enable_shuffle_letter :
-											layers.buttons_on_screen.remove(button_shuffle)	
-
-										layers.buttons_on_screen.add(button_ok)
-
-										#layers.buttons_on_screen.add(checkbox_facile2)
-										#layers.buttons_on_screen.add(checkbox_moyen2)
-										#layers.buttons_on_screen.add(checkbox_difficile2)
-
-										for emo in all_emoticoms :
-											layers.buttons_on_screen.add(emo)
-
-										layers.buttons_on_screen.add(checkbox_function_shuffle2)
-										layers.buttons_on_screen.add(checkbox_function_display_bonus2)
-										#layers.buttons_on_screen.add(checkbox_function_score2)
-
-										# ___ DRAW WINDOW ___
-										#draw new screen
-										layers.dark_filter.draw(window)
-										layers.pop_up_window.draw(window)
-										layers.buttons_on_screen.draw(window)
-
-										progress_bar.draw()
-										ui_text.drawTextPopUp(STEP)
-										
-
-									#LAST STEP
-									elif STEP == 9 :
-
-										# ___ RESET ___
-										#reset letters
-										for letter in var.current_player.hand :
-											letter.kill()
-
-										var.predicted_score = 0
-
-										# ___ NEXT STEP ___
-										STEP = STEP + 1
-										progress_bar.fill()
-
-										# new buttons
-										layers.buttons_on_screen.remove(button_end_turn)
-										if enable_shuffle_letter :
-											layers.buttons_on_screen.remove(button_shuffle)	
-
-										layers.buttons_on_screen.add(button_ok)
-
-										# ___ DRAW WINDOW ___
-										window.blit(var.background_pop_up_empty, (0,0))
-										layers.buttons_on_screen.draw(window)
-										progress_bar.draw()
-										ui_text.drawTextPopUp(STEP)
-									
-									#pygame.display.update()
-									var.current_action = "WINDOW_DISPLAYED"
-									#break 
+							#TODO : check if works properly
 
 							elif ( enable_shuffle_letter and (button_shuffle.collide(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
 									button_shuffle.release()
@@ -3870,84 +2496,12 @@ while game_is_running:
 									need_update = True
 
 									# ___ SHUFFLE ___
-									give_help = choice( [True, True, True, True] )
-									more_help = choice( [True, True, False] )	
 
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
 									shuffle(var.current_player.hand_state)
 
-									#TODO create function
-
-									#logging.debug("hand state : %a", var.current_player.hand_state)
-
-									if give_help :
-										#logging.debug("litte help")
-
-										if STEP == 6 :
-											#logging.debug("STEP 6")
-
-											letters_s = var.current_player.hand.findByName('S')
-											if letters_s != [] :
-												#logging.debug("S in hand")
-												first_letter_s = letters_s[0]
-												s_index = var.current_player.hand_state.index(first_letter_s.id)
-												#reshuffle
-												var.current_player.hand_state[0], var.current_player.hand_state[s_index] = var.current_player.hand_state[s_index], var.current_player.hand_state[0]
-											
-											letters_e = var.current_player.hand.findByName('E')
-											if letters_e != [] :
-
-												#logging.debug("E in hand")
-												first_letter_e = letters_e[0]
-												e_index = var.current_player.hand_state.index(first_letter_e.id)
-												#reshuffle
-												var.current_player.hand_state[6], var.current_player.hand_state[e_index] = var.current_player.hand_state[e_index], var.current_player.hand_state[6]
-
-											if more_help :
-												#logging.debug("MORE HELP")
-
-												letters_c = var.current_player.hand.findByName('C')
-												if letters_c != [] :
-
-													#logging.debug("C in hand")
-													first_letter_c = letters_c[0]
-													c_index = var.current_player.hand_state.index(first_letter_c.id)
-													#reshuffle
-													var.current_player.hand_state[6], var.current_player.hand_state[c_index] = var.current_player.hand_state[c_index], var.current_player.hand_state[6]
-
-
-										elif STEP == 9 :
-
-											letters_a = var.current_player.hand.findByName('A')
-											if letters_a != [] :
-												#logging.debug("A in hand")
-												first_letter_a = letters_a[0]
-												a_index = var.current_player.hand_state.index(first_letter_a.id)
-												#reshuffle
-												var.current_player.hand_state[0], var.current_player.hand_state[a_index] = var.current_player.hand_state[a_index], var.current_player.hand_state[0]
-											
-											letters_r = var.current_player.hand.findByName('R')
-											if letters_r != [] :
-
-												#logging.debug("R in hand")
-												first_letter_r = letters_r[0]
-												r_index = var.current_player.hand_state.index(first_letter_r.id)
-												#reshuffle
-												var.current_player.hand_state[5], var.current_player.hand_state[r_index] = var.current_player.hand_state[r_index], var.current_player.hand_state[5]
-
-											if more_help :
-												#logging.debug("MORE HELP")
-
-												letters_v = var.current_player.hand.findByName('V')
-												if letters_v != [] :
-
-													#logging.debug("V in hand")
-													first_letter_v = letters_v[0]
-													v_index = var.current_player.hand_state.index(first_letter_v.id)
-													#reshuffle
-													var.current_player.hand_state[1], var.current_player.hand_state[v_index] = var.current_player.hand_state[v_index], var.current_player.hand_state[1]
 
 									#logging.debug("NEW hand state : %a", var.current_player.hand_state)
 									pos_x = (UI_LEFT_LIMIT)
@@ -3965,6 +2519,7 @@ while game_is_running:
 									var.current_player.hand.draw(window)	
 									#pygame.display.update()
 									need_update = True
+
 
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
 							else :
