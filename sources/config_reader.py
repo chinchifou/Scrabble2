@@ -14,6 +14,7 @@ import re
 h_display_params = {}
 h_rules_params = {}
 h_ui_params = {}
+h_pop_up_params = {}
 players = []
 
 
@@ -32,7 +33,8 @@ def str_to_bool(s):
 #relative path
 path_conf_disp_file = path.abspath('../config/display_settings.ini')
 path_conf_rules_file = path.abspath('../config/game_settings.ini')
-path_conf_language_file = path.abspath('../materials/texts/ui_content.ini')
+path_conf_ui_language_file = path.abspath('../materials/texts/ui_content.ini')
+path_conf_pop_up_language_file = path.abspath('../materials/texts/error_pop_up.ini')
 
 #match everything of format >> multiple_letters = LeTTers
 match_word = re.compile(r'^([a-z_]*)\s*=\s*([A-Za-z]*)\s*$')
@@ -141,7 +143,7 @@ ui_possible_values = (
 'triple_word'
 )
 
-for line in open(path_conf_language_file, "r", encoding="utf8") :
+for line in open(path_conf_ui_language_file, "r", encoding="utf8") :
 
 	text_found = match_ui_word.search(line)
 
@@ -157,3 +159,32 @@ for line in open(path_conf_language_file, "r", encoding="utf8") :
 				if value != '' :
 					values_array.append(value.strip())
 			h_ui_params [ param ] = values_array 
+
+
+# --- Pop up content ---
+
+pop_up_possible_values = (
+'first_turn_one_letter',
+'not_on_start_tile',
+'play_in_diagonal',
+'not_reusing_letters',
+'hole_in_word'
+)
+
+
+for line in open(path_conf_pop_up_language_file, "r", encoding="utf8") :
+
+	text_found = match_ui_word.search(line)
+
+	if text_found :
+		param = str(text_found.group(1))
+		values_array = []
+
+		if param in pop_up_possible_values:
+			start = line.index('=')+1
+			all_values = line[start:]
+			all_values = all_values.strip().split('/')
+			for value in all_values :
+				if value != '' :
+					values_array.append(value.strip())
+			h_pop_up_params [ param ] = values_array 

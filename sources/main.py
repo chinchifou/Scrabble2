@@ -315,7 +315,7 @@ class UIText():
 
 
 #class used to diaply text pop up to the user
-class UserInterFacePopUp(UIText):
+class UserInterFaceToolTip(UIText):
 
 	def __init__(self, text, line_heigh, bold, pos_in_tiles, text_color, background_color):
 		UIText.__init__(self, text, line_heigh, bold, pos_in_tiles)
@@ -359,11 +359,11 @@ class UITextPrinter():
 		self.id_tile_pop_up = 0
 		self.pop_up_displayed = False
 
-		self.double_letter = UserInterFacePopUp( ui_content['double_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
-		self.triple_letter = UserInterFacePopUp( ui_content['triple_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
+		self.double_letter = UserInterFaceToolTip( ui_content['double_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_LIGHT )
+		self.triple_letter = UserInterFaceToolTip( ui_content['triple_letter'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.BLUE_DEEP )
 
-		self.double_word = UserInterFacePopUp( ui_content['double_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
-		self.triple_word = UserInterFacePopUp( ui_content['triple_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
+		self.double_word = UserInterFaceToolTip( ui_content['double_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_LIGHT )
+		self.triple_word = UserInterFaceToolTip( ui_content['triple_word'][language_id], LINE_HEIGHT.POP_UP, False, (0, 0), COLOR.BLACK, COLOR.RED_DEEP )
 
 #Draw UI text
 	def drawText(self):
@@ -456,12 +456,13 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time = 4000):
+def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time=4):
 
 	# ___ Init ___
 	pygame.mouse.set_cursor(*arrow) 
 
-	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time / 20.0)
+	global FRAMES_BEFORE_POP_UP_DISAPPEAR
+	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time * 60)
 
 	nb_lignes = len(ar_texts)
 	my_line_height = LINE_HEIGHT
@@ -1033,27 +1034,28 @@ def calculatePoints(layer_letters_played) :
 
 
 	#store the cause of invlaidity for help pop-up
-	invalid_move_causes = []
+	invalid_move_cause = ''
 
 	#___ First turn valid move conditions ___
 	if len( layers.letters_on_board.sprites() ) == 0 : #first turn
 
-		if len(letters_played) == 1 : #one letter played
-			logging.info('INVALID MOVE - Only played one letter on first turn')
-			invalid_move_causes.append('START WITH ONE LETTER')
 		if var.current_board_state[7][7] == '?' : #not on the start tile
 			logging.info('INVALID MOVE - Did not play on the start tile')
-			invalid_move_causes.append('NOT ON START TILE')
+			invalid_move_cause = 'not_on_start_tile'
 
-		if invalid_move_causes != [] :
-			return [ [], invalid_move_causes ]
+		if len(letters_played) == 1 : #one letter played
+			logging.info('INVALID MOVE - Only played one letter on first turn')
+			invalid_move_cause = 'first_turn_one_letter'
+
+		if invalid_move_cause != '' :
+			return [ [], invalid_move_cause ]
 
 
 	#___ Nothing played ___
 	if len(letters_played) == 0 :
 		logging.info('Nothing played')
 		logging.info('')
-		return [ [], [''] ]
+		return [ [], '' ]
 
 
 	#___ SOMETHING PLAYED ___
@@ -1077,10 +1079,9 @@ def calculatePoints(layer_letters_played) :
 		if (delta_x != 0 and delta_y != 0) :
 			#TODO display error message
 			logging.info("INVALID MOVE - Played in diagonal")
-			invalid_move_causes.append('DIAGONAL')
+			invalid_move_cause = 'play_in_diagonal'
 			is_valid_move = False
-			logging.debug("I was there 99")
-			return [ [], invalid_move_causes]
+			return [ [], invalid_move_cause]
 
 
 		#___ VERTICAL WORD PLAYED ___
@@ -1137,12 +1138,12 @@ def calculatePoints(layer_letters_played) :
 			if away_vertically and away_horizontally :
 				logging.info("INVALID MOVE - Not played close to an existing word")
 				is_valid_move = False
-				invalid_move_causes.append('AWAY')
+				invalid_move_cause = 'not_reusing_letters'
 
 			if contains_holes :
 				logging.info("INVALID MOVE - Contains holes")
 				is_valid_move = False
-				invalid_move_causes.append('HOLE')			
+				invalid_move_cause = 'hole_in_word'	
 
 
 			#----- VALID MOVE -----
@@ -1234,7 +1235,7 @@ def calculatePoints(layer_letters_played) :
 
 			#----- INVALID MOVE -----
 			else :
-				return[ [], invalid_move_causes ]
+				return[ [], invalid_move_cause ]
 
 
 		#___ HORIZONTAL WORD PLAYED ___
@@ -1291,12 +1292,12 @@ def calculatePoints(layer_letters_played) :
 			if away_vertically and away_horizontally :
 				logging.info("INVALID MOVE - Not played close to an existing word")
 				is_valid_move = False
-				invalid_move_causes.append('AWAY')
+				invalid_move_cause = 'not_reusing_letters'
 
 			if contains_holes :
 				logging.info("INVALID MOVE - Contains holes")
 				is_valid_move = False
-				invalid_move_causes.appen('HOLE')			
+				invalid_move_cause = 'hole_in_word'
 
 
 			#----- VALID MOVE -----
@@ -1389,7 +1390,7 @@ def calculatePoints(layer_letters_played) :
 
 			#----- INVALID MOVE -----
 			else :
-				return[ [], invalid_move_causes ]
+				return[ [], invalid_move_cause ]
 
 
 		#----- Calculate scores -----
@@ -1402,7 +1403,7 @@ def calculatePoints(layer_letters_played) :
 		logging.info('Total score this turn : %i', total_score)
 		logging.info('')
 
-		return [ words_and_scores, [''] ]
+		return [ words_and_scores, '' ]
 
 
 #increment predicted score in real time
@@ -1965,6 +1966,9 @@ else :
 #User interface content
 ui_content = config_reader.h_ui_params
 
+#User interface pop up content
+ui_pop_up_content = config_reader.h_pop_up_params
+
 #Initialize userface texts
 ui_text = UITextPrinter(ui_content)
 
@@ -2460,9 +2464,7 @@ while game_is_running:
 								layers.buttons_on_screen.draw(window)
 
 								#calculate score
-								var.last_words_and_scores, validity_errors = calculatePoints(layers.letters_just_played)
-
-								logging.debug("validity errors : %s", validity_errors)
+								var.last_words_and_scores, invalid_move_cause = calculatePoints(layers.letters_just_played)
 
 								words = []
 								for association in var.last_words_and_scores :
@@ -2472,22 +2474,18 @@ while game_is_running:
 
 								#------ CHECK IF VALID MOVE ------
 								valid_move = True
-								texts = []
+								text_pop_up = []
 
 								if ( len( layers.letters_just_played.sprites() ) > 0) :
-									if validity_errors != [''] : #invalid move
+									if invalid_move_cause != '' : #invalid move
 										valid_move = False
-										for cause in validity_errors :
-											#TODO translate for UI
-											texts.append(cause)
-
-								logging.debug("text pop up : %s", texts)
-										
+										text_pop_up = ui_pop_up_content[invalid_move_cause][language_id].split('<NEWLINE>')
+							
 
 								#------ INVALID MOVE -> Display Pop Up ------		
 								if valid_move == False :
 									#create pop up
-									layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
+									layers.pop_up.add( createPopUp(text_pop_up, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 8)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
