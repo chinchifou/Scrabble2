@@ -3,18 +3,21 @@ __________  PRIMARY  __________
 
 check TODO in code
 
-PRIORITY :
+PRIMARY :
 
 Improve shuffle (for multiple letters before a blank spot)
+
+SECONDARY :
+
+Calculate Points Horizontal before verticaly when one letter played (easier to understand in Ui when multiple word)
 
 Clean code builder from github (especially for "/config")
 Clean script to install needed librairies + check dependancies
 
 
-Special dev :
 
-add avatar
 
+OLD STUFF
 
 Common dev :
 

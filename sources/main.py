@@ -1042,16 +1042,16 @@ def calculatePoints(layer_letters_played) :
 		letters_played[(int(letter.pos_x - DELTA), int(letter.pos_y - DELTA))] = letter.name
 
 	#___ LOGGER ___	
-	logging.debug("letters played : %s", letters_played)
-
 	if len(letters_played) > 1 :
-		logging.debug('%i letters played', len(letters_played))
+		logging.debug('%i letters played : %s', len(letters_played), letters_played)
+		logging.info('')
 	else :
-		logging.debug('%i letter played', len(letters_played)) 
+		logging.debug('%i letter played : %s', len(letters_played), letters_played)
+		logging.info('') 
 
 	#___ NOTHING PLAYED ___
 	if len(letters_played) == 0 :
-		logging.info('nothing played')
+		logging.info('Nothing played')
 		logging.info('')
 		return []
 
@@ -1071,45 +1071,73 @@ def calculatePoints(layer_letters_played) :
 		min_y, max_y, delta_y = min(all_y), max(all_y), max(all_y)-min(all_y)
 
 
-		#___ ERROR CHECKING ___	
 		# played in diagonal ?
 		if (delta_x != 0 and delta_y != 0) :
 			#TODO display error message
-			logging.debug("played in diagonal")
+			logging.info("INVALID MOVE - Played in diagonal")
 			is_valid_move = False
 			return[]
 
 
 		#___ VERTICAL WORD PLAYED ___
 		if delta_x == 0 :
+			logging.debug('Vertical word possible')
 
 			start_y, end_y = min_y, max_y
-
 			#find first letter
 			while( ( (start_y - 1) >= 0) and (var.current_board_state[start_y - 1][min_x] != '?') ) :
 				start_y = start_y - 1
-
 			#find last letter
 			while( ( (end_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
 				end_y = end_y + 1
 
+			#------ Is valid move ? ------
+			#supposed INVALID until the opposite is proven
+			away_vertically, away_horizontally, contains_holes = True, True, True
 
-			#away from older letters (above or below)
+			#away from older letters ? (above or below)
 			if (start_y == min_y and end_y == max_y and len( layers.letters_on_board.sprites() ) > 0):
-				logging.debug("not played close to another word")
-				if len(layer_letters_played) > 0 :
-					is_valid_move = False
+				logging.debug("  Not played close to another word - vertically")	
+			else :
+				away_vertically = False
 
+			#contains hole with just the letters played ?
 			if (delta_y+1 > len(letters_played) ) :
-				logging.debug("there is a hole between letters played")
+				logging.debug("  There is a hole in the word if using only letters played")
+			else :
+				contains_holes = False
+
+
+			if away_vertically or contains_holes :
 				#browse all letters
 				it_y = start_y
-				while( ( (it_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[it_y + 1][min_x] != '?') ) :
-					#TODO - search left and right
+				while( ( it_y <= TILES_PER_LINE-1) and (var.current_board_state[it_y][min_x] != '?') ) :
+					#left
+					if min_x > 0 :
+						if var.current_board_state[it_y][min_x-1] != '?' :
+							away_horizontally = False
+					#right
+					if min_x + 1 <= TILES_PER_LINE :
+						if var.current_board_state[it_y][min_x+1] != '?' :
+							away_horizontally = False
+
 					it_y = it_y + 1
+
+				it_y = it_y - 1 #back to last letter
+
 				if ( (it_y-start_y) != (end_y-start_y) ) :
-					logging.debug("there is a hole between letters played - even using old letters in vertical")
-					is_valid_move = False
+					logging.debug("    There is a hole in the word if using all available letters")
+				else :
+					contains_holes = False
+
+			#------ Conclude on validity ------
+			if away_vertically and away_horizontally :
+				logging.info("INVALID MOVE - Not played close to an existing word")
+				is_valid_move = False
+
+			if contains_holes :
+				logging.info("INVALID MOVE - Contains holes")
+				is_valid_move = False			
 
 
 			#----- VALID MOVE -----
@@ -1117,17 +1145,16 @@ def calculatePoints(layer_letters_played) :
 
 				#___ SCRABBLE ___
 				if len(letters_played) == 7 : #is a SCRABBLE ?
-
-					#TODO do not add a scrabble if invalid move
 					words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+					logging.info('Scrabble obtained')
 					SOUNDS.victory.play()
 			
+				# prevent one letter word to be counted
+				if end_y == start_y  : 
+					logging.debug('  Vertical one letter word ignored')
 
-				#TODO : do not allow one letter in first turn
-				# prevent one letter word
-				if ( end_y > start_y ) : 
-
-					logging.debug('VERTICAL WORD')
+				else:
+					logging.info('Vertical word played')
 					new_word, new_word_multiplier, new_word_score = '', 1, 0
 
 					#___ FIRST PASSAGE : calculate points for word just created ___
@@ -1168,7 +1195,7 @@ def calculatePoints(layer_letters_played) :
 						condition_2 = ( (it_x + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y][it_x+1] != '?' ) 
 
 						if ( condition_1  or condition_2 ) :       
-							logging.debug('HORIZONTAL WORD')
+							logging.debug('Horizontal word played')
 
 							#___ PREPARE ITERATION : go to the begining of the word ___
 							while( ( (it_x - 1) >= 0) and (var.current_board_state[it_y][it_x-1] != '?') ) : 
@@ -1200,16 +1227,6 @@ def calculatePoints(layer_letters_played) :
 							old_word_score = old_word_score * old_word_multiplier
 							words_and_scores.append([old_word, old_word_score])
 
-				total_score = 0 
-
-				for association in words_and_scores :
-					logging.info('Word %s gives %i points', association[0], association[1])
-					total_score += association[1]
-				
-				logging.info('total_score : %i', total_score)
-				logging.info('')
-				return words_and_scores 
-
 			#----- INVALID MOVE -----
 			else :
 				return[]
@@ -1217,36 +1234,63 @@ def calculatePoints(layer_letters_played) :
 
 		#___ HORIZONTAL WORD PLAYED ___
 		elif delta_y == 0 : 
+			logging.debug('Horizontal word possible')
 
 			start_x, end_x = min_x, max_x
-
 			#find first letter
 			while( ( (start_x - 1) >= 0) and (var.current_board_state[min_y][start_x - 1] != '?') ) :
 				start_x = start_x - 1
-
 			#find last letter
 			while( ( (end_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
 				end_x = end_x + 1
 
+			#------ Is valid move ? ------
+			#supposed INVALID until the opposite is proven
+			away_vertically, away_horizontally, contains_holes = True, True, True
 
 			#away from older letters (left or right)
 			if (start_x == min_x and end_x == max_x and len( layers.letters_on_board.sprites() ) > 0):
-				logging.debug("not played close to another word")
-				if len(layer_letters_played) > 0 :
-					is_valid_move = False
+				logging.debug("  Not played close to another word - horizontally")	
+			else :
+				away_horizontally = False
 
+			#contains hole with just the letters played ?
 			if (delta_x+1 > len(letters_played) ) :
-				logging.debug("there is a hole between letters played")
+				logging.debug("  There is a hole between letters played")
+			else :
+				contains_holes = False
+
+			if away_horizontally or contains_holes :
 				#browse all letters
 				it_x = start_x
-				while( ( (it_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x + 1] != '?') ) :
-					#TODO - search up and down
+				while( ( it_x <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x] != '?') ) :
+					#up
+					if min_y > 0 :
+						if var.current_board_state[min_y - 1][it_x] != '?':
+							away_vertically = False
+					#down
+					if min_y + 1 <= TILES_PER_LINE :
+						if var.current_board_state[min_y + 1][it_x] != '?':
+							away_vertically = False						
+
 					it_x = it_x + 1
 
-				logging.debug("it_x : %i, start_x : %i, end_x : %i", it_x, start_x, end_x)
+				it_x = it_x - 1 #back to last letter
+
 				if ( (it_x-start_x) != (end_x-start_x) ) :
-					logging.debug("there is a hole between letters played - even using old letters in horizontal")
-					is_valid_move = False
+					logging.debug("    There is a hole in the word if using all available letters")
+				else :
+					contains_holes = False
+
+			#------ Conclude on validity ------
+			if away_vertically and away_horizontally :
+				logging.info("INVALID MOVE - Not played close to an existing word")
+				is_valid_move = False
+
+			if contains_holes :
+				logging.info("INVALID MOVE - Contains holes")
+				is_valid_move = False	
+
 
 			#----- VALID MOVE -----
 			if is_valid_move :
@@ -1255,14 +1299,15 @@ def calculatePoints(layer_letters_played) :
 
 					#TODO do not add a scrabble if invalid move
 					words_and_scores.append(['!! SCRABBLE !!', var.points_for_scrabble])
+					logging.info('Scrabble obtained')
 					SOUNDS.victory.play()
 
+				#Do not count one letter word
+				if  end_x == start_x :
+					logging.debug('  Horizontal one letter word ignored')
 
-				#TODO : do not allow one letter in first turn
-				#prevent one letter word
-				if ( end_x > start_x ) : 
-
-					logging.debug('HORIZONTAL WORD')
+				else : 
+					logging.debug('Horizontal word played')
 					new_word, new_word_multiplier, new_word_score= '', 1, 0
 
 					#___ FIRST PASSAGE : calculate points for word just created ___
@@ -1303,7 +1348,7 @@ def calculatePoints(layer_letters_played) :
 						condition_2 = ( (it_y + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y+1][it_x] != '?' ) 
 
 						if ( condition_1  or condition_2 ) :
-							logging.debug('VERTICAL WORD')
+							logging.debug('Vertical word played')
 
 							#___ PREPARE ITERATION : go to the begining of the word ___
 							while( ( (it_y - 1) >= 0) and (var.current_board_state[it_y-1][it_x] != '?') ) : #go to the begining of the word
@@ -1339,16 +1384,18 @@ def calculatePoints(layer_letters_played) :
 			else :
 				return []
 
-			total_score = 0 #TEMP
 
-			for association in words_and_scores :
-				logging.info('Word %s gives %i points', association[0], association[1])
-				total_score += association[1]
-			
-			logging.info('total_score : %i', total_score)
-			logging.info('')
+		#----- Calculate scores -----
+		total_score = 0 #TEMP
 
-			return words_and_scores
+		for association in words_and_scores :
+			logging.info("Word '%s' gives %i points", association[0], association[1])
+			total_score += association[1]
+		
+		logging.info('Total score this turn : %i', total_score)
+		logging.info('')
+
+		return words_and_scores
 
 
 #increment predicted score in real time
@@ -1382,15 +1429,15 @@ cfg_double_buffer = display_settings['enable_double_buffer']
 cfg_max_fps = display_settings['max_fps']
 
 #logging configuration
-logging.debug("DISPLAY SETTINGS")
-logging.debug("Fullscreen : %s", cfg_fullscreen)
-logging.debug("Resizable : %s", cfg_resizable)
-logging.debug("Resolution auto : %s", cfg_resolution_auto)
-logging.debug("Enable Windows 10 upscaling : %s", cfg_enable_windows_ten_upscaling)
-logging.debug("Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
-logging.debug("Custom window height : %s", cfg_custom_window_height)
-logging.debug("Hardware accelerated : %s", cfg_hardware_accelerated)
-logging.debug("Double buffer : %s", cfg_double_buffer)
+logging.debug("--- Display settings ---")
+logging.debug("  Fullscreen : %s", cfg_fullscreen)
+logging.debug("  Resizable : %s", cfg_resizable)
+logging.debug("  Resolution auto : %s", cfg_resolution_auto)
+logging.debug("  Enable Windows 10 upscaling : %s", cfg_enable_windows_ten_upscaling)
+logging.debug("  Custom window width : %s", int ( cfg_custom_window_height * (16/9.0)) )
+logging.debug("  Custom window height : %s", cfg_custom_window_height)
+logging.debug("  Hardware accelerated : %s", cfg_hardware_accelerated)
+logging.debug("  Double buffer : %s", cfg_double_buffer)
 logging.debug("")
 
 #Game settings
@@ -1425,12 +1472,12 @@ elif var.number_of_letters_per_hand > 9 :
 	var.number_of_letters_per_hand = 9
 	forced = 'forced to '
 
-logging.debug("GAMES RULES")
-logging.debug("Language : %s", LETTERS_LANGUAGE)
-logging.debug("Players : %s", players_names)
-logging.debug("Number of letters per_hand %s: %s", forced, var.number_of_letters_per_hand)
-logging.debug("Display next player hand : %s", display_next_player_hand)
-logging.debug("Enable shuffle letters : %s", enable_shuffle_letter)
+logging.debug("--- Game Rules ---")
+logging.debug("  Language : %s", LETTERS_LANGUAGE)
+logging.info("  Players : %s", players_names)
+logging.debug("  Number of letters per_hand %s: %s", forced, var.number_of_letters_per_hand)
+logging.debug("  Display next player hand : %s", display_next_player_hand)
+logging.debug("  Enable shuffle letters : %s", enable_shuffle_letter)
 logging.debug("")
 
 
@@ -1612,6 +1659,7 @@ hand_clic_strings = ( #sized 24x24
 hand_clic=((24,24),(6,1))+pygame.cursors.compile(hand_clic_strings,"X",".")
 
 #BIG
+#TODO to debug
 if False :
 
 	arrow_strings = ( #sized 24x24
