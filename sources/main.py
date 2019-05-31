@@ -61,13 +61,15 @@ REFERENCE_TILE_SIZE = 60
 #number of tiles on the board for each column and each row
 TILES_PER_LINE = 15
 
-global DELTA, UI_LEFT_LIMIT, UI_LEFT_INDENT, UI_INTERLIGNE
+global DELTA, UI_LEFT_LIMIT, UI_LEFT_INDENT, UI_TOP, UI_INTERLIGNE
 #delta expressed in tiles from top left corner of the Window
 DELTA = 1.5
 #Left limit for text of the user interface
 UI_LEFT_LIMIT = DELTA + TILES_PER_LINE + DELTA + 1.0
 #Left limit with an identation in the user interface text
 UI_LEFT_INDENT = UI_LEFT_LIMIT + 0.5
+#Maximum for the top of the UI
+UI_TOP = 1.5
 #Size expressed in tile of the space between two consecutive line of text
 UI_INTERLIGNE = 1.0
 
@@ -333,32 +335,25 @@ class UITextPrinter():
 	def __init__(self, ui_content):
 
 		#UI text init
-		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, 2*UI_INTERLIGNE) )
+		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, UI_TOP) ) #fix value
 
-		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1.2+1*UI_INTERLIGNE) )
-
-		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.pos_y+1) )
+		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE+1.2+1*UI_INTERLIGNE) )
+		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.bottom_tiles+0.25*UI_INTERLIGNE) )
 
 		if display_next_player_hand :
 			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.next_player_hand.bottom_tiles+UI_INTERLIGNE) )
 		else :
 			self.scores = UIText(ui_content['scores'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+1+UI_INTERLIGNE) )
-
-		self.player_score = UIText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles) )
-
-		self.previous_turn_summary = UIText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
-
-		self.word_and_points = UIText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles )  )		
+		self.player_score = UIText(ui_content['player_score'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.scores.bottom_tiles+0.25*UI_INTERLIGNE) )
 
 		self.nothing_played = UIText( ui_content['nothing_played'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE) )
-
-		self.scrabble_obtained = UIText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles) )
+		self.previous_turn_summary = UIText( ui_content['previous_turn_summary'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.scores.bottom_tiles+(0.8*len(players_names))+UI_INTERLIGNE ) )
+		self.word_and_points = UIText ( ui_content['word_and_points'][language_id], LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles+0.5*UI_INTERLIGNE )  )		
+		self.scrabble_obtained = UIText(ui_content['scrabble_obtained'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_INDENT, self.previous_turn_summary.bottom_tiles+0.5*UI_INTERLIGNE) )
 		
-		self.remaining_letters = UIText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
-
-		self.remaining_letter = UIText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
-		
-		self.no_remaining_letter = UIText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.previous_turn_summary.bottom_tiles) )
+		self.remaining_letters = UIText( ui_content['remaining_letters'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.nothing_played.bottom_tiles+0.5*UI_INTERLIGNE) )
+		self.remaining_letter = UIText( ui_content['remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.nothing_played.bottom_tiles+0.5*UI_INTERLIGNE) )
+		self.no_remaining_letter = UIText( ui_content['no_remaining_letter'][language_id], LINE_HEIGHT.NORMAL, False, (UI_LEFT_LIMIT, self.nothing_played.bottom_tiles+0.5*UI_INTERLIGNE) )
 		
 		#hardcoded help pop-up
 		self.id_tile_pop_up = 0
@@ -416,8 +411,7 @@ class UITextPrinter():
 			pos_y_delta += 0.8
 
 		#previous turn summary
-		if len(var.last_words_and_scores) > 0 :
-
+		if len(var.last_words_and_scores) > 0 : #something played
 			#header
 			text = self.previous_turn_summary.font.render( self.previous_turn_summary.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
 			window.blit(text, (self.previous_turn_summary.pos_x_pix, self.previous_turn_summary.pos_y_pix))
@@ -432,34 +426,22 @@ class UITextPrinter():
 					window.blit(text, (self.word_and_points.pos_x_pix, self.word_and_points.pos_y_pix+(pos_y_delta*var.tile_size)))
 				pos_y_delta += 0.8
 
-		else :
-			#nothing played
+		else : #nothing played
 			text = self.nothing_played.font.render( self.nothing_played.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name), 1, COLOR.GREY_LIGHT )
 			window.blit(text, (self.nothing_played.pos_x_pix, self.nothing_played.pos_y_pix) )
 
+		#Remaining letters
 		if len(var.bag_of_letters) == 0 :
 			text = self.no_remaining_letter.font.render( self.no_remaining_letter.text, 1, COLOR.GREY_LIGHT )
-				
-			if len(var.last_words_and_scores) > 0 :
-				window.blit(text, (self.no_remaining_letter.pos_x_pix, self.no_remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-			else :
-				window.blit(text, (self.no_remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
-
 		elif len(var.bag_of_letters) == 1 :
-			text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY_LIGHT )
-				
-			if len(var.last_words_and_scores) > 0 :
-				window.blit(text, (self.remaining_letter.pos_x_pix, self.remaining_letter.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-			else :
-				window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
-
+			text = self.remaining_letter.font.render( self.remaining_letter.text, 1, COLOR.GREY_LIGHT )		
 		else :
 			text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY_LIGHT )
 
-			if len(var.last_words_and_scores) > 0 :
-				window.blit(text, (self.remaining_letters.pos_x_pix, self.remaining_letters.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
-			else :
-				window.blit(text, (self.remaining_letters.pos_x_pix, self.nothing_played.pos_y_pix+ (2*UI_INTERLIGNE)*var.tile_size ) )
+		if len(var.last_words_and_scores) > 0 : #something played
+			window.blit(text, (self.remaining_letter.pos_x_pix, self.word_and_points.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+		else : #nothing played
+			window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (0.8+UI_INTERLIGNE)*var.tile_size ) )
 
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
@@ -1916,6 +1898,22 @@ else :
 #Initialize game window
 window = resizeWindow(var.window_width, var.window_height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
+#Define UI scaling
+if 1 <= len(players_names) <= 2 :
+	UI_INTERLIGNE = 1.25
+if 3 <= len(players_names) <= 4 :
+	UI_INTERLIGNE = 1.0
+if 5 <= len(players_names) <= 6 :
+	UI_TOP = 1.0
+	UI_INTERLIGNE = 0.8
+	LINE_HEIGHT.TITLE = 0.8
+	LINE_HEIGHT.SUBTITLE = 0.6
+elif 6 < len(players_names) :
+	UI_TOP = 0.75
+	UI_INTERLIGNE = 0.7
+	LINE_HEIGHT.TITLE = 0.7
+	LINE_HEIGHT.SUBTITLE = 0.6
+
 
 #----- Create board game -----
 
@@ -1923,7 +1921,7 @@ window = resizeWindow(var.window_width, var.window_height, cfg_fullscreen, cfg_r
 board = Board("empty_background", 0, 0) #automatically stored in the corresponding layer
 
 #create hand_holder
-hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, 1.5*UI_INTERLIGNE+1.4, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
+hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, UI_TOP+LINE_HEIGHT.TITLE+0.5*UI_INTERLIGNE-0.1, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 
 
 #User interface language
@@ -1953,7 +1951,7 @@ if enough_letters :
 		start_hand = GroupOfSprites()
 		hand_state = []
 		pos_x = (UI_LEFT_LIMIT)
-		pos_y = ui_text.current_player_turn.pos_y+1
+		pos_y = ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
 
 		for i in range(var.number_of_letters_per_hand) :
 			if len(var.bag_of_letters) > 0 :
@@ -2083,10 +2081,11 @@ while game_is_running:
 		#~~~~~~ KEY PRESSED - RESTART GAME ~~~~~~			
 		elif ( event_type == pygame.KEYDOWN ) and ( event.key == pygame.K_SPACE ) :
 			logging.info("SPACE key pressed")
+			pass
 
 			#TODO : creatre a real restart !
 
-
+			"""
 			# Reset Board
 			var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
 
@@ -2150,9 +2149,8 @@ while game_is_running:
 			layers.letters_on_board.draw(window)
 			pygame.display.update()
 
-			var.current_action = "SELECT_A_LETTER"		
-			
-
+			var.current_action = "SELECT_A_LETTER"			
+			"""
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		#TODO create a specific function ?
@@ -2495,7 +2493,7 @@ while game_is_running:
 											del(var.bag_of_letters[random_int])	
 
 											var.current_player.hand_state[index_hand] = drawn_letter.id
-											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.pos_y+1
+											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
 											drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
 											var.current_player.hand.add(drawn_letter)
 
