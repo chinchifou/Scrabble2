@@ -1415,6 +1415,12 @@ logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG, format
 logging.info("_________START OF LOG___________")
 logging.info("")
 
+#----- OS verification -----
+os_name = platform.system()
+os_version = platform.release()
+logging.debug("Platform : %s %s", os_name, os_version)
+logging.debug("")
+
 #----- Get configuration -----
 
 #Display settings
@@ -1439,6 +1445,24 @@ logging.debug("  Custom window height : %s", cfg_custom_window_height)
 logging.debug("  Hardware accelerated : %s", cfg_hardware_accelerated)
 logging.debug("  Double buffer : %s", cfg_double_buffer)
 logging.debug("")
+
+#----- DPI scaling -----
+if cfg_enable_windows_ten_upscaling == False :
+	if ( os_name == "Windows" and os_version == "10" ):
+		# Query DPI Awareness (Windows 10 and 8)
+		awareness = ctypes.c_int()
+		errorCode = ctypes.windll.shcore.GetProcessDpiAwareness(0, ctypes.addressof(awareness))
+
+		if awareness.value == 0 :
+			# Set DPI Awareness  (Windows 10 and 8)
+			errorCode = ctypes.windll.shcore.SetProcessDpiAwareness(2)
+			if errorCode != 0:
+				errorCode = ctypes.windll.shcore.SetProcessDpiAwareness(1)
+			if errorCode == 0 :
+				logging.debug("Pygame's window resolution handled by itself")
+			else :
+				logging.debug("  DPI scaling failed with Eror code : %s", errorCode)
+			logging.debug("")
 
 #Game settings
 game_settings = config_reader.h_rules_params
@@ -1484,27 +1508,7 @@ logging.debug("")
 #~~~~~~ GAME INITIALIAZATION ~~~~~~
 
 
-#----- OS verification and DPI scaling -----
 
-
-os_name = platform.system()
-os_version = platform.release()
-
-if cfg_enable_windows_ten_upscaling == False :
-	if ( os_name == "Windows" and os_version == "10" ):
-		# Query DPI Awareness (Windows 10 and 8)
-		awareness = ctypes.c_int()
-		errorCode = ctypes.windll.shcore.GetProcessDpiAwareness(0, ctypes.addressof(awareness))
-
-		if awareness.value == 0 :
-			logging.debug("DPI scaling")
-			logging.debug("Applications' resolutions are overriden by Windows 10")
-			logging.debug("Changing this behaviour for this pygame app instance ...")
-
-			# Set DPI Awareness  (Windows 10 and 8)
-			errorCode = ctypes.windll.shcore.SetProcessDpiAwareness(2)
-			logging.debug("Pygame's window resolution is now handled by itself")
-			logging.debug("")
 
 
 #----- Launch Pygame -----
@@ -1876,9 +1880,9 @@ pygame.mouse.set_cursor(*arrow)
 
 fps_clock = pygame.time.Clock()
 clic_clock = pygame.time.Clock()
-logging.debug("INITIALIZATION")
-logging.debug("%s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
-logging.debug("Pygame started")
+logging.debug("--- Initialization ---")
+logging.debug("  %s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
+logging.debug("  Pygame started")
 logging.debug("")
 logging.info("-------------------")
 logging.info("GAME STARTED")
