@@ -1026,7 +1026,7 @@ def updateTileSize(width, height):
 
 #Logging functions
 def logPlayersInfo():
-	logging.info("PLAYERS INFO")
+	logging.info("--- Players info ---")
 	for player in PLAYERS :
 		player.info()
 	logging.info("")
@@ -1411,7 +1411,7 @@ def incrementPredictedScore():
 
 log_file = path.join(PATHS.path_log,'scrabble.log')
 # levels : NOTSET < DEBUG < INFO < WARNING < ERROR < CRITICAL
-logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d %p %I:%M:%S')
+logging.basicConfig(filename=log_file, filemode='w', level=logging.DEBUG, format='%(asctime)s.%(msecs)03d  |  %(levelname)s  |  %(message)s', datefmt='%Y-%m-%d  %p %I:%M:%S')
 logging.info("_________START OF LOG___________")
 logging.info("")
 
