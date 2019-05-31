@@ -1031,11 +1031,30 @@ def calculatePoints(layer_letters_played) :
 		logging.debug('%i letter played : %s', len(letters_played), letters_played)
 		logging.info('') 
 
-	#___ NOTHING PLAYED ___
+
+	#store the cause of invlaidity for help pop-up
+	invalid_move_causes = []
+
+	#___ First turn valid move conditions ___
+	if len( layers.letters_on_board.sprites() ) == 0 : #first turn
+
+		if len(letters_played) == 1 : #one letter played
+			logging.info('INVALID MOVE - Only played one letter on first turn')
+			invalid_move_causes.append('START WITH ONE LETTER')
+		if var.current_board_state[7][7] == '?' : #not on the start tile
+			logging.info('INVALID MOVE - Did not play on the start tile')
+			invalid_move_causes.append('NOT ON START TILE')
+
+		if invalid_move_causes != [] :
+			return [ [], invalid_move_causes ]
+
+
+	#___ Nothing played ___
 	if len(letters_played) == 0 :
 		logging.info('Nothing played')
 		logging.info('')
-		return []
+		return [ [], [''] ]
+
 
 	#___ SOMETHING PLAYED ___
 	else :
@@ -1052,13 +1071,16 @@ def calculatePoints(layer_letters_played) :
 		min_x, max_x, delta_x = min(all_x), max(all_x), max(all_x)-min(all_x)
 		min_y, max_y, delta_y = min(all_y), max(all_y), max(all_y)-min(all_y)
 
+		logging.debug("delat x : %s, delta y : %s", delta_x, delta_y)
 
 		# played in diagonal ?
 		if (delta_x != 0 and delta_y != 0) :
 			#TODO display error message
 			logging.info("INVALID MOVE - Played in diagonal")
+			invalid_move_causes.append('DIAGONAL')
 			is_valid_move = False
-			return[]
+			logging.debug("I was there 99")
+			return [ [], invalid_move_causes]
 
 
 		#___ VERTICAL WORD PLAYED ___
@@ -1089,7 +1111,6 @@ def calculatePoints(layer_letters_played) :
 			else :
 				contains_holes = False
 
-
 			if away_vertically or contains_holes :
 				#browse all letters
 				it_y = start_y
@@ -1116,10 +1137,12 @@ def calculatePoints(layer_letters_played) :
 			if away_vertically and away_horizontally :
 				logging.info("INVALID MOVE - Not played close to an existing word")
 				is_valid_move = False
+				invalid_move_causes.append('AWAY')
 
 			if contains_holes :
 				logging.info("INVALID MOVE - Contains holes")
-				is_valid_move = False			
+				is_valid_move = False
+				invalid_move_causes.append('HOLE')			
 
 
 			#----- VALID MOVE -----
@@ -1211,7 +1234,7 @@ def calculatePoints(layer_letters_played) :
 
 			#----- INVALID MOVE -----
 			else :
-				return[]
+				return[ [], invalid_move_causes ]
 
 
 		#___ HORIZONTAL WORD PLAYED ___
@@ -1268,10 +1291,12 @@ def calculatePoints(layer_letters_played) :
 			if away_vertically and away_horizontally :
 				logging.info("INVALID MOVE - Not played close to an existing word")
 				is_valid_move = False
+				invalid_move_causes.append('AWAY')
 
 			if contains_holes :
 				logging.info("INVALID MOVE - Contains holes")
-				is_valid_move = False	
+				is_valid_move = False
+				invalid_move_causes.appen('HOLE')			
 
 
 			#----- VALID MOVE -----
@@ -1364,7 +1389,7 @@ def calculatePoints(layer_letters_played) :
 
 			#----- INVALID MOVE -----
 			else :
-				return []
+				return[ [], invalid_move_causes ]
 
 
 		#----- Calculate scores -----
@@ -1377,14 +1402,16 @@ def calculatePoints(layer_letters_played) :
 		logging.info('Total score this turn : %i', total_score)
 		logging.info('')
 
-		return words_and_scores
+		return [ words_and_scores, [''] ]
 
 
 #increment predicted score in real time
 def incrementPredictedScore():
 	var.predicted_score = 0
-	for h_word_point in calculatePoints(layers.letters_just_played) :
-		var.predicted_score = var.predicted_score + h_word_point[1]
+	a_words_points, move_is_valid = calculatePoints(layers.letters_just_played)
+	if move_is_valid:
+		for h_word_point in a_words_points :
+			var.predicted_score = var.predicted_score + h_word_point[1]
 
 
 #~~~~~~ LOAD CONFIGURATION ~~~~~~
@@ -2433,7 +2460,9 @@ while game_is_running:
 								layers.buttons_on_screen.draw(window)
 
 								#calculate score
-								var.last_words_and_scores = calculatePoints(layers.letters_just_played)
+								var.last_words_and_scores, validity_errors = calculatePoints(layers.letters_just_played)
+
+								logging.debug("validity errors : %s", validity_errors)
 
 								words = []
 								for association in var.last_words_and_scores :
@@ -2442,19 +2471,21 @@ while game_is_running:
 
 
 								#------ CHECK IF VALID MOVE ------
-								move_on = True
+								valid_move = True
+								texts = []
 
 								if ( len( layers.letters_just_played.sprites() ) > 0) :
-									#TODO
+									if validity_errors != [''] : #invalid move
+										valid_move = False
+										for cause in validity_errors :
+											#TODO translate for UI
+											texts.append(cause)
 
-									if len(words) == 0 :
-										#TODO
-										texts =["Coup invalide."]
-										move_on = False
-
+								logging.debug("text pop up : %s", texts)
+										
 
 								#------ INVALID MOVE -> Display Pop Up ------		
-								if move_on == False :
+								if valid_move == False :
 									#create pop up
 									layers.pop_up.add( createPopUp(texts, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE)  )
 
