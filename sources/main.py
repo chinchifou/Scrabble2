@@ -2228,7 +2228,7 @@ while game_is_running:
 
 				#prepare exit image (displayed when removing pop up)
 				window.blit(snapshot, (0,0))
-				
+
 			else :
 				pygame.display.update()
 			
@@ -2360,6 +2360,7 @@ while game_is_running:
 										else :
 
 											if var.allow_fast_shuffle :
+												#TODO1 to improve
 
 												letter_id = var.current_player.hand_state[index_in_hand]
 												old_letter = var.current_player.hand.findByIndex(letter_id)
@@ -2580,7 +2581,6 @@ while game_is_running:
 									shuffle(var.current_player.hand_state)
 
 
-									#logging.debug("NEW hand state : %a", var.current_player.hand_state)
 									pos_x = (UI_LEFT_LIMIT)
 									pos_y = pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
 
@@ -2594,7 +2594,7 @@ while game_is_running:
 									# ___ UPDATE DISPLAY ___
 									var.current_player.hand.clear(window, var.background_no_letter)
 									var.current_player.hand.draw(window)	
-									#pygame.display.update()
+
 									need_update = True
 
 
@@ -2627,7 +2627,7 @@ while game_is_running:
 
 							#TODO to improve based on "is a mouse" or "is a touchescreen"
 							#not a simple fast clic
-							if ( timer > 200 )  :
+							if ( timer > 100 )  :
 
 								selected_letter = layers.selected_letter.sprites()[0]
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery 

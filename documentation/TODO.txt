@@ -4,11 +4,7 @@ __________  PRIMARY  __________
 check TODO in code
 
 
-Fix bug (small freeze ) when resizing when a pop up is displayed
-
-Improve shuffle (for multiple letters before a blank spot)
-
-
+Improve shuffle (for multiple letters before a blank spot) #TODO1
 
 
 #TODO SIMPLIFY (separate stuff)
