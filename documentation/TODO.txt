@@ -3,26 +3,17 @@ __________  PRIMARY  __________
 
 check TODO in code
 
-PRIMARY :
+
+Fix bug (small freeze ) when resizing when a pop up is displayed
 
 Improve shuffle (for multiple letters before a blank spot)
 
-SECONDARY :
-
-Calculate Points Horizontal before verticaly when one letter played (easier to understand in Ui when multiple word)
-
-Clean code builder from github (especially for "/config")
-Clean script to install needed librairies + check dependancies
 
 
 
+#TODO SIMPLIFY (separate stuff)
 
-OLD STUFF
-
-Common dev :
-
-	#TODO SIMPLIFY (separate stuff)
-	#TODO CREATE A FUNCTION
+#TODO CREATE A FUNCTION
 
 	layers.background.draw(window)
 	layers.tiles.draw(window)
@@ -43,33 +34,13 @@ Common dev :
 	var.current_background = window.copy()
 
 
-Refactor calculatePoints()
-	I. Not allowed if not close to an existing word
-		if letter_on_board.size > 0
-			there are already played letters closeby
-
-	II. Not allowed in diagonal
-		Played letters must followed a line
-
-	III. First word must have more than one letter and be on the start tile
-		If letter_on_board.size == 0
-			letters_played.size should be > 1
-			and
-			for tile in letters played 
-				some of tile must be on start tile
-
-	IV. Create and hanlde events for invalid moves
-
-	V. Display errors messages (even when multiple messages)
-
-
 Possibility to redraw Letter
 
 use save game
 
-scripts for installation
+Clean code builder from github (especially for "/config")
 
-add file for dependencies
+Clean script to install needed librairies + check dependancies
 
 
 
@@ -101,9 +72,9 @@ possibility to save different games rules (board layout, letters in bag) ?
 
 __________  SECONDARY  __________
 
-allow to change display settings while game is running
+Calculate Points Horizontal before verticaly when one letter played (easier to understand in Ui when multiple word)
 
-display error message on UI when invalid move
+allow to change display settings while game is running
 
 Think of anonther display for "scrabble obtained"
 

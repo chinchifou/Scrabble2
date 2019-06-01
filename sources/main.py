@@ -4,15 +4,15 @@
 #~~~~~~ IMPORTS ~~~~~~
 
 #Standard library imports
+import pdb
+import platform
+import ctypes
+
 from os import path
 from os import makedirs
 
 from math import floor
 from random import randint, shuffle, choice
-
-import platform
-
-import ctypes
 
 #Modules imports
 import pygame
@@ -456,7 +456,7 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, margin_ratio=(1.0,1.0), interligne_ratio=0.5, time=4):
+def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4):
 
 	# ___ Init ___
 	pygame.mouse.set_cursor(*arrow) 
@@ -467,7 +467,7 @@ def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, marg
 	nb_lignes = len(ar_texts)
 	my_line_height = LINE_HEIGHT
 
-	interligne = interligne_ratio * my_line_height
+	interligne = interligne_ratio * my_line_height - my_line_height
 
 	left_margin, top_margin = my_line_height*margin_ratio[0], my_line_height*margin_ratio[1]
 	window_pos_x, window_pos_y = position[0], position[1]
@@ -484,9 +484,7 @@ def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, marg
 			longest_word = text
 
 	test_font = pygame.font.SysFont("Calibri", floor(my_line_height*var.tile_size))
-	initial_max_width = test_font.size(text)[0] / var.tile_size
-
-
+	initial_max_width = test_font.size(longest_word)[0] / var.tile_size
 	initial_total_height = my_line_height*nb_lignes + interligne*(nb_lignes - 1) 
 
 	correction_ratio_width, correction_ratio_height = 1.0, 1.0
@@ -504,6 +502,7 @@ def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, marg
 		interligne = interligne_ratio * my_line_height
 		left_margin, top_margin = my_line_height*margin_ratio[0], my_line_height*margin_ratio[1]
 
+
 	new_total_height = 2*top_margin + my_line_height*nb_lignes + interligne*(nb_lignes - 1)
 
 	test_font = pygame.font.SysFont("Calibri", floor(my_line_height*var.tile_size)) 
@@ -515,13 +514,10 @@ def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, marg
 	window_width =  ( 2*left_margin + new_max_width )
 	window_height =  ( new_total_height )
 
-
 	# ___ Move to the center of the center of the screen ___
 	if to_move_in_the_center :
-
-		window_pos_x = (32 - window_width) / 2.0 
-		window_pos_y = (18 - window_height) / 2.0
-
+		window_pos_x =  ( (bounds[0] - window_width) / 2.0 ) 
+		window_pos_y =  ( (bounds[1] - window_height) / 2.0 )
 
 	# ___ create pop_up background surface ___
 	pop_up_surface = pygame.Surface( pixels(window_width , window_height) )
@@ -531,17 +527,22 @@ def createPopUp(ar_texts, position=(0,0), bounds=(32, 18), LINE_HEIGHT=0.7, marg
 
 	# ___ Create UI text objects ___
 	ui_texts = []
-	tmp_pos_x, tmp_pos_y = window_pos_x + left_margin, window_pos_y + top_margin
+	tmp_pos_x, tmp_pos_y = left_margin, top_margin
 	for text in ar_texts :
-		ui_texts.append( UIText( text, my_line_height, False, (tmp_pos_x, tmp_pos_y) ) )
+
+		if text_centered :
+			required_width = test_font.size(text)[0] / var.tile_size
+			padding = ( new_max_width - required_width ) / 2.0
+		else :
+			padding = 0
+
+		ui_texts.append( UIText( text, my_line_height, False, (tmp_pos_x+padding, tmp_pos_y) ) )
 		tmp_pos_y += my_line_height + interligne
 
 
-	# ___ add text ___
-	tmp_pos_y = top_margin
+	# ___ Blit text to pop up ___
 	for ui_text in ui_texts :
-		pop_up_surface.blit( ui_text.font.render(ui_text.text, 1, COLOR.WHITE), pixels(left_margin, tmp_pos_y) )
-		tmp_pos_y = tmp_pos_y + my_line_height + interligne
+		pop_up_surface.blit( ui_text.font.render(ui_text.text, 1, COLOR.WHITE), pixels(ui_text.pos_x, ui_text.pos_y) )
 
 
 	#create complete pop_up
@@ -2485,7 +2486,7 @@ while game_is_running:
 								#------ INVALID MOVE -> Display Pop Up ------		
 								if valid_move == False :
 									#create pop up
-									layers.pop_up.add( createPopUp(text_pop_up, LINE_HEIGHT=LINE_HEIGHT.SUBTITLE, time = 8)  )
+									layers.pop_up.add( createPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  )
 
 									# snapshot of before pop_up
 									snapshot = window.copy()
