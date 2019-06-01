@@ -2217,7 +2217,20 @@ while game_is_running:
 
 			layers.selected_letter.draw(window)
 
-			pygame.display.update()
+			if MUST_DIPSLAY_POP_UP :
+				# snapshot of before pop_up
+				snapshot = window.copy()
+
+				#display pop_up
+				layers.dark_filter.draw(window)
+				layers.pop_up.draw(window)
+				pygame.display.update()
+
+				#prepare exit image (displayed when removing pop up)
+				window.blit(snapshot, (0,0))
+				
+			else :
+				pygame.display.update()
 			
 
 		# NORMAL EVENTS
