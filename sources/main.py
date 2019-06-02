@@ -113,6 +113,7 @@ class GameVariable():
 		self.current_player = []
 
 		self.current_action = 'SELECT_A_LETTER'
+		self.draw_a_letter = False
 		self.a_button_is_pushed = False
 
 		self.background_empty = []
@@ -155,10 +156,10 @@ PATHS = AllPaths()
 #class used to print error messages in console and log file
 class ErrorPrinter():
 
-	def not_enough_letters(self):
+	def not_enough_letters(self, nb_letters, nb_expected):
 		logging.error('! ! ! . . . . . . . . ! ! !')
 		logging.error('INITIAL SETTINGS ERROR : not enough letters at game start.')
-		logging.error('Some player has less letters than the others.')
+		logging.error('%s letters available but a minium of %s letters is required.', nb_letters, nb_expected)
 		logging.error('Possible solutions :')
 		logging.error('  1. add more letters')
 		logging.error('  2. reduce number of letters authorized per player')
@@ -167,7 +168,7 @@ class ErrorPrinter():
 		logging.error('')
 
 		print('INITIAL SETTINGS ERROR : not enough letters at game start.')
-		print('Some player has less letters than the others.')
+		print('%s letters available but a minium of %s letters is required.' %(nb_letters, nb_expected))
 		print('Possible solutions :')
 		print('  1. add more letters')
 		print('  2. reduce number of letters authorized per player')
@@ -337,7 +338,7 @@ class UITextPrinter():
 		#UI text init
 		self.current_player_turn = UIText(ui_content['current_player_turn'][language_id], LINE_HEIGHT.TITLE, True, ( UI_LEFT_LIMIT, UI_TOP) ) #fix value
 
-		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE+1.2+1*UI_INTERLIGNE) )
+		self.next_player_hand_header = UIText(ui_content['next_player_hand'][language_id], LINE_HEIGHT.NORMAL, True, ( UI_LEFT_LIMIT, self.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE+1.2+2*UI_INTERLIGNE) )
 		self.next_player_hand = UIText("", LINE_HEIGHT.NORMAL, False, ( UI_LEFT_INDENT, self.next_player_hand_header.bottom_tiles+0.25*UI_INTERLIGNE) )
 
 		if display_next_player_hand :
@@ -1496,7 +1497,7 @@ elif LETTERS_LANGUAGE == 'french':
 	POINTS_FOR = rules.points_french
 	PATHS.path_letters = PATHS.path_letters_french
 
-
+logging.debug("intial bag of letters : %s", var.bag_of_letters)
 
 #Data validation
 forced = ""
@@ -1519,15 +1520,29 @@ logging.debug("")
 #~~~~~~ GAME INITIALIAZATION ~~~~~~
 
 
-
-
-
 #----- Launch Pygame -----
 
 
 game_engine = pygame.init() #init() -> (numpass, numfail)
 sound_engine = pygame.mixer.init() #init(frequency=22050, size=-16, channels=2, buffer=4096) -> None
 game_is_running = True
+
+fps_clock = pygame.time.Clock()
+clic_clock = pygame.time.Clock()
+logging.debug("--- Initialization ---")
+logging.debug("  %s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
+logging.debug("  Pygame started")
+logging.debug("")
+logging.info("-------------------")
+logging.info("GAME STARTED")
+logging.info("-------------------")
+logging.info("")
+
+#----- Load Sounds -----
+SOUNDS = Sounds()
+logging.debug("SOUNDS loaded")
+logging.debug("")
+
 
 
 #___ CUSTOM POINTERS ___
@@ -1673,9 +1688,9 @@ hand_clic_strings = ( #sized 24x24
 )
 hand_clic=((24,24),(6,1))+pygame.cursors.compile(hand_clic_strings,"X",".")
 
+"""
 #BIG
-#TODO to debug
-if False :
+#TODO to debug:
 
 	arrow_strings = ( #sized 24x24
 	  "            X                                   ",
@@ -1884,27 +1899,11 @@ if False :
 	  "                                                ",
 	)
 	close_hand=((48,48),(24,14))+pygame.cursors.compile(hand_strings,"X",".")
+"""
 
-
-
+#Set custom cursor
 pygame.mouse.set_cursor(*arrow)
 
-fps_clock = pygame.time.Clock()
-clic_clock = pygame.time.Clock()
-logging.debug("--- Initialization ---")
-logging.debug("  %s pygame modules were launched and %s failed", game_engine[0], game_engine[1])
-logging.debug("  Pygame started")
-logging.debug("")
-logging.info("-------------------")
-logging.info("GAME STARTED")
-logging.info("-------------------")
-logging.info("")
-
-
-#----- Load Sounds -----
-SOUNDS = Sounds()
-logging.debug("SOUNDS loaded")
-logging.debug("")
 
 #----- Window init -----
 
@@ -1926,6 +1925,8 @@ else :
 
 #Initialize game window
 window = resizeWindow(var.window_width, var.window_height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
+
+#----- Variables init -----
 
 #Define UI scaling
 if 1 <= len(players_names) <= 2 :
@@ -1952,6 +1953,10 @@ board = Board("empty_background", 0, 0) #automatically stored in the correspondi
 #create hand_holder
 hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, UI_TOP+LINE_HEIGHT.TITLE+0.5*UI_INTERLIGNE-0.1, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 
+#create discard holder
+discard_holder = Hand_holder("discard_holder", UI_LEFT_LIMIT - 0.1, UI_TOP+LINE_HEIGHT.TITLE+2.5*UI_INTERLIGNE-0.1, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
+discard_holder.remove(layers.hand_holder) #remove from layer
+
 
 #User interface language
 if UI_LANGUAGE == 'english' :
@@ -1975,7 +1980,7 @@ ui_text = UITextPrinter(ui_content)
 
 
 #----- Create players -----
-enough_letters = len(players_names)*var.number_of_letters_per_hand < len(var.bag_of_letters)
+enough_letters = len(players_names)*var.number_of_letters_per_hand <= len(var.bag_of_letters)
 
 if enough_letters :
 
@@ -1991,7 +1996,7 @@ if enough_letters :
 				letter = Letter(var.bag_of_letters[random_int], pos_x, pos_y)
 				start_hand.add(letter)
 				hand_state.append(letter.id)
-				del(var.bag_of_letters[0])
+				del(var.bag_of_letters[random_int])
 				pos_x = pos_x+1
 
 		PLAYERS.append(Player(player_name, 0, start_hand, hand_state))
@@ -2003,7 +2008,7 @@ if enough_letters :
 
 else :
 	game_is_running = False
-	ERROR.not_enough_letters()
+	ERROR.not_enough_letters( len(var.bag_of_letters), len(players_names)*var.number_of_letters_per_hand )
 
 
 #~~~~~~ CREATE SPRITES ~~~~~~
@@ -2031,12 +2036,14 @@ for row in range(0,TILES_PER_LINE) :
 	y_pos += 1
 
 # ------- CREATES BUTTONS --------
-button_ok = Button("ok", 32/2.0 - 1, 14.5 )
 
 button_end_turn = Button("end_turn", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1)
+button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x), button_end_turn.pos_y + 1.25)
+button_draw = Button("draw", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
 
-button_shuffle = Button("shuffle", tiles1(hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
-
+layers.buttons_on_screen.add(button_end_turn)
+layers.buttons_on_screen.add(button_shuffle)
+layers.buttons_on_screen.add(button_draw)
 
 #create dark_filter
 mask_surface = pygame.Surface((var.window_width, var.window_height))
@@ -2049,9 +2056,6 @@ layers.dark_filter.add(dark_filter)
 
 
 # ___ SNAPSHOT FOR LATER EASY REFRESH ___
-layers.buttons_on_screen.add(button_end_turn)
-layers.buttons_on_screen.add(button_shuffle)
-
 layers.background.draw(window)
 layers.tiles.draw(window)
 layers.hand_holder.draw(window)
@@ -2115,74 +2119,6 @@ while game_is_running:
 			logging.info("SPACE key pressed")
 			pass
 
-			#TODO : creatre a real restart !
-
-			"""
-			# Reset Board
-			var.current_board_state = [ ['?' for i in range(TILES_PER_LINE)] for j in range(TILES_PER_LINE) ]
-
-			# Reset letters
-			for letter in layers.letters_on_board :
-				letter.kill()
-			
-			for letter in layers.letters_just_played :
-				letter.kill()
-
-			for letter in var.current_player.hand :
-				letter.kill()
-
-
-			layers.buttons_on_screen.empty()
-			layers.buttons_on_screen.add(button_play)
-
-			# Reset player
-			var.current_player.score = 0
-
-			pos_x = (UI_LEFT_LIMIT)
-			pos_y = layers.hand_holder.sprites()[0].pos_y + 0.1
-
-			hand_state = []
-			for tmp_letter in tmp_first_hand :
-				if tmp_letter != 0 :
-					letter = Letter(tmp_letter, pos_x, pos_y)
-					start_hand.add(letter)
-					hand_state.append(letter.id)
-				else :
-					hand_state.append(0)
-				pos_x = pos_x+1
-			PLAYERS[0].hand_state = hand_state
-
-
-			# ___ SNAPSHOT FOR LATER EASY REFRESH ___
-			layers.buttons_on_screen.add(button_end_turn)
-
-			layers.background.draw(window)
-			layers.tiles.draw(window)
-			layers.hand_holder.draw(window)
-			var.background_empty = window.copy()
-
-			layers.buttons_on_screen.draw(window)
-			var.background_no_letter = window.copy()
-
-			layers.dark_filter.draw(window)
-			layers.pop_up_window.draw(window)
-			layers.background_pop_up_empty = window.copy()
-
-
-			# ___ FIRST IMAGE ___
-			layers.buttons_on_screen.remove(button_end_turn)
-			layers.buttons_on_screen.add(button_play)
-
-			layers.background.draw(window)
-			layers.tiles.draw(window)
-
-			layers.buttons_on_screen.draw(window)
-
-			layers.letters_on_board.draw(window)
-			pygame.display.update()
-
-			var.current_action = "SELECT_A_LETTER"			
-			"""
 
 		#~~~~~~ WINDOW RESIZE ~~~~~~
 		#TODO create a specific function ?
@@ -2288,33 +2224,42 @@ while game_is_running:
 									var.current_action = "PLAY_A_LETTER"
 
 
+							#------ CLIC ON A LETTER IN DISCARD ? -------
+							if var.draw_a_letter == True :
+
+								#TODO
+								pass
+	
+
+
 							#------ CLIC ON A LETTER JUST PLAYED ? -------
-							for letter_from_board in layers.letters_just_played :
+							else :
+								for letter_from_board in layers.letters_just_played :
 
-								if letter_from_board.collide(cursor_pos_x, cursor_pos_y) :
+									if letter_from_board.collide(cursor_pos_x, cursor_pos_y) :
 
-									pygame.mouse.set_cursor(*close_hand)
+										pygame.mouse.set_cursor(*close_hand)
 
-									var.delta_pos_on_tile = ( cursor_pos_x - letter_from_board.rect.x , cursor_pos_y - letter_from_board.rect.y)
+										var.delta_pos_on_tile = ( cursor_pos_x - letter_from_board.rect.x , cursor_pos_y - letter_from_board.rect.y)
 
-									tile_x_on_board = int(letter_from_board.pos_x - DELTA)
-									tile_y_on_board = int(letter_from_board.pos_y - DELTA)
+										tile_x_on_board = int(letter_from_board.pos_x - DELTA)
+										tile_y_on_board = int(letter_from_board.pos_y - DELTA)
 
-									var.current_board_state[tile_y_on_board][tile_x_on_board] = '?'
+										var.current_board_state[tile_y_on_board][tile_x_on_board] = '?'
 
-									layers.letters_just_played.remove(letter_from_board)
-									layers.selected_letter.add(letter_from_board)
+										layers.letters_just_played.remove(letter_from_board)
+										layers.selected_letter.add(letter_from_board)
 
-									#refresh screen
-									layers.letters_just_played.clear(window, var.background_no_letter)
-									layers.letters_just_played.draw(window)
+										#refresh screen
+										layers.letters_just_played.clear(window, var.background_no_letter)
+										layers.letters_just_played.draw(window)
 
-									var.current_background = window.copy()									
-									layers.selected_letter.draw(window)
-									pygame.display.update()
+										var.current_background = window.copy()									
+										layers.selected_letter.draw(window)
+										pygame.display.update()
 
-									pygame.mouse.set_cursor(*close_hand)
-									var.current_action = "PLAY_A_LETTER"
+										pygame.mouse.set_cursor(*close_hand)
+										var.current_action = "PLAY_A_LETTER"
 							
 
 							#------ CLIC ON BUTTONS (VISUAL) -------
@@ -2340,7 +2285,9 @@ while game_is_running:
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery
 
 								#------ CLIC ON THE HAND HOLDER ? -------
-								for hand_holder in layers.hand_holder :
+								if var.draw_a_letter == False :
+
+									hand_holder = layers.hand_holder.findByIndex(2)
 
 									move_my_letter = False
 
@@ -2351,10 +2298,7 @@ while game_is_running:
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
-											logging.debug("empty slot")
-
 											move_my_letter = True
-											logging.debug("please move")
 
 										#----------------------NOT AN EMPTY SLOT--------------------	
 										else :
@@ -2394,7 +2338,6 @@ while game_is_running:
 
 
 										if move_my_letter == True :
-											logging.debug("MOVING")
 										
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
@@ -2421,42 +2364,85 @@ while game_is_running:
 											var.current_action = "SELECT_A_LETTER"
 
 
-								#------ CLIC ON A TILE ON THE BOARD ? -------
-								for tile in layers.tiles :
+									#------ CLIC ON A TILE ON THE BOARD ? -------
+									for tile in layers.tiles :
 
-									if tile.collide(letter_center_x, letter_center_y) == True :
+										if tile.collide(letter_center_x, letter_center_y) == True :
 
-										logging.debug("Tile center pos : %i, %i", tile.rect.centerx, tile.rect.centery)
+											logging.debug("Tile center pos : %i, %i", tile.rect.centerx, tile.rect.centery)
 
-										tile_x_on_board = int( tile.pos_x - DELTA )
-										tile_y_on_board = int( tile.pos_y - DELTA )
+											tile_x_on_board = int( tile.pos_x - DELTA )
+											tile_y_on_board = int( tile.pos_y - DELTA )
 
-										#------ EMPTY TILE ? -------
-										if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+											#------ EMPTY TILE ? -------
+											if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
-											selected_letter = layers.selected_letter.sprites()[0]
+												selected_letter = layers.selected_letter.sprites()[0]
 
-											selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
-											var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+												selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
+												var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
 
-											layers.letters_just_played.add(selected_letter)								
+												layers.letters_just_played.add(selected_letter)								
+												layers.selected_letter.remove(selected_letter)
+
+												layers.selected_letter.clear(window, var.current_background)	
+												layers.letters_just_played.draw(window)
+
+
+												if display_new_score_in_real_time :
+													incrementPredictedScore()
+													layers.mask_text.draw(window)
+
+												#TODO REFRESH TEXT
+												var.current_background = window.copy()
+
+												pygame.mouse.set_cursor(*open_hand)
+												CURSOR_IS_OPEN_HAND = True
+
+												pygame.display.update()
+
+												var.current_action = "SELECT_A_LETTER"
+
+
+								# ----- Discarding a letter -----
+								else :
+
+									discard_holder = layers.hand_holder.findByIndex(2)
+
+									move_my_letter = False
+
+									if hand_holder.collide(letter_center_x, letter_center_y) :
+
+										index_in_hand = hand_holder.indexAtPos(letter_center_x)
+										delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
+
+										#------ EMPTY SPOT ? -------
+										if var.current_player.hand_state[index_in_hand] == 0 :
+											move_my_letter = True
+
+										if move_my_letter == True :
+										
+											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
+											var.current_player.hand_state[index_in_hand] = selected_letter.id
+
+											#change letter from layers
+											var.current_player.hand.add(selected_letter)
 											layers.selected_letter.remove(selected_letter)
 
-											layers.selected_letter.clear(window, var.current_background)	
-											layers.letters_just_played.draw(window)
-
+											#refresh screen
+											layers.selected_letter.clear(window, var.current_background)
+											var.current_player.hand.draw(window)
 
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
 												layers.mask_text.draw(window)
 
-											#TODO REFRESH TEXT
 											var.current_background = window.copy()
 
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True
 
-											pygame.display.update()
+											pygame.display.update()											
 
 											var.current_action = "SELECT_A_LETTER"
 
@@ -2475,34 +2461,48 @@ while game_is_running:
 							if ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 								button_end_turn.release()
+								button_end_turn.turnOnHighlighted()
 								layers.buttons_on_screen.clear(window, var.background_empty)
-								layers.buttons_on_screen.draw(window)
+								#TODO2 put clear directly in button class ?
 
-								#calculate score
-								var.last_words_and_scores, invalid_move_cause = calculatePoints(layers.letters_just_played)
-
-								words = []
-								for association in var.last_words_and_scores :
-									var.current_player.score += association[1]
-									words.append(association[0])
-
-
-								#------ CHECK IF VALID MOVE ------
 								valid_move = True
-								text_pop_up = []
 
-								if ( len( layers.letters_just_played.sprites() ) > 0) :
-									if invalid_move_cause != '' : #invalid move
-										valid_move = False
-										text_pop_up = ui_pop_up_content[invalid_move_cause][language_id].split('<NEWLINE>')
-							
+								# --- draw a lettter ?"
+								if var.draw_a_letter == True :
+
+									var.draw_a_letter = False
+									#TODO - has draw letters
+
+								else :
+
+									#calculate score
+									var.last_words_and_scores, invalid_move_cause = calculatePoints(layers.letters_just_played)
+
+									words = []
+									for association in var.last_words_and_scores :
+										var.current_player.score += association[1]
+										words.append(association[0])
+
+
+									#------ CHECK IF VALID MOVE ------
+									valid_move = True
+									text_pop_up = []
+
+									if ( len( layers.letters_just_played.sprites() ) > 0) :
+										if invalid_move_cause != '' : #invalid move
+											valid_move = False
+											text_pop_up = ui_pop_up_content[invalid_move_cause][language_id].split('<NEWLINE>')
+								
 
 								#------ INVALID MOVE -> Display Pop Up ------		
 								if valid_move == False :
 									#create pop up
 									layers.pop_up.add( createPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  )
 
+									#TODO2 drawall ?
+
 									# snapshot of before pop_up
+									layers.buttons_on_screen.draw(window)
 									snapshot = window.copy()
 
 									#display pop_up
@@ -2525,8 +2525,10 @@ while game_is_running:
 										layers.letters_on_board.add(letter)
 
 									layers.letters_just_played.empty()
-									window.blit(var.background_no_letter, (0,0))
-									var.current_player.hand.clear(window, var.background_no_letter)
+									layers.letters_just_played.clear(window, var.background_no_letter)
+
+									#TODO usefull ?
+									#var.current_player.hand.clear(window, var.background_no_letter)
 
 									#redraw letters
 									index_hand = 0
@@ -2547,13 +2549,16 @@ while game_is_running:
 									var.current_player.info()
 
 									#display
-									layers.letters_just_played.clear(window, var.background_no_letter)
-									layers.letters_on_board.draw(window)
+									window.blit(var.background_no_letter, (0,0))
 
+									layers.letters_on_board.draw(window)
 									var.current_player.hand.draw(window)
+									layers.buttons_on_screen.draw(window)
 
 									var.current_background_no_text = window.copy()
 									ui_text.drawText()
+
+									var.current_background = window.copy()
 
 									TURN += 1
 
@@ -2598,6 +2603,44 @@ while game_is_running:
 									need_update = True
 
 
+							#------ RELEASE CLIC ON DRAW BUTTON -------
+							if ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ):
+
+								button_draw.release()
+								button_draw.turnOnHighlighted()
+								layers.buttons_on_screen.clear(window, var.background_empty)
+
+								need_update = True
+
+								if var.draw_a_letter == False :
+									discard_holder = layers.all.findByName("discard_holder")
+									layers.hand_holder.add(discard_holder)
+
+									#display
+									layers.buttons_on_screen.draw(window)
+									layers.hand_holder.draw(window)
+									var.current_player.hand.draw(window)
+
+									var.current_background = window.copy()
+									var.draw_a_letter = True
+
+
+								elif var.draw_a_letter == True :
+
+									discard_holder = layers.all.findByName("discard_holder")
+									layers.hand_holder.remove(discard_holder)
+									layers.hand_holder.clear(window, var.background_no_letter)
+
+									#update
+									layers.buttons_on_screen.draw(window)
+									layers.hand_holder.draw(window)
+									var.current_player.hand.draw(window)
+									var.current_background = window.copy()
+
+									var.draw_a_letter = False
+
+
+
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
 							else :
 								if not CURSOR_IS_OPEN_HAND == True :
@@ -2618,6 +2661,7 @@ while game_is_running:
 										need_update = True										
 
 							if need_update :
+								#pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
 								pygame.display.update()
 							
 
@@ -2633,14 +2677,16 @@ while game_is_running:
 								letter_center_x, letter_center_y = selected_letter.rect.centerx, selected_letter.rect.centery 
 
 								#------ CLIC ON THE HAND HOLDER ? -------
-								for hand_holder in layers.hand_holder :
+								#hand_holder = layers.hand_holder.findByIndex(2)
+								#TODO !!!
+								for hand_holder in layers.hand_holder.sprites() :
 
 									move_my_letter = False
 
 									if hand_holder.collide(letter_center_x, letter_center_y) :
 
 										index_in_hand = hand_holder.indexAtPos(letter_center_x)
-										delta_x, delta_y = layers.hand_holder.sprites()[0].pos_x + 0.1, layers.hand_holder.sprites()[0].pos_y + 0.1
+										delta_x, delta_y = hand_holder.pos_x + 0.1, hand_holder.pos_y + 0.1
 
 										#------ EMPTY SPOT ? -------
 										if var.current_player.hand_state[index_in_hand] == 0 :
@@ -2686,7 +2732,6 @@ while game_is_running:
 
 
 										if move_my_letter == True :
-											logging.debug("MOVING")
 										
 											selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 											var.current_player.hand_state[index_in_hand] = selected_letter.id
@@ -2745,6 +2790,9 @@ while game_is_running:
 											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
+
+						elif var.current_action == "DRAW_A_LETTER":
+							pass
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	

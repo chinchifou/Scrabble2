@@ -48,13 +48,18 @@ def redrawAll()
 	layer_letters.draw()
 	...
 
++ drawFrom(nb_layer)
+
+add a priority level for layer ?
+
+
 declare as global vars:
 window
 language_id
 
 create "update" for buttons to update state base on mouse cursor position
 
-add a priority level for layer ?
+
 
 tile size 2 times smaller ??
 
