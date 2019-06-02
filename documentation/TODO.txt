@@ -7,6 +7,9 @@ check TODO in code
 Improve shuffle (for multiple letters before a blank spot) #TODO1
 
 
+#TODO2 improve draw / draw all / use of layers ...
+
+
 #TODO SIMPLIFY (separate stuff)
 
 #TODO CREATE A FUNCTION
