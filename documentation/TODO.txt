@@ -3,6 +3,18 @@ __________  PRIMARY  __________
 
 check TODO in code
 
+TODO debug 
+refresh not correct because background do not contain discard holder
+display the help pop up resolve the problem
+
+cursor pointer incorrect while clicking on button
+cursor pointer incorrect after releasing clic on a button
+
+Add pop up when not possible to draw (no more letters)
+Add warning pop up when dangerous to draw (few letters)
+
+Add UI text after having discard letters
+
 
 Improve shuffle (for multiple letters before a blank spot) #TODO1
 
@@ -33,8 +45,6 @@ Improve shuffle (for multiple letters before a blank spot) #TODO1
 	var.current_background = window.copy()
 
 
-Possibility to redraw Letter
-
 use save game
 
 Clean code builder from github (especially for "/config")
@@ -59,9 +69,12 @@ add a priority level for layer ?
 declare as global vars:
 window
 language_id
+cursor_pos_x
+cursor_pos_y
+
+createPopUp including visual aspect
 
 create "update" for buttons to update state base on mouse cursor position
-
 
 
 tile size 2 times smaller ??

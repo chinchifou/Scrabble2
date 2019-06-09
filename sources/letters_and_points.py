@@ -60,6 +60,7 @@ for i in range(5):
 for i in range(3):
 	letters_french.append('D')
 	letters_french.append('M')
+
 for i in range(2):
 	letters_french.append('G')
 	letters_french.append('B')
@@ -76,6 +77,25 @@ letters_french.append('W')
 letters_french.append('X')
 letters_french.append('Y')
 letters_french.append('Z')
+
+#test values
+"""
+letters_french.append('G')
+letters_french.append('B')
+letters_french.append('C')
+letters_french.append('P')
+letters_french.append('F')
+letters_french.append('H')
+letters_french.append('V')
+
+letters_french.append('J')
+letters_french.append('Q')
+letters_french.append('K')
+letters_french.append('W')
+letters_french.append('X')
+letters_french.append('Y')
+letters_french.append('Z')
+"""
 
 
 #~~~~~~ POINTS ~~~~~~
