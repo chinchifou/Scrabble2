@@ -122,7 +122,7 @@ class GameVariable():
 		self.current_player = []
 
 		self.current_action = 'SELECT_A_LETTER'
-		self.draw_a_letter = False
+		self.discard_holder_displayed = False
 
 		#----- Update display -----
 		self.a_button_is_pushed = False
@@ -467,20 +467,20 @@ class UITextPrinter():
 def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4):
 
 	# ___ Init ___
-	pygame.mouse.set_cursor(*arrow) 
+	if isinstance(ar_texts, str) :
+		ar_texts = ar_texts.split('\n')
 
-	global FRAMES_BEFORE_POP_UP_DISAPPEAR
-	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time * 60)
-
-	nb_lignes = len(ar_texts)
 	my_line_height = LINE_HEIGHT
 
-	interligne = interligne_ratio * my_line_height - my_line_height
-
+	to_move_in_the_center = ( position == (0,0) )
 	left_margin, top_margin = my_line_height*margin_ratio[0], my_line_height*margin_ratio[1]
 	window_pos_x, window_pos_y = position[0], position[1]
 
-	to_move_in_the_center = ( position == (0,0) )
+	nb_lignes = len(ar_texts)
+	interligne = interligne_ratio * my_line_height - my_line_height
+
+	global FRAMES_BEFORE_POP_UP_DISAPPEAR
+	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time * 60)
 
 
 	# ___ Prevent to go out of the boundaries ___
@@ -556,6 +556,28 @@ def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), b
 	#create complete pop_up
 	return UI_Surface('pop_up', window_pos_x, window_pos_y, pop_up_surface)
 
+
+def displayPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4) :
+
+	pygame.mouse.set_cursor(*arrow) 
+
+	#Create pop up
+	layers.pop_up.add( createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4)  )
+	
+	# snapshot of before pop_up
+	layers.buttons_on_screen.draw(var.window)
+	snapshot = var.window.copy()
+	
+	#display pop_up
+	layers.dark_filter.draw(var.window)
+	layers.pop_up.draw(var.window)
+	pygame.display.update()
+	need_update = False
+
+	global MUST_DIPSLAY_POP_UP
+	MUST_DIPSLAY_POP_UP = True
+	#prepare exit image (displayed when removing pop up)
+	var.window.blit(snapshot, (0,0))
 
 
 #~~~~~~ CONVERTION ~~~~~~
@@ -2197,6 +2219,7 @@ while game_is_running:
 
 									if letter_from_hand.collide(cursor_pos_x, cursor_pos_y) :
 
+										#TODO8 to debug
 										pygame.mouse.set_cursor(*close_hand)
 
 										var.delta_pos_on_tile = ( cursor_pos_x - letter_from_hand.rect.x , cursor_pos_y - letter_from_hand.rect.y)
@@ -2215,12 +2238,11 @@ while game_is_running:
 										layers.selected_letter.draw(var.window)
 										pygame.display.update()
 
-										pygame.mouse.set_cursor(*close_hand)
 										var.current_action = "PLAY_A_LETTER"
 
 
 							#------ Clic on the Discard Holder ? -------
-							elif var.draw_a_letter and var.discard_holder.collide(cursor_pos_x, cursor_pos_y) :
+							elif var.discard_holder_displayed and var.discard_holder.collide(cursor_pos_x, cursor_pos_y) :
 
 								#------ Clic on a letter in the Discard Holder ? -------
 								for letter_from_hand in var.current_player.hand :
@@ -2238,6 +2260,7 @@ while game_is_running:
 										var.discard_holder_state[index_discard_holder] = 0
 
 										#refresh screen
+										#TODO refresh not OK
 										var.current_player.hand.clear(var.window, var.background_empty)
 										var.current_player.hand.draw(var.window)
 
@@ -2377,7 +2400,7 @@ while game_is_running:
 
 
 								#------ Clic on the discard holder ? -------
-								if var.draw_a_letter and var.discard_holder.collide(letter_center_x, letter_center_y) :
+								if var.discard_holder_displayed and var.discard_holder.collide(letter_center_x, letter_center_y) :
 
 									index_in_hand = var.discard_holder.indexAtPos(letter_center_x)
 									delta_x, delta_y = var.discard_holder.pos_x + 0.1, var.discard_holder.pos_y + 0.1
@@ -2475,27 +2498,30 @@ while game_is_running:
 
 								valid_move = True
 
-								# --- draw a lettter ? ---
-								if var.draw_a_letter == True :
+								# --- discard holder is shown ---
+								if var.discard_holder_displayed == True :
 
+									# does not have discarded letters
 									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
-
-										var.draw_a_letter = False
+										var.discard_holder_displayed = False
 										#TODO ask confirmation ?
 
+									# have discarded letters
 									else :
-										var.draw_a_letter = False
+										var.discard_holder_displayed = False
+										discarded_letters = []
 
 										for index in var.discard_holder_state :
 											if index != 0 :
 
 												letter = var.current_player.hand.findByIndex(index)
-
 												var.current_player.hand.remove(letter)
-												logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
-												var.bag_of_letters.append(letter.name)
+												discarded_letters.append(letter)
 
-												var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
+												logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
+												#var.bag_of_letters.append(letter.name)
+												
+										var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
 
 										#redraw letters
 										index_hand = 0
@@ -2509,8 +2535,14 @@ while game_is_running:
 												delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
 												drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
 												var.current_player.hand.add(drawn_letter)
+												logging.info("%s has discarded letter %s", var.current_player.name, drawn_letter.name)
 
 											index_hand += 1
+
+										#put discarded letters in the bag of letters
+										for letter in discarded_letters :
+											var.bag_of_letters.append(letter.name)
+										discarded_letters = []
 
 										var.current_player = var.current_player.next()
 										var.current_player.info()
@@ -2556,24 +2588,8 @@ while game_is_running:
 									#------ INVALID MOVE -> Display Pop Up ------		
 									if valid_move == False :
 
-										# snapshot before pop_up
-										layers.buttons_on_screen.draw(var.window)
 										need_update = False
-
-										#create pop up
-										layers.pop_up.add( createPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  )
-
-										snapshot = var.window.copy()
-
-										#display pop_up
-										layers.dark_filter.draw(var.window)
-										layers.pop_up.draw(var.window)
-										pygame.display.update()
-
-										MUST_DIPSLAY_POP_UP = True
-
-										#prepare exit image (displayed when removing pop up)
-										var.window.blit(snapshot, (0,0))
+										displayPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  
 									
 
 									#------ VALID MOVE -> Draw letters and next player ------
@@ -2608,6 +2624,7 @@ while game_is_running:
 										var.window.blit(var.background_empty, (0,0))
 
 										layers.letters_on_board.draw(var.window)
+										#TODO ? draw hand_holder ?
 										var.current_player.hand.draw(var.window)
 										layers.buttons_on_screen.draw(var.window)
 
@@ -2655,7 +2672,7 @@ while game_is_running:
 									# ___ UPDATE DISPLAY ___
 									var.current_player.hand.clear(var.window, var.background_empty)
 									var.current_player.hand.draw(var.window)	
-									
+
 									need_update = True
 
 
@@ -2664,26 +2681,37 @@ while game_is_running:
 
 								button_draw.release()
 								button_draw.turnOnHighlighted()
-								layers.buttons_on_screen.clear(var.window, var.background_empty)
+								layers.buttons_on_screen.clear( var.window, var.background_empty)
 
-								need_update = True
+								need_update = False
 
-								if var.draw_a_letter == False :
-									#TODO - inform user if there is no more letter in bag
+								#discard holder not displayed yet
+								if var.discard_holder_displayed == False :
 
-									discard_holder = layers.all.findByName("discard_holder")
-									layers.hand_holder.add(discard_holder)
+									#not enough letters remaining
+									if len(var.bag_of_letters) < var.number_of_letters_per_hand :
+										displayPopUp("Not enough remaining letters")
 
-									#display
-									layers.buttons_on_screen.draw(var.window)
-									layers.hand_holder.draw(var.window)
-									var.current_player.hand.draw(var.window)
+									else:
 
-									var.current_background = var.window.copy()
-									var.draw_a_letter = True
+										#TODO9 - create a snapsot for later screen refresh ? 
+										discard_holder = layers.all.findByName("discard_holder")
+										layers.hand_holder.add(discard_holder)
+
+										#display
+										layers.buttons_on_screen.draw(var.window)
+										layers.hand_holder.draw(var.window)
+										var.current_player.hand.draw(var.window)
+
+										var.current_background = var.window.copy()
+										var.discard_holder_displayed = True
+
+										need_update = True
 
 
-								elif var.draw_a_letter == True :
+
+								#Discard holde already displayed
+								elif var.discard_holder_displayed == True :
 
 									#TODO temporary 
 									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
@@ -2698,26 +2726,13 @@ while game_is_running:
 										var.current_player.hand.draw(var.window)
 										var.current_background = var.window.copy()
 
-										var.draw_a_letter = False
+										var.discard_holder_displayed = False
+										need_update = True
+
 
 									else :
-
-										#create pop up
-										#bug ...
-										layers.pop_up.add( createPopUp("Attention lettres dans la pioche")  )
-										# snapshot of before pop_up
-										layers.buttons_on_screen.draw(var.window)
-										snapshot = var.window.copy()
-										#display pop_up
-										layers.dark_filter.draw(var.window)
-										layers.pop_up.draw(var.window)
-										pygame.display.update()
-										need_update = False
-
-										MUST_DIPSLAY_POP_UP = True
-										#prepare exit image (displayed when removing pop up)
-										var.window.blit(snapshot, (0,0))
-
+										#TODO in different languages
+										displayPopUp("Attention lettres dans la pioche")
 
 
 							#------ RELEASE CLIC AWAY FROM BUTTON (VISUAL) -------
@@ -2743,7 +2758,6 @@ while game_is_running:
 								#pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
 								pygame.display.update()
 							
-
 
 						#------ PLAY A SELECTED LETTER-------
 						if var.current_action == 'PLAY_A_LETTER' and len(layers.selected_letter) == 1 :
@@ -2829,9 +2843,8 @@ while game_is_running:
 										var.current_action = "SELECT_A_LETTER"
 
 
-
 								#------ Clic on the discard holder ? -------
-								if var.draw_a_letter and var.discard_holder.collide(letter_center_x, letter_center_y) :
+								if var.discard_holder_displayed and var.discard_holder.collide(letter_center_x, letter_center_y) :
 
 									index_in_hand = var.discard_holder.indexAtPos(letter_center_x)
 									delta_x, delta_y = var.discard_holder.pos_x + 0.1, var.discard_holder.pos_y + 0.1
@@ -2899,9 +2912,6 @@ while game_is_running:
 											pygame.display.update()
 
 											var.current_action = "SELECT_A_LETTER"
-
-						elif var.current_action == "DRAW_A_LETTER":
-							pass
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	

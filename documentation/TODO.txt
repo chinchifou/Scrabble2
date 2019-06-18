@@ -3,24 +3,65 @@ __________  PRIMARY  __________
 
 check TODO in code
 
-TODO debug 
-refresh not correct because background do not contain discard holder
-display the help pop up resolve the problem
+------ DRAW -----------
 
-cursor pointer incorrect while clicking on button
-cursor pointer incorrect after releasing clic on a button
+TODO9 debug 
+	refresh not correct because background does not contain discard holder
+	display the help pop up resolve the problem
 
-Add pop up when not possible to draw (no more letters)
-Add warning pop up when dangerous to draw (few letters)
+
+Change buttons and aspects
+	END_TURN --> VALIDATE
+	DRAW --> CANCEL
+
+
+cursor pointer incorrect TODO8
+	on button
+		while clicking 
+		after releasing clic
+
+Add UI Pop Up in different languages
 
 Add UI text after having discard letters
-
 
 Improve shuffle (for multiple letters before a blank spot) #TODO1
 
 
 #TODO2 improve draw / draw all / use of layers ...
 
+
+use save game
+
+Clean code builder from github (especially for "/config")
+
+Clean script to install needed librairies + check dependancies
+
+
+
+__________  SECONDARY  __________
+
+Calculate Points Horizontal before verticaly when one letter played (easier to understand in Ui when multiple word)
+
+allow to change display settings while game is running
+
+Think of anonther display for "scrabble obtained"
+
+UI - switch "scores" and "previous turn summary"
+
+possibilility to change value for "points for a scrabble"
+
+set logger to different levels from a file
+
+
+Pop up message
+	pb when a lot of lines
+
+
+
+__________  REFACTORING  __________
+
+Rename Hand_Holder -> LetterHolder
+Rename layers.hand_holder --> Layers.letter_holders
 
 #TODO SIMPLIFY (separate stuff)
 
@@ -43,17 +84,6 @@ Improve shuffle (for multiple letters before a blank spot) #TODO1
 	ui_text.drawText()
 
 	var.current_background = window.copy()
-
-
-use save game
-
-Clean code builder from github (especially for "/config")
-
-Clean script to install needed librairies + check dependancies
-
-
-
-__________  REFACTORING  __________
 
 create redrawAll() function to update the screen ? 
 def redrawAll()
@@ -87,21 +117,6 @@ possibility to save different games rules (board layout, letters in bag) ?
 
 
 
-__________  SECONDARY  __________
-
-Calculate Points Horizontal before verticaly when one letter played (easier to understand in Ui when multiple word)
-
-allow to change display settings while game is running
-
-Think of anonther display for "scrabble obtained"
-
-UI - switch "scores" and "previous turn summary"
-
-possibilility to change value for "points for a scrabble"
-
-set logger to different levels from a file
-
-
 
 __________  PERFORMANCE  __________
 
@@ -116,6 +131,7 @@ __________  BUG  __________
 fix a glitch on LAPTOP or low resolutions (small black strip) for board when big window (bug already present in Scrabble V1) maybe due to to bad "round"
 > use smaller tile size ?
 
+FIx bug on latop : not possible to select a letter by using the trackpad (release event created by the system ?)
 
 
 __________  TO KEEP IN MIND  __________

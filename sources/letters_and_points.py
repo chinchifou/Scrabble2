@@ -41,7 +41,10 @@ letters_english.append('X')
 letters_english.append('Z')
 
 #----- French -----
+
 letters_french = [] #total length must be 102
+
+"""
 for i in range(15):
 	letters_french.append('E')
 for i in range(9):
@@ -77,9 +80,10 @@ letters_french.append('W')
 letters_french.append('X')
 letters_french.append('Y')
 letters_french.append('Z')
+"""
 
 #test values
-"""
+
 letters_french.append('G')
 letters_french.append('B')
 letters_french.append('C')
@@ -95,7 +99,14 @@ letters_french.append('W')
 letters_french.append('X')
 letters_french.append('Y')
 letters_french.append('Z')
-"""
+
+letters_french.append('J')
+letters_french.append('Q')
+letters_french.append('K')
+letters_french.append('W')
+letters_french.append('X')
+letters_french.append('Y')
+letters_french.append('Z')
 
 
 #~~~~~~ POINTS ~~~~~~
