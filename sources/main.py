@@ -1984,7 +1984,7 @@ board = Board("empty_background", 0, 0) #automatically stored in the correspondi
 var.hand_holder = Hand_holder("hand_holder", UI_LEFT_LIMIT - 0.1, UI_TOP+LINE_HEIGHT.TITLE+0.5*UI_INTERLIGNE-0.1, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 
 #create discard holder
-var.discard_holder = Hand_holder("discard_holder", UI_LEFT_LIMIT - 0.1, UI_TOP+LINE_HEIGHT.TITLE+2.5*UI_INTERLIGNE-0.1, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
+var.discard_holder = Hand_holder("discard_holder", UI_LEFT_LIMIT - 0.1, UI_TOP+LINE_HEIGHT.TITLE+ 1.75*UI_INTERLIGNE-0.1, var.number_of_letters_per_hand)#automatically stored in the corresponding layer
 var.discard_holder.remove(layers.hand_holder) #remove from layer
 
 
@@ -2067,9 +2067,10 @@ for row in range(0,TILES_PER_LINE) :
 
 # ------- CREATES BUTTONS --------
 
-button_end_turn = Button("end_turn", tiles1(var.hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1)
-button_shuffle = Button("shuffle", tiles1(var.hand_holder.rect.x), button_end_turn.pos_y + 1.25)
-button_draw = Button("draw", tiles1(var.hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, button_end_turn.pos_y + 1.25)
+button_shuffle = Button("shuffle", tiles1(var.hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1 )
+button_draw = Button("draw", button_shuffle.pos_x, UI_TOP+LINE_HEIGHT.TITLE+ 1.75*UI_INTERLIGNE)
+button_end_turn = Button("end_turn", button_draw.pos_x, button_draw.pos_y + 1 + 0.2)
+
 
 layers.buttons_on_screen.add(button_end_turn)
 layers.buttons_on_screen.add(button_shuffle)
