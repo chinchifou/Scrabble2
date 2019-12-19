@@ -1124,7 +1124,7 @@ def calculatePoints(layer_letters_played) :
 			while( ( (start_y - 1) >= 0) and (var.current_board_state[start_y - 1][min_x] != '?') ) :
 				start_y = start_y - 1
 			#find last letter
-			while( ( (end_y + 1) <= TILES_PER_LINE-1) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
+			while( ( (end_y + 1) < TILES_PER_LINE) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
 				end_y = end_y + 1
 
 			#------ Is valid move ? ------
@@ -1146,13 +1146,13 @@ def calculatePoints(layer_letters_played) :
 			if away_vertically or contains_holes :
 				#browse all letters
 				it_y = start_y
-				while( ( it_y <= TILES_PER_LINE-1) and (var.current_board_state[it_y][min_x] != '?') ) :
+				while( ( it_y < TILES_PER_LINE) and (var.current_board_state[it_y][min_x] != '?') ) :
 					#left
 					if min_x > 0 :
 						if var.current_board_state[it_y][min_x-1] != '?' :
 							away_horizontally = False
 					#right
-					if min_x + 1 <= TILES_PER_LINE :
+					if min_x + 1 < TILES_PER_LINE :
 						if var.current_board_state[it_y][min_x+1] != '?' :
 							away_horizontally = False
 
@@ -1229,7 +1229,7 @@ def calculatePoints(layer_letters_played) :
 					if (it_x, it_y) in (letters_played) : #prevent to count already existing words
 
 						condition_1 = ( (it_x - 1) >= 0 ) and ( var.current_board_state[it_y][it_x-1] != '?' )
-						condition_2 = ( (it_x + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y][it_x+1] != '?' ) 
+						condition_2 = ( (it_x + 1) < TILES_PER_LINE ) and ( var.current_board_state[it_y][it_x+1] != '?' ) 
 
 						if ( condition_1  or condition_2 ) :       
 							logging.debug('Horizontal word played')
@@ -1240,7 +1240,7 @@ def calculatePoints(layer_letters_played) :
 
 							old_word, old_word_score, old_word_multiplier = '', 0, 1
 							#___ ITERATE ON THE LETTER OF THE WORD (go to the end of the word) ___
-							while( ( (it_x) <= TILES_PER_LINE-1) and (var.current_board_state[it_y][it_x] != '?') ) :
+							while( ( (it_x) < TILES_PER_LINE) and (var.current_board_state[it_y][it_x] != '?') ) :
 
 								old_letter = var.current_board_state[it_y][it_x]
 								old_word += old_letter
@@ -1278,7 +1278,7 @@ def calculatePoints(layer_letters_played) :
 			while( ( (start_x - 1) >= 0) and (var.current_board_state[min_y][start_x - 1] != '?') ) :
 				start_x = start_x - 1
 			#find last letter
-			while( ( (end_x + 1) <= TILES_PER_LINE-1) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
+			while( ( (end_x + 1) < TILES_PER_LINE) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
 				end_x = end_x + 1
 
 			#------ Is valid move ? ------
@@ -1300,13 +1300,13 @@ def calculatePoints(layer_letters_played) :
 			if away_horizontally or contains_holes :
 				#browse all letters
 				it_x = start_x
-				while( ( it_x <= TILES_PER_LINE-1) and (var.current_board_state[min_y][it_x] != '?') ) :
+				while( ( it_x < TILES_PER_LINE) and (var.current_board_state[min_y][it_x] != '?') ) :
 					#up
 					if min_y > 0 :
 						if var.current_board_state[min_y - 1][it_x] != '?':
 							away_vertically = False
 					#down
-					if min_y + 1 <= TILES_PER_LINE :
+					if min_y + 1 < TILES_PER_LINE :
 						if var.current_board_state[min_y + 1][it_x] != '?':
 							away_vertically = False						
 
@@ -1384,7 +1384,7 @@ def calculatePoints(layer_letters_played) :
 					if (it_x, it_y) in (letters_played) : #prevent to count already existing words
 
 						condition_1 = ( (it_y - 1) >= 0 ) and ( var.current_board_state[it_y-1][it_x] != '?' )
-						condition_2 = ( (it_y + 1) <= TILES_PER_LINE-1 ) and ( var.current_board_state[it_y+1][it_x] != '?' ) 
+						condition_2 = ( (it_y + 1) < TILES_PER_LINE ) and ( var.current_board_state[it_y+1][it_x] != '?' ) 
 
 						if ( condition_1  or condition_2 ) :
 							logging.debug('Vertical word played')
@@ -1395,7 +1395,7 @@ def calculatePoints(layer_letters_played) :
 
 							old_word, old_word_score, old_word_multiplier= '', 0, 1
 							#___ ITERATE ON THE LETTER OF THE WORD (go to the end of the word) ___
-							while( ( (it_y) <= TILES_PER_LINE-1) and (var.current_board_state[it_y][it_x] != '?') ) :
+							while( ( (it_y) < TILES_PER_LINE) and (var.current_board_state[it_y][it_x] != '?') ) :
 
 								old_letter = var.current_board_state[it_y][it_x]
 								old_word += old_letter
