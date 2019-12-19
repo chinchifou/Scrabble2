@@ -2714,7 +2714,7 @@ while game_is_running:
 								#Discard holde already displayed
 								elif var.discard_holder_displayed == True :
 
-									#TODO temporary 
+									#TODO3 change button aspect 
 									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
 
 										discard_holder = layers.all.findByName("discard_holder")

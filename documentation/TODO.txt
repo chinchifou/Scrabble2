@@ -9,9 +9,9 @@ TODO9 debug
 	refresh not correct because background does not contain discard holder
 	display the help pop up resolve the problem
 
-
+TODO3
 Change buttons and aspects
-	END_TURN --> VALIDATE
+	PASS --> END_TURN ( --> VALIDATE )
 	DRAW --> CANCEL
 
 
