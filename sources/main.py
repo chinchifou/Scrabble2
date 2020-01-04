@@ -2691,6 +2691,7 @@ while game_is_running:
 									layers.buttons_on_screen.remove(button_draw)
 
 									button_draw.release()
+									button_draw.turnOnHighlighted()
 									button_cancel.turnOnHighlighted()
 									layers.buttons_on_screen.clear( var.window, var.background_empty)
 									need_update = True
@@ -2724,6 +2725,7 @@ while game_is_running:
 									layers.buttons_on_screen.add(button_draw)
 
 									button_cancel.release()
+									button_cancel.turnOnHighlighted()
 									button_draw.turnOnHighlighted()
 									layers.buttons_on_screen.clear( var.window, var.background_empty)
 									#need_update = True
