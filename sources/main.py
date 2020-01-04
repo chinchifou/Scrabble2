@@ -809,6 +809,7 @@ class Button(ResizableSprite):
 
 		self.is_highlighted = False
 		self.is_pushed = False
+		self.is_enabled = True
 		self.is_a_checkbox = is_a_checkbox
 		self.is_an_emoticom = is_an_emoticom
 
@@ -837,6 +838,18 @@ class Button(ResizableSprite):
 		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
 		self.mask = self.getMask(self.name+'.png')
 		self.is_pushed = False	
+
+	def enable(self):
+		self.image = loadTransparentImage(path.join(self.path, self.name+'.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'.png')
+		self.is_enabled = True
+
+	def disable(self):
+		self.image = loadTransparentImage(path.join(self.path, self.name+'_disabled.png'))
+		self.image = pygame.transform.smoothscale(self.image, pixels(self.width, self.height))
+		self.mask = self.getMask(self.name+'_disabled.png')
+		self.is_enabled = False
 
 
 class Checkbox(Button):
@@ -2262,10 +2275,15 @@ while game_is_running:
 										index_discard_holder = var.discard_holder_state.index(letter_from_hand.id)
 										var.discard_holder_state[index_discard_holder] = 0
 
+										if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
+											button_confirm.disable()
+
 										#refresh screen
-										#TODO refresh not OK
+										#TODO9 refresh not OK
 										var.current_player.hand.clear(var.window, var.background_empty)
 										var.current_player.hand.draw(var.window)
+
+										layers.buttons_on_screen.draw(var.window)
 
 										var.current_background = var.window.copy()									
 										layers.selected_letter.draw(var.window)
@@ -2307,13 +2325,14 @@ while game_is_running:
 
 							#------ CLIC ON BUTTONS (VISUAL) -------
 							for button in layers.buttons_on_screen :
-								if button.collide(cursor_pos_x, cursor_pos_y) == True :
-									#change button state
-									button.is_highlighted = False
-									button.push()
-									var.a_button_is_pushed = True
-									layers.buttons_on_screen.clear(var.window, var.background_empty)
-									layers.buttons_on_screen.draw(var.window) 
+								if button.is_enabled :
+									if button.collide(cursor_pos_x, cursor_pos_y) == True :
+										#change button state
+										button.is_highlighted = False
+										button.push()
+										var.a_button_is_pushed = True
+										layers.buttons_on_screen.clear(var.window, var.background_empty)
+										layers.buttons_on_screen.draw(var.window) 
 							pygame.display.update()
 
 
@@ -2571,7 +2590,7 @@ while game_is_running:
 
 
 							#------ RELEASE CLIC ON CONFIRM BUTTON -------
-							if ( (button_confirm.collide(cursor_pos_x, cursor_pos_y) == True) and (button_confirm.is_pushed) ):
+							if ( (button_confirm.collide(cursor_pos_x, cursor_pos_y) == True) and (button_confirm.is_pushed) and (button_confirm.is_enabled)):
 								
 								layers.buttons_on_screen.add(button_end_turn)
 								layers.buttons_on_screen.remove(button_confirm)
@@ -2689,22 +2708,25 @@ while game_is_running:
 								#discard holder not displayed yet
 								if var.discard_holder_displayed == False :
 
-
 									#not enough letters remaining
 									if len(var.bag_of_letters) < var.number_of_letters_per_hand :
 
 										button_draw.release()
 										displayPopUp("Not enough remaining letters")
 
-									else:									
+									else:
+																			
+										button_draw.release()
+										layers.buttons_on_screen.remove(button_draw)	
+
 										layers.buttons_on_screen.add(button_cancel)
-										layers.buttons_on_screen.remove(button_draw)										
+										button_cancel.turnOnHighlighted()
 
 										layers.buttons_on_screen.add(button_confirm)
+										button_confirm.disable()
+
 										layers.buttons_on_screen.remove(button_end_turn)
 
-										button_draw.release()
-										button_cancel.turnOnHighlighted()
 
 										#TODO9 - create a snapsot for later screen refresh ??? 
 										discard_holder = layers.all.findByName("discard_holder")
@@ -2872,9 +2894,10 @@ while game_is_running:
 									#------ EMPTY SPOT ? -------
 									if var.discard_holder_state[index_in_hand] == 0 :
 										move_my_letter = True
+										button_confirm.enable()
 
 									else :
-										#TODO push letters
+										#TODO1 push letters
 										pass
 
 									if move_my_letter == True :
@@ -2889,6 +2912,8 @@ while game_is_running:
 										#refresh screen
 										layers.selected_letter.clear(var.window, var.current_background)
 										var.current_player.hand.draw(var.window)
+
+										layers.buttons_on_screen.draw(var.window)
 
 										var.current_background = var.window.copy()
 
@@ -2948,14 +2973,15 @@ while game_is_running:
 				buttons_changed = False
 				#TODO restrict area to boost performance
 				for button in layers.buttons_on_screen :
-					if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
-						button.turnOnHighlighted()
-						pygame.mouse.set_cursor(*hand)
-						buttons_changed = True
-					elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
-						button.turnOffHighlighted()
-						pygame.mouse.set_cursor(*arrow)
-						buttons_changed = True
+					if button.is_enabled :
+						if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+							button.turnOnHighlighted()
+							pygame.mouse.set_cursor(*hand)
+							buttons_changed = True
+						elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+							button.turnOffHighlighted()
+							pygame.mouse.set_cursor(*arrow)
+							buttons_changed = True
 
 				if buttons_changed :
 					layers.buttons_on_screen.clear(var.window, var.background_empty)
