@@ -5,31 +5,35 @@ check TODO in code
 
 ------ DRAW -----------
 
-TODO9 debug 
-	refresh not correct because background does not contain discard holder
-	display the help pop up resolve the problem
+	Change buttons and aspects
+		PASS --> END_TURN ( --> VALIDATE )
+			Create snapshot to avoid bug with pop-up
 
-TODO3
-	TODO4 debug - split in two ?
-Change buttons and aspects
-	PASS --> END_TURN ( --> VALIDATE )
-	DRAW --> CANCEL
-		Create snapshot to avoid bug with pop-up
+	#TODO2 put clear directly in button class ?
 
+	Add UI Pop Up in different languages
 
-cursor pointer incorrect TODO8
+	Add UI text after having discard letters
+
+	TODO9 debug 
+		refresh not correct because background does not contain discard holder
+		display the help pop up resolve the problem
+		
+
+#TODO1
+Improve shuffle (for multiple letters before a blank spot) 
+
+TODO8
+cursor pointer incorrect 
 	on button
 		while clicking 
 		after releasing clic
 
-Add UI Pop Up in different languages
-
-Add UI text after having discard letters
-
-Improve shuffle (for multiple letters before a blank spot) #TODO1
-
-
 #TODO2 improve draw / draw all / use of layers ...
+#TODO2 put clear directly in button class ?
+
+TODO11
+when a click on a button > display a pop up > wait > button and mouse are incorrect
 
 
 use save game

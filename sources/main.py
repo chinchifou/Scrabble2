@@ -2495,7 +2495,8 @@ while game_is_running:
 
 								button_end_turn.release()
 								button_end_turn.turnOnHighlighted()
-								layers.buttons_on_screen.clear(var.window, var.background_empty)
+
+								#layers.buttons_on_screen.clear(var.window, var.background_empty)
 								#TODO2 put clear directly in button class ?
 
 								valid_move = True
@@ -2503,10 +2504,17 @@ while game_is_running:
 								# --- discard holder is shown ---
 								if var.discard_holder_displayed == True :
 
+									layers.buttons_on_screen.add(button_draw)
+									layers.buttons_on_screen.remove(button_cancel)
+
+									button_cancel.release()
+
+									need_update = True
+
 									# does not have discarded letters
 									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
 										var.discard_holder_displayed = False
-										#TODO ask confirmation ?
+										#TODO4 to debug (need to click twice)
 
 									# have discarded letters
 									else :
@@ -2546,24 +2554,24 @@ while game_is_running:
 											var.bag_of_letters.append(letter.name)
 										discarded_letters = []
 
-										var.current_player = var.current_player.next()
-										var.current_player.info()
+									var.current_player = var.current_player.next()
+									var.current_player.info()
 
-										#display
-										var.window.blit(var.background_empty, (0,0))
+									#display
+									var.window.blit(var.background_empty, (0,0))
 
-										layers.letters_on_board.draw(var.window)
-										var.current_player.hand.draw(var.window)
-										layers.buttons_on_screen.draw(var.window)
+									layers.letters_on_board.draw(var.window)
+									var.current_player.hand.draw(var.window)
+									layers.buttons_on_screen.draw(var.window)
 
-										var.current_background_no_text = var.window.copy()
-										ui_text.drawText()
+									var.current_background_no_text = var.window.copy()
+									ui_text.drawText()
 
-										var.current_background = var.window.copy()
+									var.current_background = var.window.copy()
 
-										TURN += 1
+									TURN += 1
 
-										need_update = True
+									need_update = True
 
 
 								else :
@@ -2681,28 +2689,25 @@ while game_is_running:
 							#------ RELEASE CLIC ON DRAW BUTTON -------
 							if ( ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ) or ( (button_cancel.collide(cursor_pos_x, cursor_pos_y) == True) and (button_cancel.is_pushed) ) ):
 
-								#TODO3 change button aspect
-								#TODO4 debug
 
 								#discard holder not displayed yet
 								if var.discard_holder_displayed == False :
 
-									layers.buttons_on_screen.add(button_cancel)
-									layers.buttons_on_screen.remove(button_draw)
-
-									button_draw.release()
-									button_draw.turnOnHighlighted()
-									button_cancel.turnOnHighlighted()
-									layers.buttons_on_screen.clear( var.window, var.background_empty)
-									need_update = True
 
 									#not enough letters remaining
 									if len(var.bag_of_letters) < var.number_of_letters_per_hand :
+
+										button_draw.release()
 										displayPopUp("Not enough remaining letters")
 
-									else:
+									else:									
+										layers.buttons_on_screen.add(button_cancel)
+										layers.buttons_on_screen.remove(button_draw)
 
-										#TODO9 - create a snapsot for later screen refresh ? 
+										button_draw.release()
+										button_cancel.turnOnHighlighted()
+
+										#TODO9 - create a snapsot for later screen refresh ??? 
 										discard_holder = layers.all.findByName("discard_holder")
 										layers.hand_holder.add(discard_holder)
 
@@ -2717,21 +2722,16 @@ while game_is_running:
 										need_update = True
 
 
-
 								#Discard holde already displayed
 								elif var.discard_holder_displayed == True :
 
-									layers.buttons_on_screen.remove(button_cancel)
-									layers.buttons_on_screen.add(button_draw)
-
-									button_cancel.release()
-									button_cancel.turnOnHighlighted()
-									button_draw.turnOnHighlighted()
-									layers.buttons_on_screen.clear( var.window, var.background_empty)
-									#need_update = True
-
-									 
 									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
+
+										layers.buttons_on_screen.remove(button_cancel)
+										layers.buttons_on_screen.add(button_draw)
+
+										button_cancel.release()
+										button_draw.turnOnHighlighted()
 
 										discard_holder = layers.all.findByName("discard_holder")
 										layers.hand_holder.remove(discard_holder)
@@ -2749,6 +2749,7 @@ while game_is_running:
 
 									else :
 										#TODO in different languages
+										button_cancel.release()
 										displayPopUp("Attention lettres dans la pioche")
 
 
