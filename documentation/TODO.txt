@@ -13,7 +13,7 @@ check TODO in code
 
 	#TODO2 put clear directly in button class ?
 
-	Add UI Pop Up in different languages
+	#TODO 7 Add UI Pop Up in different languages
 
 	Add UI text after having discard letters
 
@@ -21,6 +21,8 @@ check TODO in code
 		refresh not correct because background does not contain discard holder
 		display the help pop up resolve the problem
 
+#TODO8 possible display problem to solve (flickering around other letters when moving a letter)
+#TODO8 debug display
 
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 

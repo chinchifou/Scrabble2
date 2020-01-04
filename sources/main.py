@@ -128,6 +128,7 @@ class GameVariable():
 		self.a_button_is_pushed = False
 
 		self.background_empty = []
+		self.background_empty_drawing = []
 
 		self.current_background_no_text = []
 		self.current_background = []
@@ -2111,6 +2112,17 @@ if game_is_running :
 	layers.hand_holder.draw(var.window)
 	var.background_empty = var.window.copy()
 
+
+	discard_holder = layers.all.findByName("discard_holder")
+	layers.hand_holder.add(discard_holder)
+	layers.hand_holder.draw(var.window)
+
+	var.background_empty_drawing = var.window.copy()
+
+	layers.hand_holder.remove(discard_holder)
+	layers.hand_holder.clear(var.window, var.background_empty)
+
+
 	layers.buttons_on_screen.draw(var.window)
 
 	var.current_player.hand.draw(var.window)
@@ -2167,10 +2179,22 @@ while game_is_running:
 
 			var.window = resizeWindow(width, height, cfg_fullscreen, cfg_resizable, cfg_resolution_auto, cfg_custom_window_height, cfg_double_buffer, cfg_hardware_accelerated)
 
+			#return to normal config even if drawing letters
+			layers.hand_holder.remove(discard_holder)
+
 			layers.background.draw(var.window)
 			layers.tiles.draw(var.window)
 			layers.hand_holder.draw(var.window)
 			var.background_empty = var.window.copy()
+
+			discard_holder = layers.all.findByName("discard_holder")
+			layers.hand_holder.add(discard_holder)
+			layers.hand_holder.draw(var.window)
+			var.background_empty_drawing = var.window.copy()
+			
+			if var.discard_holder_displayed == False :
+				layers.hand_holder.remove(discard_holder)
+				layers.hand_holder.clear(var.window, var.background_empty)
 
 			layers.buttons_on_screen.draw(var.window)
 			layers.letters_on_board.draw(var.window)
@@ -2247,7 +2271,7 @@ while game_is_running:
 										var.current_player.hand_state[hand_state_index] = 0
 
 										#refresh screen
-										var.current_player.hand.clear(var.window, var.background_empty)
+										var.current_player.hand.clear(var.window, var.background_empty_drawing) #needed when drawing letters
 										var.current_player.hand.draw(var.window)
 
 										var.current_background = var.window.copy()									
@@ -2280,7 +2304,7 @@ while game_is_running:
 
 										#refresh screen
 										#TODO9 refresh not OK
-										var.current_player.hand.clear(var.window, var.background_empty)
+										var.current_player.hand.clear(var.window, var.background_empty_drawing)
 										var.current_player.hand.draw(var.window)
 
 										layers.buttons_on_screen.draw(var.window)
@@ -2772,7 +2796,7 @@ while game_is_running:
 
 
 									else :
-										#TODO in different languages
+										#TODO7 in different languages
 										button_cancel.release()
 										displayPopUp("Attention lettres dans la pioche")
 
@@ -2869,6 +2893,8 @@ while game_is_running:
 
 										#refresh screen
 										layers.selected_letter.clear(var.window, var.current_background)
+
+										var.current_player.hand.clear(var.window, var.current_background)
 										var.current_player.hand.draw(var.window)
 
 										if display_new_score_in_real_time :
@@ -2911,6 +2937,8 @@ while game_is_running:
 
 										#refresh screen
 										layers.selected_letter.clear(var.window, var.current_background)
+
+										var.current_player.hand.clear(var.window, var.current_background)
 										var.current_player.hand.draw(var.window)
 
 										layers.buttons_on_screen.draw(var.window)
@@ -3011,6 +3039,7 @@ while game_is_running:
 
 				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
 
+				#TODO8 possible display problem to solve (flickering around other letters when moving a letter)
 				layers.selected_letter.clear(var.window, var.current_background)
 				layers.selected_letter.draw(var.window)
 
