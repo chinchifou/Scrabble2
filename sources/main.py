@@ -2071,6 +2071,7 @@ button_shuffle = Button("shuffle", tiles1(var.hand_holder.rect.x)+var.number_of_
 button_draw = Button("draw", button_shuffle.pos_x, UI_TOP+LINE_HEIGHT.TITLE+ 1.75*UI_INTERLIGNE)
 button_cancel = Button("cancel", button_shuffle.pos_x, UI_TOP+LINE_HEIGHT.TITLE+ 1.75*UI_INTERLIGNE)
 button_end_turn = Button("end_turn", button_draw.pos_x, button_draw.pos_y + 1 + 0.2)
+button_confirm = Button("confirm", button_draw.pos_x, button_draw.pos_y + 1 + 0.2)
 
 
 layers.buttons_on_screen.add(button_end_turn)
@@ -2490,68 +2491,62 @@ while game_is_running:
 
 							need_update = False
 
+
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							if ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 								button_end_turn.release()
 
-								#layers.buttons_on_screen.clear(var.window, var.background_empty)
-								#TODO2 put clear directly in button class ?
+								#calculate score
+								var.last_words_and_scores, invalid_move_cause = calculatePoints(layers.letters_just_played)
 
+								words = []
+								for association in var.last_words_and_scores :
+									var.current_player.score += association[1]
+									words.append(association[0])
+
+
+								#------ CHECK IF VALID MOVE ------
 								valid_move = True
+								text_pop_up = []
 
-								# --- discard holder is shown ---
-								if var.discard_holder_displayed == True :
+								if ( len( layers.letters_just_played.sprites() ) > 0) :
+									if invalid_move_cause != '' : #invalid move
+										valid_move = False
+										text_pop_up = ui_pop_up_content[invalid_move_cause][language_id].split('<NEWLINE>')
+							
 
-									layers.buttons_on_screen.add(button_draw)
-									layers.buttons_on_screen.remove(button_cancel)
+								#------ INVALID MOVE -> Display Pop Up ------		
+								if valid_move == False :
 
-									button_cancel.release()
+									need_update = False
+									displayPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  
+								
 
-									need_update = True
+								#------ VALID MOVE -> Draw letters and next player ------
+								else :
 
-									# does not have discarded letters
-									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
-										var.discard_holder_displayed = False
-										#TODO4 to debug (need to click twice)
+									#letters
+									for letter in layers.letters_just_played :
+										layers.letters_on_board.add(letter)
 
-									# have discarded letters
-									else :
-										var.discard_holder_displayed = False
-										discarded_letters = []
+									layers.letters_just_played.empty()
+									layers.letters_just_played.clear(var.window, var.background_empty)
 
-										for index in var.discard_holder_state :
-											if index != 0 :
+									#redraw letters
+									index_hand = 0
+									while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
+										if var.current_player.hand_state[index_hand] == 0 :
+											random_int = randint(0,len(var.bag_of_letters)-1)
+											drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
+											del(var.bag_of_letters[random_int])	
 
-												letter = var.current_player.hand.findByIndex(index)
-												var.current_player.hand.remove(letter)
-												discarded_letters.append(letter)
+											var.current_player.hand_state[index_hand] = drawn_letter.id
+											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
+											drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
+											var.current_player.hand.add(drawn_letter)
 
-												logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
-												#var.bag_of_letters.append(letter.name)
-												
-										var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
-
-										#redraw letters
-										index_hand = 0
-										while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
-											if var.current_player.hand_state[index_hand] == 0 :
-												random_int = randint(0,len(var.bag_of_letters)-1)
-												drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
-												del(var.bag_of_letters[random_int])	
-
-												var.current_player.hand_state[index_hand] = drawn_letter.id
-												delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
-												drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
-												var.current_player.hand.add(drawn_letter)
-												logging.info("%s has discarded letter %s", var.current_player.name, drawn_letter.name)
-
-											index_hand += 1
-
-										#put discarded letters in the bag of letters
-										for letter in discarded_letters :
-											var.bag_of_letters.append(letter.name)
-										discarded_letters = []
+										index_hand += 1
 
 									var.current_player = var.current_player.next()
 									var.current_player.info()
@@ -2560,6 +2555,7 @@ while game_is_running:
 									var.window.blit(var.background_empty, (0,0))
 
 									layers.letters_on_board.draw(var.window)
+									#TODO ? draw hand_holder ?
 									var.current_player.hand.draw(var.window)
 									layers.buttons_on_screen.draw(var.window)
 
@@ -2573,78 +2569,80 @@ while game_is_running:
 									need_update = True
 
 
-								else :
 
-									#calculate score
-									var.last_words_and_scores, invalid_move_cause = calculatePoints(layers.letters_just_played)
-
-									words = []
-									for association in var.last_words_and_scores :
-										var.current_player.score += association[1]
-										words.append(association[0])
-
-
-									#------ CHECK IF VALID MOVE ------
-									valid_move = True
-									text_pop_up = []
-
-									if ( len( layers.letters_just_played.sprites() ) > 0) :
-										if invalid_move_cause != '' : #invalid move
-											valid_move = False
-											text_pop_up = ui_pop_up_content[invalid_move_cause][language_id].split('<NEWLINE>')
+							#------ RELEASE CLIC ON CONFIRM BUTTON -------
+							if ( (button_confirm.collide(cursor_pos_x, cursor_pos_y) == True) and (button_confirm.is_pushed) ):
 								
+								layers.buttons_on_screen.add(button_end_turn)
+								layers.buttons_on_screen.remove(button_confirm)
+								button_confirm.release()
 
-									#------ INVALID MOVE -> Display Pop Up ------		
-									if valid_move == False :
+								layers.buttons_on_screen.add(button_draw)
+								layers.buttons_on_screen.remove(button_cancel)
+								button_cancel.release()
 
-										need_update = False
-										displayPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  
-									
+								need_update = True
 
-									#------ VALID MOVE -> Draw letters and next player ------
-									else :
+								# does not have discarded letters
+								if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
+									var.discard_holder_displayed = False
 
-										#letters
-										for letter in layers.letters_just_played :
-											layers.letters_on_board.add(letter)
+								# have discarded letters
+								else :
+									var.discard_holder_displayed = False
+									discarded_letters = []
 
-										layers.letters_just_played.empty()
-										layers.letters_just_played.clear(var.window, var.background_empty)
+									for index in var.discard_holder_state :
+										if index != 0 :
 
-										#redraw letters
-										index_hand = 0
-										while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
-											if var.current_player.hand_state[index_hand] == 0 :
-												random_int = randint(0,len(var.bag_of_letters)-1)
-												drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
-												del(var.bag_of_letters[random_int])	
+											letter = var.current_player.hand.findByIndex(index)
+											var.current_player.hand.remove(letter)
+											discarded_letters.append(letter)
 
-												var.current_player.hand_state[index_hand] = drawn_letter.id
-												delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
-												drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
-												var.current_player.hand.add(drawn_letter)
+											logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
+											#var.bag_of_letters.append(letter.name)
+											
+									var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
 
-											index_hand += 1
+									#redraw letters
+									index_hand = 0
+									while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
+										if var.current_player.hand_state[index_hand] == 0 :
+											random_int = randint(0,len(var.bag_of_letters)-1)
+											drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
+											del(var.bag_of_letters[random_int])	
 
-										var.current_player = var.current_player.next()
-										var.current_player.info()
+											var.current_player.hand_state[index_hand] = drawn_letter.id
+											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
+											drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
+											var.current_player.hand.add(drawn_letter)
+											logging.info("%s has discarded letter %s", var.current_player.name, drawn_letter.name)
 
-										#display
-										var.window.blit(var.background_empty, (0,0))
+										index_hand += 1
 
-										layers.letters_on_board.draw(var.window)
-										#TODO ? draw hand_holder ?
-										var.current_player.hand.draw(var.window)
-										layers.buttons_on_screen.draw(var.window)
+									#put discarded letters in the bag of letters
+									for letter in discarded_letters :
+										var.bag_of_letters.append(letter.name)
+									discarded_letters = []
 
-										var.current_background_no_text = var.window.copy()
-										ui_text.drawText()
+								var.current_player = var.current_player.next()
+								var.current_player.info()
 
-										var.current_background = var.window.copy()
+								#display
+								var.window.blit(var.background_empty, (0,0))
 
-										TURN += 1
+								layers.letters_on_board.draw(var.window)
+								var.current_player.hand.draw(var.window)
+								layers.buttons_on_screen.draw(var.window)
 
-										need_update = True
+								var.current_background_no_text = var.window.copy()
+								ui_text.drawText()
+
+								var.current_background = var.window.copy()
+
+								TURN += 1
+
+								need_update = True
 
 
 
@@ -2700,7 +2698,10 @@ while game_is_running:
 
 									else:									
 										layers.buttons_on_screen.add(button_cancel)
-										layers.buttons_on_screen.remove(button_draw)
+										layers.buttons_on_screen.remove(button_draw)										
+
+										layers.buttons_on_screen.add(button_confirm)
+										layers.buttons_on_screen.remove(button_end_turn)
 
 										button_draw.release()
 										button_cancel.turnOnHighlighted()
@@ -2727,6 +2728,9 @@ while game_is_running:
 
 										layers.buttons_on_screen.remove(button_cancel)
 										layers.buttons_on_screen.add(button_draw)
+
+										layers.buttons_on_screen.remove(button_confirm)
+										layers.buttons_on_screen.add(button_end_turn)
 
 										button_cancel.release()
 										button_draw.turnOnHighlighted()

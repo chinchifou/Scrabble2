@@ -9,6 +9,8 @@ check TODO in code
 		PASS --> END_TURN ( --> VALIDATE )
 			Create snapshot to avoid bug with pop-up
 
+	TODO Disable VALIDATE
+
 	#TODO2 put clear directly in button class ?
 
 	Add UI Pop Up in different languages

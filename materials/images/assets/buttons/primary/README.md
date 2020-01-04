@@ -2,5 +2,5 @@
 
 You can use Microsoft Paint and create a text box with a text box as follow :
 	- Calibri
-	- size 18
+	- size 24
 	
