@@ -2687,7 +2687,7 @@ while game_is_running:
 
 
 							#------ RELEASE CLIC ON DRAW BUTTON -------
-							if ( ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ) or ( (button_cancel.collide(cursor_pos_x, cursor_pos_y) == True) and (button_cancel.is_pushed) ) ):
+							elif ( ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ) or ( (button_cancel.collide(cursor_pos_x, cursor_pos_y) == True) and (button_cancel.is_pushed) ) ):
 
 
 								#discard holder not displayed yet
