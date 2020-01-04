@@ -18,22 +18,15 @@ check TODO in code
 	TODO9 debug 
 		refresh not correct because background does not contain discard holder
 		display the help pop up resolve the problem
-		
+
 
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 
 
-TODO8
-cursor pointer incorrect 
-	on button
-		while clicking 
-		after releasing clic
 
 #TODO2 improve draw / draw all / use of layers ...
 #TODO2 put clear directly in button class ?
 
-TODO11
-when a click on a button > display a pop up > wait > button and mouse are incorrect
 
 
 use save game

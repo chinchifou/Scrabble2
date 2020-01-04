@@ -2494,7 +2494,6 @@ while game_is_running:
 							if ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
 
 								button_end_turn.release()
-								button_end_turn.turnOnHighlighted()
 
 								#layers.buttons_on_screen.clear(var.window, var.background_empty)
 								#TODO2 put clear directly in button class ?
@@ -2655,7 +2654,6 @@ while game_is_running:
 
 							elif ( enable_shuffle_letter and (button_shuffle.collide(cursor_pos_x, cursor_pos_y) == True) and (button_shuffle.is_pushed) ):
 									button_shuffle.release()
-									button_shuffle.turnOnHighlighted()
 
 									layers.buttons_on_screen.clear(var.window, var.background_empty)
 									layers.buttons_on_screen.draw(var.window)
