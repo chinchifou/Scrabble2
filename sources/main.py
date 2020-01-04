@@ -2069,6 +2069,7 @@ for row in range(0,TILES_PER_LINE) :
 
 button_shuffle = Button("shuffle", tiles1(var.hand_holder.rect.x)+var.number_of_letters_per_hand + 0.2 + 0.75, layers.hand_holder.sprites()[0].pos_y + 0.1 )
 button_draw = Button("draw", button_shuffle.pos_x, UI_TOP+LINE_HEIGHT.TITLE+ 1.75*UI_INTERLIGNE)
+button_cancel = Button("cancel", button_shuffle.pos_x, UI_TOP+LINE_HEIGHT.TITLE+ 1.75*UI_INTERLIGNE)
 button_end_turn = Button("end_turn", button_draw.pos_x, button_draw.pos_y + 1 + 0.2)
 
 
@@ -2678,16 +2679,21 @@ while game_is_running:
 
 
 							#------ RELEASE CLIC ON DRAW BUTTON -------
-							if ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ):
+							if ( ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ) or ( (button_cancel.collide(cursor_pos_x, cursor_pos_y) == True) and (button_cancel.is_pushed) ) ):
 
-								button_draw.release()
-								button_draw.turnOnHighlighted()
-								layers.buttons_on_screen.clear( var.window, var.background_empty)
-
-								need_update = False
+								#TODO3 change button aspect
+								#TODO4 debug
 
 								#discard holder not displayed yet
 								if var.discard_holder_displayed == False :
+
+									layers.buttons_on_screen.add(button_cancel)
+									layers.buttons_on_screen.remove(button_draw)
+
+									button_draw.release()
+									button_cancel.turnOnHighlighted()
+									layers.buttons_on_screen.clear( var.window, var.background_empty)
+									need_update = True
 
 									#not enough letters remaining
 									if len(var.bag_of_letters) < var.number_of_letters_per_hand :
@@ -2714,7 +2720,15 @@ while game_is_running:
 								#Discard holde already displayed
 								elif var.discard_holder_displayed == True :
 
-									#TODO3 change button aspect 
+									layers.buttons_on_screen.remove(button_cancel)
+									layers.buttons_on_screen.add(button_draw)
+
+									button_cancel.release()
+									button_draw.turnOnHighlighted()
+									layers.buttons_on_screen.clear( var.window, var.background_empty)
+									#need_update = True
+
+									 
 									if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
 
 										discard_holder = layers.all.findByName("discard_holder")

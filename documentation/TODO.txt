@@ -10,9 +10,11 @@ TODO9 debug
 	display the help pop up resolve the problem
 
 TODO3
+	TODO4 debug - split in two ?
 Change buttons and aspects
 	PASS --> END_TURN ( --> VALIDATE )
 	DRAW --> CANCEL
+		Create snapshot to avoid bug with pop-up
 
 
 cursor pointer incorrect TODO8
