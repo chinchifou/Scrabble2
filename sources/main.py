@@ -1064,7 +1064,7 @@ def logPlayersInfo():
 def calculatePoints(layer_letters_played) :
 
 	#format 'letters_played' {(x, y) : 'a' }
-	# 'x' and 'y' will then be swapped when accessing 'board_state' it is a matrix
+	# 'x' and 'y' will then be swapped when accessing 'board_state' as it is a matrix
 	# eg : m =[[a, b], [c, d]] -> to get 'b' you need to access : m[1][2] which for the UI would be m(2, 1)
 	letters_played = {}
 	for letter in layer_letters_played :
@@ -1079,7 +1079,7 @@ def calculatePoints(layer_letters_played) :
 		logging.info('') 
 
 
-	#store the cause of invlaidity for help pop-up
+	#store the cause of invladity for help pop-up
 	invalid_move_cause = ''
 
 	#___ First turn valid move conditions ___
@@ -1142,7 +1142,9 @@ def calculatePoints(layer_letters_played) :
 			while( ( (end_y + 1) < TILES_PER_LINE) and (var.current_board_state[end_y + 1][min_x] != '?') ) :
 				end_y = end_y + 1
 
+
 			#------ Is valid move ? ------
+
 			#supposed INVALID until the opposite is proven
 			away_vertically, away_horizontally, contains_holes = True, True, True
 
@@ -1193,6 +1195,7 @@ def calculatePoints(layer_letters_played) :
 
 
 			#----- VALID MOVE -----
+
 			if is_valid_move :
 
 				#___ SCRABBLE ___
@@ -1296,7 +1299,9 @@ def calculatePoints(layer_letters_played) :
 			while( ( (end_x + 1) < TILES_PER_LINE) and (var.current_board_state[min_y][end_x + 1] != '?') ) :
 				end_x = end_x + 1
 
+
 			#------ Is valid move ? ------
+
 			#supposed INVALID until the opposite is proven
 			away_vertically, away_horizontally, contains_holes = True, True, True
 
@@ -1347,6 +1352,7 @@ def calculatePoints(layer_letters_played) :
 
 
 			#----- VALID MOVE -----
+
 			if is_valid_move :
 				#___ SCRABBLE ___
 				if len(letters_played) == 7 : #is a SCRABBLE ?
@@ -1735,7 +1741,7 @@ hand_clic=((24,24),(6,1))+pygame.cursors.compile(hand_clic_strings,"X",".")
 
 """
 #BIG
-#TODO to debug:
+#TODO3 to debug:
 
 	arrow_strings = ( #sized 24x24
 	  "            X                                   ",
@@ -2096,7 +2102,6 @@ layers.buttons_on_screen.add(button_draw)
 #create dark_filter
 mask_surface = pygame.Surface((var.window_width, var.window_height))
 mask_surface.fill(COLOR.BLACK)
-#mask_surface.set_alpha(180)
 mask_surface.set_alpha(230)
 mask_surface = mask_surface.convert_alpha()
 dark_filter = UI_Surface('dark_filter', 0, 0, mask_surface)
@@ -2111,27 +2116,21 @@ if game_is_running :
 	layers.background.draw(var.window)
 	layers.tiles.draw(var.window)
 	layers.hand_holder.draw(var.window)
-	var.background_empty = var.window.copy()
-
+	var.background_empty = var.window.copy() #emtpy background
 
 	discard_holder = layers.all.findByName("discard_holder")
 	layers.hand_holder.add(discard_holder)
 	layers.hand_holder.draw(var.window)
-
-	var.background_empty_drawing = var.window.copy()
-
+	var.background_empty_drawing = var.window.copy() #empty background with two holders
 	layers.hand_holder.remove(discard_holder)
 	layers.hand_holder.clear(var.window, var.background_empty)
 
-
 	layers.buttons_on_screen.draw(var.window)
-
 	var.current_player.hand.draw(var.window)
-
-	var.current_background_no_text = var.window.copy()
+	var.current_background_no_text = var.window.copy() #full_background without text
 	ui_text.drawText()
 
-	var.current_background = var.window.copy()
+	var.current_background = var.window.copy() #current background
 	pygame.display.update()
 
 
@@ -2644,7 +2643,7 @@ while game_is_running:
 											discarded_letters.append(letter)
 
 											logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
-											#var.bag_of_letters.append(letter.name)
+											#TODO2 create a pop up indicating discarded letters
 											
 									var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
 

@@ -9,14 +9,13 @@ check TODO in code
 		PASS --> END_TURN ( --> VALIDATE )
 			Create snapshot to avoid bug with pop-up
 
-	#TODO2 put clear directly in button class ?
-
-	#TODO 7 Add UI Pop Up in different languages
+	#TODO7 Add UI Pop Up in different languages
 
 	Add UI text after having discard letters
 
 	TODO prevent from playing letter AND drawing
 
+	#TODO2 create a pop up indicating discarded letters
 
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 
@@ -25,7 +24,7 @@ Improve shuffle (for multiple letters before a blank spot)
 #TODO2 improve draw / draw all / use of layers ...
 #TODO2 put clear directly in button class ?
 
-
+#TODO3 debug big pointers
 
 use save game
 
