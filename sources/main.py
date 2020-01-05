@@ -2900,6 +2900,7 @@ while game_is_running:
 										if display_new_score_in_real_time :
 											incrementPredictedScore()
 											layers.mask_text.draw(var.window)
+											#TODO4 display predicted score
 
 										var.current_background = var.window.copy()
 
@@ -2977,7 +2978,8 @@ while game_is_running:
 
 											if display_new_score_in_real_time :
 												incrementPredictedScore()
-												layers.mask_text.draw(var.window)							
+												layers.mask_text.draw(var.window)	
+												#TODO4 display predicted score						
 
 											pygame.mouse.set_cursor(*open_hand)
 											CURSOR_IS_OPEN_HAND = True

@@ -17,9 +17,11 @@ check TODO in code
 
 	#TODO2 create a pop up indicating discarded letters
 
+
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 
 
+#TODO4 display predicted score
 
 #TODO2 improve draw / draw all / use of layers ...
 #TODO2 put clear directly in button class ?
