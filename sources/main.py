@@ -963,7 +963,7 @@ class Player :
 #----- Game window creation and resize -----
 def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_window_height, double_buffer, hardware_accelerated) :
 	
-	logging.info("WINDOW Creation")
+	logging.debug("WINDOW Creation")
 	updateTileSize(width,height)
 
 	for ui_text in UIText.all :
@@ -977,8 +977,8 @@ def resizeWindow(width, height, fullscreen, resizable, resolution_auto, custom_w
 	var.window_width = width
 	var.window_height = height
 
-	logging.info("Size of game window is : %s * %s", width, height)
-	logging.info("")
+	logging.debug("Size of game window is : %s * %s", width, height)
+	logging.debug("")
 
 
 	if fullscreen :
@@ -1046,7 +1046,8 @@ def loadTransparentImage(complete_path):
 #Update Tile Size to match new window size
 def updateTileSize(width, height):
 	zoom_factor = min( float(width / 1920), float(height/1080) )
-	var.tile_size = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )	
+	var.tile_size = int (floor ( REFERENCE_TILE_SIZE*zoom_factor ) )
+	var.tile_size = max (var.tile_size, 20) #prevent the game window of becoming to small
 	logging.info("New Tile Size is : %s", var.tile_size)
 	if var.current_action == "PLAY_A_LETTER" :
 		var.delta_pos_on_tile
