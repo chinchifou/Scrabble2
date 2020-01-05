@@ -9,20 +9,14 @@ check TODO in code
 		PASS --> END_TURN ( --> VALIDATE )
 			Create snapshot to avoid bug with pop-up
 
-	TODO Disable VALIDATE
-
 	#TODO2 put clear directly in button class ?
 
 	#TODO 7 Add UI Pop Up in different languages
 
 	Add UI text after having discard letters
 
-	TODO9 debug 
-		refresh not correct because background does not contain discard holder
-		display the help pop up resolve the problem
+	TODO prevent from playing letter AND drawing
 
-#TODO8 possible display problem to solve (flickering around other letters when moving a letter)
-#TODO8 debug display
 
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 
@@ -143,3 +137,5 @@ __________  TO KEEP IN MIND  __________
 /!\ warning for "PLAY_LETTER", when clicking on a button and releasing the clic above a letter
 
 The event queue offers some simple filtering. This can help performance slightly by blocking certain event types from the queue, use the pygame.event.set_allowed() and pygame.event.set_blocked() to work with this filtering
+
+When processsing a MOUSEUP on a button just call .release() the piece of code close to the end of main.py will update the UI

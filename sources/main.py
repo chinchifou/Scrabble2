@@ -413,10 +413,10 @@ class UITextPrinter():
 				else :
 					text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score) + " (+" +str(var.predicted_score)) + ")" , 1, COLOR.BLUE_SUPER_LIGHT )
 				self.player_score.font.set_bold(0)
-				var.window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+(pos_y_delta*var.tile_size) ) )
+				var.window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+int(pos_y_delta*var.tile_size) ) )
 			else :
 				text = self.player_score.font.render( self.player_score.text.replace('_',' ').replace('<PLAYER>', player.name).replace('<SCORE>', str(player.score)), 1, COLOR.GREY_LIGHT )
-				var.window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+(pos_y_delta*var.tile_size) ) )
+				var.window.blit(text, (self.player_score.pos_x_pix, self.player_score.pos_y_pix+int(pos_y_delta*var.tile_size) ) )
 			pos_y_delta += 0.8
 
 		#previous turn summary
@@ -429,10 +429,10 @@ class UITextPrinter():
 			for association in var.last_words_and_scores :
 				if association[0] == "!! SCRABBLE !!" :
 					text = self.scrabble_obtained.font.render( self.scrabble_obtained.text.replace('<PREVIOUS_PLAYER>',var.current_player.previous().name).replace('<SCRABBLE_POINTS>', str(var.points_for_scrabble)), 1, COLOR.RED_DEEP )
-					var.window.blit(text, (self.scrabble_obtained.pos_x_pix, self.scrabble_obtained.pos_y_pix+(pos_y_delta*var.tile_size)))
+					var.window.blit(text, (self.scrabble_obtained.pos_x_pix, self.scrabble_obtained.pos_y_pix+int(pos_y_delta*var.tile_size)))
 				else :		
 					text = self.word_and_points.font.render( self.word_and_points.text.replace('<WORD>',association[0]).replace('<POINTS>', str(association[1])), 1, COLOR.GREY_LIGHT )
-					var.window.blit(text, (self.word_and_points.pos_x_pix, self.word_and_points.pos_y_pix+(pos_y_delta*var.tile_size)))
+					var.window.blit(text, (self.word_and_points.pos_x_pix, self.word_and_points.pos_y_pix+int(pos_y_delta*var.tile_size)))
 				pos_y_delta += 0.8
 
 		else : #nothing played
@@ -448,9 +448,9 @@ class UITextPrinter():
 			text = self.remaining_letters.font.render( self.remaining_letters.text.replace( '<LETTERS_REMAINING>', str(len(var.bag_of_letters)) ), 1, COLOR.GREY_LIGHT )
 
 		if len(var.last_words_and_scores) > 0 : #something played
-			var.window.blit(text, (self.remaining_letter.pos_x_pix, self.word_and_points.pos_y_pix+ (pos_y_delta+UI_INTERLIGNE)*var.tile_size ) )
+			var.window.blit(text, (self.remaining_letter.pos_x_pix, self.word_and_points.pos_y_pix+ int((pos_y_delta+UI_INTERLIGNE)*var.tile_size) ) )
 		else : #nothing played
-			var.window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ (0.8+UI_INTERLIGNE)*var.tile_size ) )
+			var.window.blit(text, (self.remaining_letter.pos_x_pix, self.nothing_played.pos_y_pix+ int((0.8+UI_INTERLIGNE)*var.tile_size) ) )
 
 
 	def drawHelpPopPup(self, tile, pixel_pos_x, pixel_pos_y):
@@ -610,7 +610,7 @@ def pixels(value1_in_tiles, value2_in_tiles, to_round=False) :
 		return ( int(value1_in_tiles*var.tile_size), int(value2_in_tiles*var.tile_size) )
 
 def solo_pixels(value_in_tiles) :
-	return ( (value_in_tiles*var.tile_size) )
+	return ( int(value_in_tiles*var.tile_size) )
 
 
 
@@ -2659,7 +2659,7 @@ while game_is_running:
 											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
 											drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
 											var.current_player.hand.add(drawn_letter)
-											logging.info("%s has discarded letter %s", var.current_player.name, drawn_letter.name)
+											logging.info("%s has drawn letter %s", var.current_player.name, drawn_letter.name)
 
 										index_hand += 1
 
@@ -3075,7 +3075,7 @@ while game_is_running:
 									var.current_background_no_text = var.window.copy()
 									ui_text.drawText()
 
-									ui_text.drawHelpPopPup(tile, tile.rect.x+((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-(2/60.0)*(var.tile_size))
+									ui_text.drawHelpPopPup(tile, tile.rect.x+int((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-int((2/60.0)*(var.tile_size)))
 
 									var.current_background = var.window.copy()
 									layers.selected_letter.draw(var.window)
