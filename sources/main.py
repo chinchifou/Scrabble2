@@ -2646,7 +2646,6 @@ while game_is_running:
 									need_update = True
 
 
-
 							#------ RELEASE CLIC ON CONFIRM BUTTON -------
 							if ( (button_confirm.collide(cursor_pos_x, cursor_pos_y) == True) and (button_confirm.is_pushed) and (button_confirm.is_enabled)):
 								
@@ -2658,11 +2657,13 @@ while game_is_running:
 								layers.buttons_on_screen.remove(button_cancel)
 								button_cancel.release()
 
+								layers.hand_holder.remove(discard_holder)
+								layers.hand_holder.clear(var.window, var.background_empty)
+								var.discard_holder_displayed = False
+
 								need_update = True
 
-
-
-								var.discard_holder_displayed = False
+								
 								discarded_letters = []
 
 								for index in var.discard_holder_state :
@@ -2771,7 +2772,10 @@ while game_is_running:
 										pos_x = pos_x + 1
 
 									# ___ UPDATE DISPLAY ___
-									var.current_player.hand.clear(var.window, var.background_empty)
+									if var.discard_holder_displayed :
+										var.current_player.hand.clear(var.window, var.background_empty_drawing)
+									else :
+										var.current_player.hand.clear(var.window, var.background_empty)
 									var.current_player.hand.draw(var.window)	
 
 									need_update = True

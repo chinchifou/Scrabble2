@@ -11,14 +11,6 @@ check TODO in code
 
 	#TODO7 Add UI Pop Up in different languages
 
-	#TODO2 create a pop up indicating discarded letters
-
-	graphical artifact
-		when displaying "help pop up" -> discard holder reappear
-		when shuffling
-
-#TODO what happen when displaying an empty pop up ?
-
 
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 
