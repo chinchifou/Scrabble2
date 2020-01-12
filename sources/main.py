@@ -471,6 +471,7 @@ class UITextPrinter():
 def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4):
 
 	# ___ Init ___
+	# transform string to list of strings
 	if isinstance(ar_texts, str) :
 		ar_texts = ar_texts.split('\n')
 
@@ -566,7 +567,7 @@ def displayPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), 
 	pygame.mouse.set_cursor(*arrow) 
 
 	#Create pop up
-	layers.pop_up.add( createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4)  )
+	layers.pop_up.add( createPopUp(ar_texts, text_centered, LINE_HEIGHT, position, bounds, margin_ratio, interligne_ratio, time)  )
 	
 	# snapshot of before pop_up
 	layers.buttons_on_screen.draw(var.window)
@@ -576,7 +577,6 @@ def displayPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), 
 	layers.dark_filter.draw(var.window)
 	layers.pop_up.draw(var.window)
 	pygame.display.update()
-	need_update = False
 
 	global MUST_DISPLAY_POP_UP
 	MUST_DISPLAY_POP_UP = True
@@ -2648,48 +2648,64 @@ while game_is_running:
 
 								need_update = True
 
-								# does not have discarded letters
-								if var.discard_holder_state == [0 for i in range (0, var.number_of_letters_per_hand)] :
-									var.discard_holder_displayed = False
 
-								# have discarded letters
+
+								var.discard_holder_displayed = False
+								discarded_letters = []
+
+								for index in var.discard_holder_state :
+									if index != 0 :
+
+										letter = var.current_player.hand.findByIndex(index)
+										var.current_player.hand.remove(letter)
+										discarded_letters.append(letter)
+
+										logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
+										
+								var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
+
+								#redraw letters
+								index_hand = 0
+								while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
+									if var.current_player.hand_state[index_hand] == 0 :
+										random_int = randint(0,len(var.bag_of_letters)-1)
+										drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
+										del(var.bag_of_letters[random_int])	
+
+										var.current_player.hand_state[index_hand] = drawn_letter.id
+										delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
+										drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
+										var.current_player.hand.add(drawn_letter)
+										logging.info("%s has drawn letter %s", var.current_player.name, drawn_letter.name)
+
+									index_hand += 1
+
+								#put discarded letters in the bag of letters
+								for letter in discarded_letters :
+									var.bag_of_letters.append(letter.name)
+
+
+								#create UI info pop up
+								#TODO 7
+								pop_up_text = ""
+								if len(discarded_letters) == 1 :
+									pop_up_text = var.current_player.name + " has discarded letter "
 								else :
-									var.discard_holder_displayed = False
-									discarded_letters = []
+									pop_up_text = var.current_player.name + " has discarded letters "
 
-									for index in var.discard_holder_state :
-										if index != 0 :
+								for letter in discarded_letters :
+									if len(discarded_letters) > 1 : #more than one element
+										if letter != discarded_letters[0] : #not first
+											if letter != discarded_letters[-1] : #not last
+												pop_up_text = pop_up_text+" , "
+											else :
+												pop_up_text = pop_up_text+" and "
+												#TODO 7
+									pop_up_text = pop_up_text+letter.name
+								pop_up_text = pop_up_text+"."
 
-											letter = var.current_player.hand.findByIndex(index)
-											var.current_player.hand.remove(letter)
-											discarded_letters.append(letter)
-
-											logging.info("%s has discarded letter %s", var.current_player.name, letter.name)
-											#TODO2 create a pop up indicating discarded letters
-											
-									var.discard_holder_state = [0 for i in range (0, var.number_of_letters_per_hand)]
-
-									#redraw letters
-									index_hand = 0
-									while len(var.bag_of_letters) > 0 and index_hand < var.number_of_letters_per_hand :
-										if var.current_player.hand_state[index_hand] == 0 :
-											random_int = randint(0,len(var.bag_of_letters)-1)
-											drawn_letter = Letter(var.bag_of_letters[random_int], 0, 0)
-											del(var.bag_of_letters[random_int])	
-
-											var.current_player.hand_state[index_hand] = drawn_letter.id
-											delta_x, delta_y = UI_LEFT_LIMIT, ui_text.current_player_turn.bottom_tiles+0.5*UI_INTERLIGNE
-											drawn_letter.moveAtTile( delta_x + index_hand, delta_y )
-											var.current_player.hand.add(drawn_letter)
-											logging.info("%s has drawn letter %s", var.current_player.name, drawn_letter.name)
-
-										index_hand += 1
-
-									#put discarded letters in the bag of letters
-									for letter in discarded_letters :
-										var.bag_of_letters.append(letter.name)
-									discarded_letters = []
-
+								discarded_letters = []
+								
 								var.current_player = var.current_player.next()
 								var.current_player.info()
 
@@ -2707,7 +2723,9 @@ while game_is_running:
 
 								TURN += 1
 
-								need_update = True
+								displayPopUp(pop_up_text)
+
+								need_update = False
 
 
 

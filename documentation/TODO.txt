@@ -20,6 +20,8 @@ check TODO in code
 		when displayin "help pop up" -> discard holder reappear
 		when shuffling
 
+#TODO what happen when displayinh an empty pop up ?
+
 
 #TODO1
 Improve shuffle (for multiple letters before a blank spot) 
