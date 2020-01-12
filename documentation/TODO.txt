@@ -11,11 +11,14 @@ check TODO in code
 
 	#TODO7 Add UI Pop Up in different languages
 
-	Add UI text after having discard letters
-
 	TODO prevent from playing letter AND drawing
+		disable "draw button" when lettter played
 
 	#TODO2 create a pop up indicating discarded letters
+
+	graphical artifact
+		when displayin "help pop up" -> discard holder reappear
+		when shuffling
 
 
 #TODO1
@@ -139,4 +142,4 @@ __________  TO KEEP IN MIND  __________
 
 The event queue offers some simple filtering. This can help performance slightly by blocking certain event types from the queue, use the pygame.event.set_allowed() and pygame.event.set_blocked() to work with this filtering
 
-When processsing a MOUSEUP on a button just call .release() the piece of code close to the end of main.py will update the UI
+When processsing a MOUSEUP on a button just call .release() the piece of code close to the end of main.py will update the UI (if you do not display a POP UP ...)

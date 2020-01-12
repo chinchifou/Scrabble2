@@ -14,9 +14,12 @@ from os import makedirs
 from math import floor
 from random import randint, shuffle, choice
 
+import logging
+
+
 #Modules imports
 import pygame
-import logging
+
 
 #Other python files imports
 import config_reader
@@ -83,13 +86,13 @@ global CURSOR_IS_OPEN_HAND
 CURSOR_IS_OPEN_HAND = False
 
 
-global MUST_DIPSLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR
+global MUST_DISPLAY_POP_UP, FRAMES_BEFORE_POP_UP_DISAPPEAR, MOUSEBUTTONDOWN_DURING_POP_UP
 # boolean to indicate wether to display pop_up or not
-MUST_DIPSLAY_POP_UP = False
+MUST_DISPLAY_POP_UP = False
 # number of frames before the pop_up disappear
 FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
-
-
+# remember that the mouse button has been press and wait for release
+MOUSEBUTTONDOWN_DURING_POP_UP = False
 
 #----- Changing a runtime -----
 #class to store game variable
@@ -102,7 +105,7 @@ class GameVariable():
 		self.window = 0.0
 
 		self.tile_size = 0.0
-		self.delta_pos_on_tile = 0.0
+		self.delta_pos_on_tile = [0.0, 0.0]
 
 		self.hand_holder = []
 		self.discard_holder = []
@@ -575,8 +578,8 @@ def displayPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), 
 	pygame.display.update()
 	need_update = False
 
-	global MUST_DIPSLAY_POP_UP
-	MUST_DIPSLAY_POP_UP = True
+	global MUST_DISPLAY_POP_UP
+	MUST_DISPLAY_POP_UP = True
 	#prepare exit image (displayed when removing pop up)
 	var.window.blit(snapshot, (0,0))
 
@@ -815,6 +818,13 @@ class Button(ResizableSprite):
 		self.is_an_emoticom = is_an_emoticom
 
 		ResizableSprite.__init__(self, name, pos_x, pos_y, PATHS.path_buttons, transparent=True)
+
+	def resize(self):
+		ResizableSprite.resize(self)
+		if self.is_enabled :
+			self.enable()
+		else :
+			self.disable()
 
 	def turnOnHighlighted(self):
 		self.image = loadTransparentImage(path.join(self.path, self.name+'_highlighted.png'))
@@ -2207,7 +2217,7 @@ while game_is_running:
 			var.current_background = var.window.copy()
 			layers.selected_letter.draw(var.window)
 
-			if MUST_DIPSLAY_POP_UP :
+			if MUST_DISPLAY_POP_UP :
 				# snapshot of before pop_up
 				snapshot = var.window.copy()
 
@@ -2226,9 +2236,12 @@ while game_is_running:
 		# NORMAL EVENTS
 		else :
 			# //////// POP UP DISPLAYED ////////
-			if MUST_DIPSLAY_POP_UP :
-				if ( event_type == pygame.MOUSEBUTTONUP  and event.button == 1 ) :
+			if MUST_DISPLAY_POP_UP :
+				if (event_type == pygame.MOUSEBUTTONDOWN and event.button == 1 ):
+					MOUSEBUTTONDOWN_DURING_POP_UP = True
+				if ( event_type == pygame.MOUSEBUTTONUP and event.button == 1 and MOUSEBUTTONDOWN_DURING_POP_UP ) :
 					FRAMES_BEFORE_POP_UP_DISAPPEAR = 0
+					MOUSEBUTTONDOWN_DURING_POP_UP = False
 
 			# //////// WINDOW DISPLAYED ////////
 			elif (var.current_action == "WINDOW_DISPLAYED") :
@@ -2460,6 +2473,7 @@ while game_is_running:
 										pass
 
 									if move_my_letter == True :
+										button_confirm.enable()	
 									
 										selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 										var.discard_holder_state[index_in_hand] = selected_letter.id
@@ -2471,6 +2485,8 @@ while game_is_running:
 										#refresh screen
 										layers.selected_letter.clear(var.window, var.current_background)
 										var.current_player.hand.draw(var.window)
+
+										layers.buttons_on_screen.draw(var.window)
 
 										var.current_background = var.window.copy()
 
@@ -2495,32 +2511,38 @@ while game_is_running:
 										#------ EMPTY TILE ? -------
 										if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
-											selected_letter = layers.selected_letter.sprites()[0]
+											if var.discard_holder_displayed == False :
 
-											selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
-											var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+												selected_letter = layers.selected_letter.sprites()[0]
 
-											layers.letters_just_played.add(selected_letter)								
-											layers.selected_letter.remove(selected_letter)
+												selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
+												var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
 
-											layers.selected_letter.clear(var.window, var.current_background)	
-											layers.letters_just_played.draw(var.window)
+												layers.letters_just_played.add(selected_letter)								
+												layers.selected_letter.remove(selected_letter)
+
+												layers.selected_letter.clear(var.window, var.current_background)	
+												layers.letters_just_played.draw(var.window)
 
 
-											if display_new_score_in_real_time :
-												incrementPredictedScore()
-												layers.mask_text.draw(var.window)
+												if display_new_score_in_real_time :
+													incrementPredictedScore()
+													layers.mask_text.draw(var.window)
 
-											#TODO REFRESH TEXT
-											var.current_background = var.window.copy()
+												#TODO REFRESH TEXT
+												var.current_background = var.window.copy()
 
-											pygame.mouse.set_cursor(*open_hand)
-											CURSOR_IS_OPEN_HAND = True
+												pygame.mouse.set_cursor(*open_hand)
+												CURSOR_IS_OPEN_HAND = True
 
-											pygame.display.update()
+												pygame.display.update()
 
-											var.current_action = "SELECT_A_LETTER"
+												var.current_action = "SELECT_A_LETTER"
 
+											elif var.discard_holder_displayed :
+
+												#TODO 7 in other languages
+												displayPopUp("You cannot play here") 
 
 
 
@@ -2728,7 +2750,6 @@ while game_is_running:
 							#------ RELEASE CLIC ON DRAW BUTTON -------
 							elif ( ( (button_draw.collide(cursor_pos_x, cursor_pos_y) == True) and (button_draw.is_pushed) ) or ( (button_cancel.collide(cursor_pos_x, cursor_pos_y) == True) and (button_cancel.is_pushed) ) ):
 
-
 								#discard holder not displayed yet
 								if var.discard_holder_displayed == False :
 
@@ -2738,8 +2759,7 @@ while game_is_running:
 										button_draw.release()
 										displayPopUp("Not enough remaining letters")
 
-									else:
-																			
+									else:										
 										button_draw.release()
 										layers.buttons_on_screen.remove(button_draw)	
 
@@ -2765,7 +2785,6 @@ while game_is_running:
 										var.discard_holder_displayed = True
 
 										need_update = True
-
 
 								#Discard holde already displayed
 								elif var.discard_holder_displayed == True :
@@ -2921,13 +2940,13 @@ while game_is_running:
 									#------ EMPTY SPOT ? -------
 									if var.discard_holder_state[index_in_hand] == 0 :
 										move_my_letter = True
-										button_confirm.enable()
-
+										
 									else :
 										#TODO1 push letters
 										pass
 
 									if move_my_letter == True :
+										button_confirm.enable()
 									
 										selected_letter.moveAtTile( delta_x + index_in_hand, delta_y )
 										var.discard_holder_state[index_in_hand] = selected_letter.id
@@ -2959,169 +2978,178 @@ while game_is_running:
 
 									if tile.collide(letter_center_x, letter_center_y) == True :
 
-										tile_x_on_board = int( tile.pos_x - DELTA )
-										tile_y_on_board = int( tile.pos_y - DELTA )
+										if not var.discard_holder_displayed :
+											tile_x_on_board = int( tile.pos_x - DELTA )
+											tile_y_on_board = int( tile.pos_y - DELTA )
 
-										#------ EMPTY TILE ? -------
-										if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
+											#------ EMPTY TILE ? -------
+											if var.current_board_state[tile_y_on_board][tile_x_on_board] == '?':
 
-											selected_letter = layers.selected_letter.sprites()[0]
+												selected_letter = layers.selected_letter.sprites()[0]
 
-											selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
-											var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
+												selected_letter.moveAtTile( (tile_x_on_board + DELTA), (tile_y_on_board + DELTA) )
+												var.current_board_state[tile_y_on_board][tile_x_on_board] = selected_letter.name
 
-											layers.letters_just_played.add(selected_letter)								
-											layers.selected_letter.remove(selected_letter)
+												layers.letters_just_played.add(selected_letter)								
+												layers.selected_letter.remove(selected_letter)
 
-											layers.selected_letter.clear(var.window, var.current_background)	
-											layers.letters_just_played.draw(var.window)
+												layers.selected_letter.clear(var.window, var.current_background)	
+												layers.letters_just_played.draw(var.window)
 
-											if display_new_score_in_real_time :
-												incrementPredictedScore()
-												layers.mask_text.draw(var.window)	
-												#TODO4 display predicted score						
+												if display_new_score_in_real_time :
+													incrementPredictedScore()
+													layers.mask_text.draw(var.window)	
+													#TODO4 display predicted score						
 
-											pygame.mouse.set_cursor(*open_hand)
-											CURSOR_IS_OPEN_HAND = True
+												pygame.mouse.set_cursor(*open_hand)
+												CURSOR_IS_OPEN_HAND = True
 
-											pygame.display.update()
+												pygame.display.update()
 
-											var.current_action = "SELECT_A_LETTER"
+												var.current_action = "SELECT_A_LETTER"
+
+										elif var.discard_holder_displayed :
+											#TODO 7 in other languages
+											displayPopUp("You cannot play here")
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	
 		if(event_type == pygame.MOUSEMOTION ):
 
-			mouse_pos = pygame.mouse.get_pos()
-			cursor_pos_x = mouse_pos[0]
-			cursor_pos_y = mouse_pos[1]
+			if not MUST_DISPLAY_POP_UP :
 
-			#------ SELECT A LETTER ------ 
-			if ( not var.a_button_is_pushed ) and ( not MUST_DIPSLAY_POP_UP ) and var.current_action == 'SELECT_A_LETTER' :
+				mouse_pos = pygame.mouse.get_pos()
+				cursor_pos_x = mouse_pos[0]
+				cursor_pos_y = mouse_pos[1]
 
-				#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
-				buttons_changed = False
-				#TODO restrict area to boost performance
-				for button in layers.buttons_on_screen :
-					if button.is_enabled :
-						if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
-							button.turnOnHighlighted()
-							pygame.mouse.set_cursor(*hand)
-							buttons_changed = True
-						elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
-							button.turnOffHighlighted()
-							pygame.mouse.set_cursor(*arrow)
-							buttons_changed = True
+				#------ SELECT A LETTER ------ 
+				if ( not var.a_button_is_pushed ) and var.current_action == 'SELECT_A_LETTER' :
 
-				if buttons_changed :
-					layers.buttons_on_screen.clear(var.window, var.background_empty)
-					layers.buttons_on_screen.draw(var.window)
-					pygame.display.update()
+					#------ CHANGE APPEARANCE OF BUTTONS (VISUAL) ------
+					buttons_changed = False
+					#TODO restrict area to boost performance
+					for button in layers.buttons_on_screen :
+						if button.is_enabled :
+							if ( button.collide(cursor_pos_x, cursor_pos_y) == True ) and ( not button.is_highlighted ) and (not button.is_pushed ) :
+								button.turnOnHighlighted()
+								pygame.mouse.set_cursor(*hand)
+								buttons_changed = True
+							elif ( button.collide(cursor_pos_x, cursor_pos_y) == False ) and ( button.is_highlighted ) and (not button.is_pushed ):
+								button.turnOffHighlighted()
+								pygame.mouse.set_cursor(*arrow)
+								buttons_changed = True
 
-				collide = False
-				for letter in layers.letters_just_played.sprites() :
-					if letter.collide(cursor_pos_x, cursor_pos_y) :
-						collide = True
-						pygame.mouse.set_cursor(*open_hand)
-						CURSOR_IS_OPEN_HAND = True		
-				for letter in var.current_player.hand :
-					if letter.collide(cursor_pos_x, cursor_pos_y) :
-						collide = True
-						pygame.mouse.set_cursor(*open_hand)
-						CURSOR_IS_OPEN_HAND = True
-
-				#TODO
-				if CURSOR_IS_OPEN_HAND == True and collide == False:
-					pygame.mouse.set_cursor(*arrow)
-					CURSOR_IS_OPEN_HAND = False
-
-
-			#------ MOVE SELECTED LETTER ------ 
-			if len(layers.selected_letter) == 1 :
-
-				layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
-
-				#TODO8 possible display problem to solve (flickering around other letters when moving a letter)
-				layers.selected_letter.clear(var.window, var.current_background)
-				layers.selected_letter.draw(var.window)
-
-				pygame.display.update()
-
-
-			#------ INFO ABOUT HOVERED TILE ------
-			#TODO improve logic for better performance
-			if display_type_of_tile_on_hoovering and not MUST_DIPSLAY_POP_UP :
-				if var.current_action == 'SELECT_A_LETTER' or var.current_action == 'PLAY_A_LETTER':
-					cursor_on_a_special_tile = False
-
-					#Is cursor on a special tile ?
-					for tile in layers.tiles :
-						if tile.collide(cursor_pos_x, cursor_pos_y) :
-							if  ( tile.name != 'normal' ) :
-								cursor_on_a_special_tile = True
-
-								#TODO using layers
-								#pop up not already displayed for this tile
-								if tile.id != ui_text.id_tile_pop_up :
-
-									#remove previously displayed text
-									layers.background.draw(var.window)
-									layers.tiles.draw(var.window)
-									layers.hand_holder.draw(var.window)
-
-									layers.buttons_on_screen.draw(var.window)
-									layers.letters_on_board.draw(var.window)
-									layers.letters_just_played.draw(var.window)
-									var.current_player.hand.draw(var.window)
-
-									var.current_background_no_text = var.window.copy()
-									ui_text.drawText()
-
-									ui_text.drawHelpPopPup(tile, tile.rect.x+int((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-int((2/60.0)*(var.tile_size)))
-
-									var.current_background = var.window.copy()
-									layers.selected_letter.draw(var.window)
-									pygame.display.update()
-
-									ui_text.id_tile_pop_up = tile.id
-									ui_text.pop_up_displayed = True
-									break
-
-					#If cursor on a normal tile
-					if ( not cursor_on_a_special_tile and ui_text.pop_up_displayed ):
-						#remove previously displayed text
-						layers.background.draw(var.window)
-						layers.tiles.draw(var.window)
-						layers.hand_holder.draw(var.window)
-
+					if buttons_changed :
+						layers.buttons_on_screen.clear(var.window, var.background_empty)
 						layers.buttons_on_screen.draw(var.window)
-						layers.letters_on_board.draw(var.window)
-						layers.letters_just_played.draw(var.window)
-						var.current_player.hand.draw(var.window)
-
-						var.current_background_no_text = var.window.copy()
-						ui_text.drawText()
-						
-						var.current_background = var.window.copy()
-						layers.selected_letter.draw(var.window)
 						pygame.display.update()
 
-						ui_text.id_tile_pop_up = 0
-						ui_text.pop_up_displayed = False
+					collide = False
+					for letter in layers.letters_just_played.sprites() :
+						if letter.collide(cursor_pos_x, cursor_pos_y) :
+							collide = True
+							pygame.mouse.set_cursor(*open_hand)
+							CURSOR_IS_OPEN_HAND = True		
+					for letter in var.current_player.hand :
+						if letter.collide(cursor_pos_x, cursor_pos_y) :
+							collide = True
+							pygame.mouse.set_cursor(*open_hand)
+							CURSOR_IS_OPEN_HAND = True
+
+					#TODO
+					if CURSOR_IS_OPEN_HAND == True and collide == False:
+						pygame.mouse.set_cursor(*arrow)
+						CURSOR_IS_OPEN_HAND = False
+
+
+				#------ MOVE SELECTED LETTER ------ 
+				if len(layers.selected_letter) == 1 :
+
+					layers.selected_letter.sprites()[0].moveAtPixels(cursor_pos_x - var.delta_pos_on_tile[0], cursor_pos_y - var.delta_pos_on_tile[1])
+
+					#TODO8 possible display problem to solve (flickering around other letters when moving a letter)
+					layers.selected_letter.clear(var.window, var.current_background)
+					layers.selected_letter.draw(var.window)
+
+					pygame.display.update()
+
+
+				#------ INFO ABOUT HOVERED TILE ------
+				#TODO improve logic for better performance
+				if display_type_of_tile_on_hoovering :
+					if var.current_action == 'SELECT_A_LETTER' or var.current_action == 'PLAY_A_LETTER':
+						cursor_on_a_special_tile = False
+
+						#Is cursor on a special tile ?
+						for tile in layers.tiles :
+							if tile.collide(cursor_pos_x, cursor_pos_y) :
+								if  ( tile.name != 'normal' ) :
+									cursor_on_a_special_tile = True
+
+									#TODO using layers
+									#pop up not already displayed for this tile
+									if tile.id != ui_text.id_tile_pop_up :
+
+										#remove previously displayed text
+										layers.background.draw(var.window)
+										layers.tiles.draw(var.window)
+										layers.hand_holder.draw(var.window)
+
+										layers.buttons_on_screen.draw(var.window)
+										layers.letters_on_board.draw(var.window)
+										layers.letters_just_played.draw(var.window)
+										var.current_player.hand.draw(var.window)
+
+										var.current_background_no_text = var.window.copy()
+										ui_text.drawText()
+
+										ui_text.drawHelpPopPup(tile, tile.rect.x+int((2/60.0)*var.tile_size), tile.rect.y+var.tile_size-int((2/60.0)*(var.tile_size)))
+
+										var.current_background = var.window.copy()
+										layers.selected_letter.draw(var.window)
+										pygame.display.update()
+
+										ui_text.id_tile_pop_up = tile.id
+										ui_text.pop_up_displayed = True
+										break
+
+						#If cursor on a normal tile
+						if ( not cursor_on_a_special_tile and ui_text.pop_up_displayed ):
+							#remove previously displayed text
+							layers.background.draw(var.window)
+							layers.tiles.draw(var.window)
+							layers.hand_holder.draw(var.window)
+
+							layers.buttons_on_screen.draw(var.window)
+							layers.letters_on_board.draw(var.window)
+							layers.letters_just_played.draw(var.window)
+							var.current_player.hand.draw(var.window)
+
+							var.current_background_no_text = var.window.copy()
+							ui_text.drawText()
+							
+							var.current_background = var.window.copy()
+							layers.selected_letter.draw(var.window)
+							pygame.display.update()
+
+							ui_text.id_tile_pop_up = 0
+							ui_text.pop_up_displayed = False
 
 
 
 	#display fps
 	#logging.debug('fps : %s', str(fps_clock.get_fps() ) )
 
-	if MUST_DIPSLAY_POP_UP :
+	if MUST_DISPLAY_POP_UP :
 		if FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
 			FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
 		else :
-			MUST_DIPSLAY_POP_UP = False
+			MUST_DISPLAY_POP_UP = False
 			FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 			layers.pop_up.empty()
 			#force update of  mouse pointer
+			if len(layers.selected_letter) == 1 :
+				pygame.mouse.set_cursor(*open_hand)
 			pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
 			pygame.display.update()
 
