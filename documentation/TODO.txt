@@ -11,16 +11,13 @@ check TODO in code
 
 	#TODO7 Add UI Pop Up in different languages
 
-	TODO prevent from playing letter AND drawing
-		disable "draw button" when lettter played
-
 	#TODO2 create a pop up indicating discarded letters
 
 	graphical artifact
-		when displayin "help pop up" -> discard holder reappear
+		when displaying "help pop up" -> discard holder reappear
 		when shuffling
 
-#TODO what happen when displayinh an empty pop up ?
+#TODO what happen when displaying an empty pop up ?
 
 
 #TODO1

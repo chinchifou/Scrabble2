@@ -2356,6 +2356,11 @@ while game_is_running:
 
 										var.current_background = var.window.copy()									
 										layers.selected_letter.draw(var.window)
+
+										if len(layers.letters_just_played) == 0 :
+											button_draw.enable()
+										layers.buttons_on_screen.draw(var.window)
+
 										pygame.display.update()
 
 										pygame.mouse.set_cursor(*close_hand)
@@ -2527,7 +2532,7 @@ while game_is_running:
 												layers.letters_just_played.draw(var.window)
 
 
-												if display_new_score_in_real_time :
+												if display_new_score_in_real_time : #TODO4
 													incrementPredictedScore()
 													layers.mask_text.draw(var.window)
 
@@ -2536,6 +2541,10 @@ while game_is_running:
 
 												pygame.mouse.set_cursor(*open_hand)
 												CURSOR_IS_OPEN_HAND = True
+
+												if len(layers.letters_just_played) == 1 :
+													button_draw.disable()
+												layers.buttons_on_screen.draw(var.window)
 
 												pygame.display.update()
 
@@ -2557,7 +2566,6 @@ while game_is_running:
 						if ( var.current_action == 'SELECT_A_LETTER' ) :
 
 							need_update = False
-
 
 							#------ RELEASE CLIC ON END TURN BUTTON -------
 							if ( (button_end_turn.collide(cursor_pos_x, cursor_pos_y) == True) and (button_end_turn.is_pushed) ):
@@ -2624,6 +2632,8 @@ while game_is_running:
 									layers.letters_on_board.draw(var.window)
 									#TODO ? draw hand_holder ?
 									var.current_player.hand.draw(var.window)
+
+									button_draw.enable()
 									layers.buttons_on_screen.draw(var.window)
 
 									var.current_background_no_text = var.window.copy()
@@ -3023,6 +3033,10 @@ while game_is_running:
 
 												pygame.mouse.set_cursor(*open_hand)
 												CURSOR_IS_OPEN_HAND = True
+
+												if len(layers.letters_just_played) == 1 :
+													button_draw.disable()
+												layers.buttons_on_screen.draw(var.window)
 
 												pygame.display.update()
 
