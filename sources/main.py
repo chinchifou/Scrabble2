@@ -2587,7 +2587,7 @@ while game_is_running:
 								if valid_move == False :
 
 									need_update = False
-									displayPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 8)  
+									displayPopUp(text_pop_up, interligne_ratio=1.6, margin_ratio=(2.0,1.5), time = 20)  
 								
 
 								#------ VALID MOVE -> Draw letters and next player ------
