@@ -168,7 +168,8 @@ pop_up_possible_values = (
 'not_on_start_tile',
 'play_in_diagonal',
 'not_reusing_letters',
-'hole_in_word'
+'hole_in_word',
+'draw_and_play'
 )
 
 

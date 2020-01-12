@@ -2551,9 +2551,8 @@ while game_is_running:
 												var.current_action = "SELECT_A_LETTER"
 
 											elif var.discard_holder_displayed :
-
-												#TODO 7 in other languages
-												displayPopUp("You cannot play here") 
+												text_pop_up = ui_pop_up_content["draw_and_play"][language_id].split('<NEWLINE>')
+												displayPopUp(text_pop_up, infinite=True) 
 
 
 
@@ -2699,7 +2698,7 @@ while game_is_running:
 
 
 								#create UI info pop up
-								#TODO 7
+								#TODO7
 								pop_up_text = ""
 								if len(discarded_letters) == 1 :
 									pop_up_text = var.current_player.name + " has discarded letter "
@@ -2713,7 +2712,7 @@ while game_is_running:
 												pop_up_text = pop_up_text+" , "
 											else :
 												pop_up_text = pop_up_text+" and "
-												#TODO 7
+												#TODO7
 									pop_up_text = pop_up_text+letter.name
 								pop_up_text = pop_up_text+"."
 
@@ -3047,8 +3046,8 @@ while game_is_running:
 												var.current_action = "SELECT_A_LETTER"
 
 										elif var.discard_holder_displayed :
-											#TODO 7 in other languages
-											displayPopUp("You cannot play here")
+											text_pop_up = ui_pop_up_content["draw_and_play"][language_id].split('<NEWLINE>')
+											displayPopUp(text_pop_up, infinite=True)
 
 
 		#~~~~~~ MOUSE MOTION ~~~~~~	

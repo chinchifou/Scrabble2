@@ -7,9 +7,13 @@ check TODO in code
 
 	Change buttons and aspects
 		PASS --> END_TURN ( --> VALIDATE )
-			Create snapshot to avoid bug with pop-up
 
 	#TODO7 Add UI Pop Up in different languages
+
+	prevent drawing if not enought letters
+
+	button to reinitilaze hand
+		call reinitiliaze when pressing "cancel"
 
 
 #TODO1
