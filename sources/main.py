@@ -468,7 +468,7 @@ class UITextPrinter():
 
 
 
-def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4):
+def createPopUp(ar_texts, text_centered, LINE_HEIGHT, position, bounds, margin_ratio, interligne_ratio, infinite, time):
 
 	# ___ Init ___
 	# transform string to list of strings
@@ -485,8 +485,10 @@ def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), b
 	interligne = interligne_ratio * my_line_height - my_line_height
 
 	global FRAMES_BEFORE_POP_UP_DISAPPEAR
-	FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time * 60)
-
+	if not infinite :
+		FRAMES_BEFORE_POP_UP_DISAPPEAR = int(time * 60)
+	else :
+		FRAMES_BEFORE_POP_UP_DISAPPEAR = -1
 
 	# ___ Prevent to go out of the boundaries ___
 	max_nb_letters = 0
@@ -562,12 +564,12 @@ def createPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), b
 	return UI_Surface('pop_up', window_pos_x, window_pos_y, pop_up_surface)
 
 
-def displayPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, time=4) :
+def displayPopUp(ar_texts, text_centered=True, LINE_HEIGHT=0.7, position=(0,0), bounds=(32, 18), margin_ratio=(1.0,1.0), interligne_ratio=1.5, infinite=False, time=4 ) :
 
 	pygame.mouse.set_cursor(*arrow) 
 
 	#Create pop up
-	layers.pop_up.add( createPopUp(ar_texts, text_centered, LINE_HEIGHT, position, bounds, margin_ratio, interligne_ratio, time)  )
+	layers.pop_up.add( createPopUp(ar_texts, text_centered, LINE_HEIGHT, position, bounds, margin_ratio, interligne_ratio, infinite, time)  )
 	
 	# snapshot of before pop_up
 	layers.buttons_on_screen.draw(var.window)
@@ -2723,7 +2725,7 @@ while game_is_running:
 
 								TURN += 1
 
-								displayPopUp(pop_up_text)
+								displayPopUp(pop_up_text, infinite = True)
 
 								need_update = False
 
@@ -3161,7 +3163,8 @@ while game_is_running:
 	if MUST_DISPLAY_POP_UP :
 		if FRAMES_BEFORE_POP_UP_DISAPPEAR > 0 :
 			FRAMES_BEFORE_POP_UP_DISAPPEAR -= 1
-		else :
+
+		elif FRAMES_BEFORE_POP_UP_DISAPPEAR == 0 :
 			MUST_DISPLAY_POP_UP = False
 			FRAMES_BEFORE_POP_UP_DISAPPEAR = 200
 			layers.pop_up.empty()
@@ -3170,6 +3173,8 @@ while game_is_running:
 				pygame.mouse.set_cursor(*open_hand)
 			pygame.event.post(pygame.event.Event(pygame.MOUSEMOTION))
 			pygame.display.update()
+		else : # FRAMES_BEFORE_POP_UP_DISAPPEAR == -1
+			pass
 
 logging.info("")
 logging.info("Game has ended")
